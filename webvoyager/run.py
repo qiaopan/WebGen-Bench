@@ -7,6 +7,7 @@ import os
 import shutil
 import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
 from typing import Dict, Any, List
 
 from selenium import webdriver
@@ -16,6 +17,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from prompts import SYSTEM_PROMPT, SYSTEM_PROMPT_TEXT_ONLY
 from openai import OpenAI
+from dotenv import load_dotenv
 from utils import (
     get_web_element_rect,
     encode_image,
@@ -27,6 +29,8 @@ from utils import (
     clip_message_and_obs_text_only,
 )
 from datetime import datetime
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 # ────────────────────────────────────────────────────────────────────────────────
 # Logging helpers
@@ -176,18 +180,32 @@ def call_gpt4v_api(args, openai_client, messages):
     while True:
         try:
             logging.info("Calling %s API…", args.api_model)
-            openai_response = openai_client.chat.completions.create(
+            response_stream = openai_client.chat.completions.create(
                 model=args.api_model,
                 messages=messages,
                 max_tokens=1000,
                 seed=args.seed,
+                stream=True,
+                stream_options={"include_usage": True},
                 timeout=60,
             )
 
-            prompt_tokens = openai_response.usage.prompt_tokens
-            completion_tokens = openai_response.usage.completion_tokens
+            response_parts = []
+            prompt_tokens = 0
+            completion_tokens = 0
+            for chunk in response_stream:
+                if chunk.choices:
+                    content = chunk.choices[0].delta.content
+                    if content:
+                        response_parts.append(content)
+                usage = getattr(chunk, "usage", None)
+                if usage:
+                    prompt_tokens = getattr(usage, "prompt_tokens", 0) or 0
+                    completion_tokens = getattr(usage, "completion_tokens", 0) or 0
+
+            response_text = "".join(response_parts)
             logging.info("Prompt Tokens: %s; Completion Tokens: %s", prompt_tokens, completion_tokens)
-            return prompt_tokens, completion_tokens, False, openai_response
+            return prompt_tokens, completion_tokens, False, response_text
 
         except Exception as e:  # pylint: disable=broad-except
             logging.warning("Error %s, retrying…", type(e).__name__)
@@ -317,7 +335,7 @@ def run_single_task(task: Dict[str, Any], args_dict: Dict[str, Any]):
     logging.info("########## TASK%s ##########", task["id"])
 
     # Per‑process OpenAI client
-    client = OpenAI(api_key=args.api_key, base_url="http://PI_ADDRESS:PORT/v1")
+    client = OpenAI(api_key=args.api_key, base_url=args.base_url)
 
     options = driver_config(args)
     driver_task = webdriver.Chrome(options=options)
@@ -426,14 +444,13 @@ def run_single_task(task: Dict[str, Any], args_dict: Dict[str, Any]):
             messages = clip_message_and_obs_text_only(messages, args.max_attached_imgs)
 
         # Call OpenAI
-        prompt_tokens, completion_tokens, gpt_call_error, openai_response = call_gpt4v_api(
+        prompt_tokens, completion_tokens, gpt_call_error, gpt_4v_res = call_gpt4v_api(
             args, client, messages
         )
         if gpt_call_error:
             break
         accumulate_prompt_token += prompt_tokens
         accumulate_completion_token += completion_tokens
-        gpt_4v_res = openai_response.choices[0].message.content
         messages.append({"role": "assistant", "content": gpt_4v_res})
 
         # Remove overlay rectangles
@@ -565,8 +582,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_file", type=str, default="data/test.json")
     parser.add_argument("--max_iter", type=int, default=5)
-    parser.add_argument("--api_key", default="key", type=str, help="YOUR_OPENAI_API_KEY")
-    parser.add_argument("--api_model", default="gpt-4-vision-preview", type=str)
+    parser.add_argument(
+        "--api_key",
+        default=os.environ.get("DASHSCOPE_API_KEY", ""),
+        type=str,
+        help="API key; defaults to DASHSCOPE_API_KEY",
+    )
+    parser.add_argument(
+        "--base_url",
+        default=os.environ.get(
+            "WEBVOYAGER_BASE_URL",
+            "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        ),
+        type=str,
+        help="OpenAI-compatible API base URL",
+    )
+    parser.add_argument(
+        "--api_model",
+        default=os.environ.get("WEBVOYAGER_API_MODEL", "qwen3-vl-32b-instruct"),
+        type=str,
+    )
     parser.add_argument("--output_dir", type=str, default="results")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--max_attached_imgs", type=int, default=1)

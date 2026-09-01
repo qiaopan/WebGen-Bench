@@ -127,16 +127,19 @@ def main():
         categories[cat]["accuracy"] = categories[cat]["score"] / categories[cat]["total"] * 100 if categories[cat]["total"] > 0 else 0
 
     start_failed_num = total - yes_num - partial_num - no_num
+    evaluated_total = yes_num + partial_num + no_num
+    evaluated_accuracy = score / evaluated_total * 100 if evaluated_total else 0
     print(f"start_failed: {start_failed_num}")
+    print(f"evaluated: {evaluated_total}, evaluated_accuracy: {evaluated_accuracy:.1f}")
     test_name = os.path.basename(args.in_dir)
     yes_rate = yes_num / total * 100
     partial_rate = partial_num / total * 100
     no_rate = no_num / total * 100
     start_failed_rate = start_failed_num / total * 100
     accuracy = score / total * 100
-    table = f"| test_name | yes_num | partial_num | no_num | start_failed_num | total | yes_rate | partial_rate | no_rate | start_failed_rate | accuracy |" + " | ".join(PRIMARY_CATEGORIES + INST_PRIMARY_CATEGORIES) + " |\n"
-    table += "|------|------|------|------|------|------|------|------|------|------|------|" + "------|" * len(PRIMARY_CATEGORIES + INST_PRIMARY_CATEGORIES) + "\n"
-    table += f"| {test_name} | {yes_num} | {partial_num} | {no_num}  | {start_failed_num} | {total} | {yes_rate:.1f} | {partial_rate:.1f} | {no_rate:.1f} | {start_failed_rate:.1f} | {accuracy:.1f} |" + " | ".join([f"{categories[cat]['accuracy']:.1f}" for cat in (PRIMARY_CATEGORIES + INST_PRIMARY_CATEGORIES)]) + " |\n"
+    table = f"| test_name | yes_num | partial_num | no_num | evaluated_total | evaluated_accuracy | start_failed_num | total | yes_rate | partial_rate | no_rate | start_failed_rate | accuracy |" + " | ".join(PRIMARY_CATEGORIES + INST_PRIMARY_CATEGORIES) + " |\n"
+    table += "|------|------|------|------|------|------|------|------|------|------|------|------|------|" + "------|" * len(PRIMARY_CATEGORIES + INST_PRIMARY_CATEGORIES) + "\n"
+    table += f"| {test_name} | {yes_num} | {partial_num} | {no_num} | {evaluated_total} | {evaluated_accuracy:.1f} | {start_failed_num} | {total} | {yes_rate:.1f} | {partial_rate:.1f} | {no_rate:.1f} | {start_failed_rate:.1f} | {accuracy:.1f} |" + " | ".join([f"{categories[cat]['accuracy']:.1f}" for cat in (PRIMARY_CATEGORIES + INST_PRIMARY_CATEGORIES)]) + " |\n"
     
     with open(os.path.join(args.in_dir, "table.md"), "w", encoding="utf-8") as f:
         f.write(table)

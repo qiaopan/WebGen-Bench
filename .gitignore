@@ -1,11 +1,40 @@
+# Secrets
 .env
-extracted
-env
-node_modules
+.env.*
+!.env.example
 
-__pycache__
-downloads
-wandb
+# External repositories
+bolt.diy-Fork/
 
-outputs
-gather_statistics
+# Experimental data
+data/
+
+# Generated files
+outputs/
+downloads/
+extracted/
+gather_statistics/
+
+*.log
+*.zip
+
+# Python environments
+env/
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Node.js
+node_modules/
+
+# Experiment tracking
+wandb/
+
+# macOS
+.DS_Store

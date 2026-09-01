@@ -10,8 +10,11 @@ import json
 import subprocess
 from pathlib import Path
 import sys
+from dotenv import load_dotenv
 
 from start_service import start_services
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 
 def load_json(in_file):
@@ -89,7 +92,13 @@ def get_shell_start(zip_file_paths, output_root):
     for zip_file in tqdm(zip_file_paths):
         json_file = zip_file.replace(".zip", ".json")
         data = load_json(json_file)
-        shell_actions, last_start_action = extract_bolt_actions(data["messages"][-1]["content"])
+        assistant_content = "\n".join(
+            message.get("content", "")
+            for message in data.get("messages", [])
+            if message.get("role") == "assistant"
+            and isinstance(message.get("content"), str)
+        )
+        shell_actions, last_start_action = extract_bolt_actions(assistant_content)
         commands[os.path.basename(zip_file).replace(".zip", "")] = {"shell_actions": shell_actions, "last_start_action": last_start_action}
 
     save_json(commands, os.path.join(output_root, "commands.json"))
@@ -134,18 +143,38 @@ def create_tasks_test(test_file, ports, tasks_file):
                 "expected_result": ui_instruct["expected_result"],
                 "task": ui_instruct["task"]
             })
+    task_limit = int(os.environ.get("WEBVOYAGER_TASK_LIMIT", "0"))
+    if task_limit > 0:
+        tasks = tasks[:task_limit]
     save_jsonl(tasks, tasks_file)
 
 
 def run_webvoyager(input_dir):
     input_dir = Path(input_dir)                  # Path object for convenience
 
+    api_key = os.environ.get("DASHSCOPE_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "DASHSCOPE_API_KEY is not set. Export the rotated Bailian API key "
+            "in the current terminal before starting the evaluation."
+        )
+
+    base_url = os.environ.get(
+        "WEBVOYAGER_BASE_URL",
+        "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    )
+    api_model = os.environ.get(
+        "WEBVOYAGER_API_MODEL",
+        "qwen3-vl-32b-instruct",
+    )
+    num_workers = os.environ.get("WEBVOYAGER_NUM_WORKERS", "1")
+
     cmd = [
         sys.executable,              # equivalent to "python"
-        "-u", "webvoyager\\run.py",   # keep Windows backslash
+        "-u", str(Path("webvoyager") / "run.py"),
         "--test_file", str(input_dir / "tasks_test_with_answer.jsonl"),
-        "--api_key", "sk-mah6FUel7jrB3lNj8c3cnqUGeKy1ovL5DAD1GFge92C7Fe864c8646B1B9DaB6C20a10A896",
-        "--api_model", "/mnt/cache/sharemath/models/Qwen/Qwen2.5-VL-32B-Instruct",
+        "--base_url", base_url,
+        "--api_model", api_model,
         "--headless",
         "--max_iter", "15",
         "--max_attached_imgs", "3",
@@ -154,7 +183,7 @@ def run_webvoyager(input_dir):
         "--seed", "42",
         "--output_dir", str(input_dir / "results"),
         "--download_dir", str(input_dir / "downloads"),
-        # "--num_workers", "8"
+        "--num_workers", num_workers,
     ]
 
     # run the command, raise if it fails
@@ -179,8 +208,10 @@ def main():
     log_datas = []
     if os.path.isfile(log_file):
         log_datas = load_jsonl(log_file)
-        
-    zip_files = zip_files[len(log_datas):]
+
+    force_rerun = os.environ.get("WEBVOYAGER_FORCE_RERUN", "0") == "1"
+    if not force_rerun:
+        zip_files = zip_files[len(log_datas):]
 
     unzip_files(zip_files, output_root)
 
@@ -198,8 +229,9 @@ def main():
         
         subprocess.run("pm2 delete all", shell=True)
         
-        curr_log_datas = [{"app_path": app_path} for app_path in batch_zip_files]
-        save_jsonl(curr_log_datas, log_file, mode="a")
+        if not force_rerun:
+            curr_log_datas = [{"app_path": app_path} for app_path in batch_zip_files]
+            save_jsonl(curr_log_datas, log_file, mode="a")
 
 
 if __name__ == "__main__":
