@@ -7,7 +7,11 @@
 bolt.diy-Fork/
 
 # Experimental data
-data/
+data/*
+!data/train.jsonl
+!data/test.jsonl
+!data/experiment_splits/
+!data/experiment_splits/**
 
 # Generated files
 outputs/
