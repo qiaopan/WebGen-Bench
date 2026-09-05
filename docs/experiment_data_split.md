@@ -91,11 +91,18 @@ mathematically impossible for all five groups to contain every type because
 Email Clients, Personal Blog Sites, and Streaming and Interactive Platforms have
 only two websites each.
 
-Fair comparison between conditions is paired: the no-memory and long-memory
-branches receive the same website prompt, the same frozen UI tasks and expected
+Fair comparison between conditions is paired: the `disabled` and `read_only`
+modes of the same Git commit receive the same website prompt, the same frozen UI tasks and expected
 results, the same generation limits, the same evaluator, and the same evaluation
 order. Group 02 and Groups 04/05—including their prompts, task trajectories,
 screenshots, scores, and feedback—must never update memory.
+
+The single codebase exposes three memory modes: `disabled` cannot read or write
+memory, `learn` can read and write memory, and `read_only` can retrieve from the
+frozen database but cannot update it. The machine-readable protocol is
+`config/experiment_protocol.json`. Run `python scripts/build_experiment_plan.py`
+to validate all group permissions and preview the pre-registered interleaved
+condition order without invoking any model.
 
 ## Reproduction
 

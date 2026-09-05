@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "protocol_name": "single-codebase-three-mode-staged-experiment",
+  "dataset_manifest": "data/experiment_splits/manifest.json",
+  "codebase": {
+    "strategy": "single_branch",
+    "branch": "experiment",
+    "rule": "All conditions must use the same Git commit; only memory_mode may differ."
+  },
+  "memory_modes": {
+    "disabled": {
+      "read": false,
+      "write": false,
+      "purpose": "No-memory baseline"
+    },
+    "learn": {
+      "read": true,
+      "write": true,
+      "purpose": "Build or append long memory from designated memory groups"
+    },
+    "read_only": {
+      "read": true,
+      "write": false,
+      "purpose": "Evaluate with frozen long memory"
+    }
+  },
+  "groups": {
+    "g1": {
+      "file": "data/experiment_splits/groups/group_01_memory_seed.jsonl",
+      "role": "memory_seed",
+      "allowed_modes": ["learn"]
+    },
+    "g2": {
+      "file": "data/experiment_splits/groups/group_02_dev_evaluate.jsonl",
+      "role": "development_evaluation",
+      "allowed_modes": ["disabled", "read_only"]
+    },
+    "g3": {
+      "file": "data/experiment_splits/groups/group_03_memory_append.jsonl",
+      "role": "memory_append",
+      "allowed_modes": ["learn"]
+    },
+    "g4": {
+      "file": "data/experiment_splits/groups/group_04_final_test_a.jsonl",
+      "role": "final_test_a",
+      "allowed_modes": ["disabled", "read_only"]
+    },
+    "g5": {
+      "file": "data/experiment_splits/groups/group_05_final_test_b.jsonl",
+      "role": "final_test_b",
+      "allowed_modes": ["disabled", "read_only"]
+    }
+  },
+  "paired_order": {
+    "odd_record_position": ["disabled", "read_only"],
+    "even_record_position": ["read_only", "disabled"]
+  },
+  "stages": {
+    "stage1": [
+      {
+        "phase": "memory_seed",
+        "group": "g1",
+        "modes": ["learn"]
+      },
+      {
+        "phase": "development_evaluation",
+        "group": "g2",
+        "modes": ["disabled", "read_only"],
+        "paired": true
+      }
+    ],
+    "stage2": [
+      {
+        "phase": "memory_append",
+        "group": "g3",
+        "modes": ["learn"]
+      },
+      {
+        "phase": "confirmation_evaluation",
+        "group": "g2",
+        "modes": ["disabled", "read_only"],
+        "paired": true
+      }
+    ],
+    "stage3": [
+      {
+        "phase": "final_evaluation_a",
+        "group": "g4",
+        "modes": ["disabled", "read_only"],
+        "paired": true
+      },
+      {
+        "phase": "final_evaluation_b",
+        "group": "g5",
+        "modes": ["disabled", "read_only"],
+        "paired": true
+      }
+    ]
+  }
+}

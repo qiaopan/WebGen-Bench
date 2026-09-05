@@ -196,9 +196,14 @@ def main():
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument("--in_dir", type=str)
+    parser.add_argument(
+        "--test_file",
+        default="data/test.jsonl",
+        help="JSONL group file matching the generated website order",
+    )
     args = parser.parse_args()
     in_dir = args.in_dir
-    test_file = "data/test.jsonl"
+    test_file = args.test_file
     zip_files = [os.path.join(in_dir, file) for file in os.listdir(in_dir) if file.endswith(".zip") and not file.startswith("error")]
     
     output_root = os.path.join(in_dir, "extracted")
