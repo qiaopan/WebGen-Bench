@@ -152,11 +152,13 @@ def create_tasks_test(test_file, ports, tasks_file):
 def run_webvoyager(input_dir):
     input_dir = Path(input_dir)                  # Path object for convenience
 
-    api_key = os.environ.get("DASHSCOPE_API_KEY")
+    api_key = os.environ.get("AZURE_OPENAI_API_KEY") or os.environ.get(
+        "DASHSCOPE_API_KEY"
+    )
     if not api_key:
         raise RuntimeError(
-            "DASHSCOPE_API_KEY is not set. Export the rotated Bailian API key "
-            "in the current terminal before starting the evaluation."
+            "AZURE_OPENAI_API_KEY or DASHSCOPE_API_KEY is not set. "
+            "Configure an API key before starting the evaluation."
         )
 
     base_url = os.environ.get(

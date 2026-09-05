@@ -66,12 +66,16 @@ def main():
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument("in_dir", type=str)
+    parser.add_argument(
+        "--test_file",
+        default="data/test.jsonl",
+        help="JSONL benchmark file used to generate the evaluated websites",
+    )
     args = parser.parse_args()
     args.in_dir = os.path.join(args.in_dir, "extracted")
     result_dir = os.path.join(args.in_dir, "results")
     
-    test_file = "data/test.jsonl"
-    test_datas = load_jsonl(test_file)
+    test_datas = load_jsonl(args.test_file)
     total = 0
     for data in test_datas:
         total += len(data["ui_instruct"])

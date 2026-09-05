@@ -15,8 +15,19 @@ def require_env(name: str) -> str:
     return value
 
 
+def require_api_key() -> str:
+    value = os.environ.get("AZURE_OPENAI_API_KEY", "").strip()
+    if not value:
+        value = os.environ.get("DASHSCOPE_API_KEY", "").strip()
+    if not value:
+        raise RuntimeError(
+            "缺少环境变量：AZURE_OPENAI_API_KEY 或 DASHSCOPE_API_KEY"
+        )
+    return value
+
+
 def main() -> None:
-    api_key = require_env("DASHSCOPE_API_KEY")
+    api_key = require_api_key()
     base_url = require_env("WEBVOYAGER_BASE_URL")
     model = require_env("WEBVOYAGER_API_MODEL")
 
@@ -29,12 +40,17 @@ def main() -> None:
     print(f"正在测试模型：{model}")
 
     client = OpenAI(api_key=api_key, base_url=base_url)
+    token_limit = (
+        {"max_completion_tokens": 30}
+        if "azure.com/openai/v1" in base_url
+        else {"max_tokens": 30}
+    )
     stream = client.chat.completions.create(
         model=model,
-        messages=[{"role": "user", "content": "只回答：百炼 API 连接成功"}],
-        max_tokens=30,
+        messages=[{"role": "user", "content": "只回答：模型 API 连接成功"}],
         stream=True,
         stream_options={"include_usage": True},
+        **token_limit,
     )
 
     print("模型回复：", end="", flush=True)

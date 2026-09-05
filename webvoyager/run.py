@@ -180,14 +180,19 @@ def call_gpt4v_api(args, openai_client, messages):
     while True:
         try:
             logging.info("Calling %s API…", args.api_model)
+            token_limit = (
+                {"max_completion_tokens": 1000}
+                if "azure.com/openai/v1" in args.base_url
+                else {"max_tokens": 1000}
+            )
             response_stream = openai_client.chat.completions.create(
                 model=args.api_model,
                 messages=messages,
-                max_tokens=1000,
                 seed=args.seed,
                 stream=True,
                 stream_options={"include_usage": True},
                 timeout=60,
+                **token_limit,
             )
 
             response_parts = []
@@ -584,9 +589,15 @@ def main():
     parser.add_argument("--max_iter", type=int, default=5)
     parser.add_argument(
         "--api_key",
-        default=os.environ.get("DASHSCOPE_API_KEY", ""),
+        default=(
+            os.environ.get("AZURE_OPENAI_API_KEY", "")
+            or os.environ.get("DASHSCOPE_API_KEY", "")
+        ),
         type=str,
-        help="API key; defaults to DASHSCOPE_API_KEY",
+        help=(
+            "API key; defaults to AZURE_OPENAI_API_KEY, then "
+            "DASHSCOPE_API_KEY"
+        ),
     )
     parser.add_argument(
         "--base_url",

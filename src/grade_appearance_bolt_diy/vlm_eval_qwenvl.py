@@ -12,13 +12,19 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 
 def _get_client():
-    api_key = os.getenv("DASHSCOPE_API_KEY", "").strip()
+    api_key = (
+        os.getenv("AZURE_OPENAI_API_KEY", "").strip()
+        or os.getenv("DASHSCOPE_API_KEY", "").strip()
+    )
     base_url = os.getenv(
         "APPEARANCE_BASE_URL",
         os.getenv("WEBVOYAGER_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
     ).strip()
     if not api_key:
-        raise RuntimeError("未找到 DASHSCOPE_API_KEY，请先在项目根目录的 .env 中配置。")
+        raise RuntimeError(
+            "未找到 AZURE_OPENAI_API_KEY 或 DASHSCOPE_API_KEY，"
+            "请先在项目根目录的 .env 中配置。"
+        )
     return OpenAI(api_key=api_key, base_url=base_url, timeout=120.0, max_retries=2)
 
 def encode_image(image_path):
