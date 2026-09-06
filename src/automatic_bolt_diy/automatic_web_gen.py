@@ -2,15 +2,61 @@ import os
 import time
 import hashlib
 import json
+from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from generation_validator import repair_prompt, validate_generated_zip
+
+
+def _download_new_file(driver, button, download_dir, wait_seconds=5):
+    files_before = set(os.listdir(download_dir))
+    driver.execute_script("arguments[0].click()", button)
+    deadline = time.time() + wait_seconds
+    while time.time() < deadline:
+        new_files = {name for name in os.listdir(download_dir)
+                     if name not in files_before and not name.endswith(".crdownload")}
+        if len(new_files) == 1:
+            return os.path.join(download_dir, new_files.pop())
+        time.sleep(0.25)
+    raise RuntimeError("Could not uniquely identify downloaded file")
+
+
+def _visible_element(driver, by, selector, timeout=30):
+    def locate(current):
+        return next((element for element in current.find_elements(by, selector)
+                     if element.is_displayed() and element.is_enabled()), False)
+    return WebDriverWait(driver, timeout).until(locate)
+
+
+def _open_code_view(driver):
+    downloads = [element for element in driver.find_elements(
+        By.XPATH, "//button[contains(., 'Download Code')]"
+    ) if element.is_displayed()]
+    if downloads:
+        return
+    _visible_element(
+        driver, By.XPATH, "//button[.//div[contains(@class, 'i-ph:code-bold')]]"
+    ).click()
+    _visible_element(driver, By.XPATH, "//button[./span[normalize-space()='Code']]").click()
+
+
+def _wait_generation_complete(driver, timeout=1200, require_artifact=False):
+    stop_icon = (By.CSS_SELECTOR, "div.i-ph\\:stop-circle-bold")
+    if require_artifact:
+        WebDriverWait(driver, timeout).until(EC.presence_of_element_located(
+            (By.XPATH, "//button[contains(., 'Download Code')]")
+        ))
+    else:
+        WebDriverWait(driver, 120).until(EC.presence_of_element_located(stop_icon))
+    WebDriverWait(driver, timeout).until(EC.invisibility_of_element_located(stop_icon))
+
 def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://localhost:5173/",
     desired_model="/mnt/cache/sharemath/models/qwen/Qwen2.5-Coder-32B-Instruct", provider="OpenAILike",
-    headless=False):
+    headless=False, max_repair_attempts=1):
     instruction_hash = hashlib.sha256(instruction.encode("utf-8")).hexdigest()
     print(f"Running automatic_web_gen with idx={idx}, instruction_sha256={instruction_hash}, download_dir='{download_dir}', url='{url}', desired_model='{desired_model}', provider='{provider}'")
     # ---------------------------------------
@@ -27,6 +73,7 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     request = {
         "instruction_sha256": instruction_hash,
         "model": desired_model, "provider": provider, "url": url,
+        "max_repair_attempts": max_repair_attempts,
     }
     existing = [os.path.exists(path) for path in (chat_path, zip_path)]
     if all(existing):
@@ -81,7 +128,7 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         )
         combobox.click()
 
-        wait = WebDriverWait(driver, 30)
+        wait = WebDriverWait(driver, 120)
 
         # wait until the listbox itself is visible
         wait.until(EC.visibility_of_element_located((By.ID, "model-listbox")))
@@ -104,92 +151,73 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         text_box.send_keys(instruction)
         text_box.send_keys(Keys.ENTER)
 
-        #
-        # --- STEP D: Wait for both conditions:
-        #    1) "Response Generated" to appear
-        #    2) "Download Code" button to disappear
-        #
         try:
-            wait = WebDriverWait(driver, 1200)
-
-            # Condition 1: "Response Generated" appears
-            wait.until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//div[@class='flex text-sm gap-3' and contains(., 'Response Generated')]")
-                )
-            )
-
-            # Condition 2: "Download Code" button disappears
-            # (e.g. if it was visible earlier and is removed or hidden once the code is fully processed)
-            # wait.until(
-            #     EC.invisibility_of_element_located(
-            #         (By.XPATH, "//button[contains(text(), 'Download Code')]")
-            #     )
-            # )
+            _wait_generation_complete(driver, require_artifact=True)
         except Exception as error:
             raise TimeoutError("Timed out waiting for Bolt response") from error
 
-        time.sleep(10)
+        validation_attempts = []
+        validation_path = os.path.join(download_dir, f"{idx:06d}.generation.json")
+        for attempt in range(max_repair_attempts + 1):
+            time.sleep(10)
+            _open_code_view(driver)
+            time.sleep(1)
+            settle_checks = []
+            for settle_check in range(3):
+                downloaded = _download_new_file(
+                    driver,
+                    WebDriverWait(driver, 30).until(EC.presence_of_element_located(
+                        (By.XPATH, "//button[contains(., 'Download Code')]")
+                    )),
+                    download_dir,
+                )
+                report = validate_generated_zip(downloaded)
+                settle_checks.append(report)
+                incomplete = (report.get("phase") == "archive" and
+                              "neither package.json nor index.html" in report.get("error", ""))
+                if not incomplete or settle_check == 2:
+                    break
+                Path(downloaded).rename(
+                    os.path.join(download_dir,
+                                 f"{idx:06d}.attempt-{attempt + 1}.settling-{settle_check + 1}.zip")
+                )
+                time.sleep(15)
+            report["settle_checks"] = len(settle_checks)
+            report["attempt"] = attempt + 1
+            validation_attempts.append(report)
+            with open(validation_path, "w", encoding="utf-8") as stream:
+                json.dump({"max_repair_attempts": max_repair_attempts,
+                           "attempts": validation_attempts}, stream, indent=2)
+            if report["ok"]:
+                os.rename(downloaded, zip_path)
+                print(f"Validated and renamed code file to: {zip_path}")
+                break
+            Path(downloaded).rename(
+                os.path.join(download_dir, f"{idx:06d}.attempt-{attempt + 1}.failed.zip")
+            )
+            if attempt == max_repair_attempts:
+                raise RuntimeError(f"Generated website failed validation after repair: {report}")
 
-        #
-        # --- STEP E: Click the "Code" button
-        #
-        code_button = driver.find_element(
-            By.XPATH, 
-            "//button[.//span[text()='Code']]"
-        )
-        code_button.click()
-        time.sleep(1)
-
-        #
-        # --- STEP F: Download Code, rename to {idx:06d}.zip
-        #
-        files_before = set(os.listdir(download_dir))
-        download_code_button = driver.find_element(
-            By.XPATH, 
-            "//button[contains(text(), 'Download Code')]"
-        )
-        download_code_button.click()
-        time.sleep(5)  # Wait for the code download
-
-        files_after = set(os.listdir(download_dir))
-        new_files = files_after - files_before
-        if len(new_files) == 1:
-            downloaded_file = new_files.pop()
-            old_path = os.path.join(download_dir, downloaded_file)
-            zip_name = f"{idx:06d}.zip"
-            new_path = os.path.join(download_dir, zip_name)
-            if os.path.exists(new_path):
-                raise FileExistsError(new_path)
-            os.rename(old_path, new_path)
-            print(f"Renamed code file to: {new_path}")
-        else:
-            raise RuntimeError(f"Could not uniquely identify downloaded code file: {sorted(new_files)}")
+            text_box = _visible_element(driver, By.CSS_SELECTOR, "textarea")
+            text_box.send_keys(repair_prompt(report))
+            text_box.send_keys(Keys.ENTER)
+            _wait_generation_complete(driver)
 
         #
         # --- STEP G: Export Chat -> rename to {idx:06d}.json
         #
-        files_before = set(os.listdir(download_dir))
-        export_chat_button = driver.find_element(
+        export_chat_button = _visible_element(driver,
             By.XPATH,
             "//button[@title='Export Chat']"
         )
-        export_chat_button.click()
-        time.sleep(5)  # Wait for the chat download
-
-        files_after = set(os.listdir(download_dir))
-        new_files = files_after - files_before
-        if len(new_files) == 1:
-            downloaded_file = new_files.pop()
-            old_path = os.path.join(download_dir, downloaded_file)
+        old_path = _download_new_file(driver, export_chat_button, download_dir)
+        if old_path:
             json_name = f"{idx:06d}.json"
             new_path = os.path.join(download_dir, json_name)
             if os.path.exists(new_path):
                 raise FileExistsError(new_path)
             os.rename(old_path, new_path)
             print(f"Renamed chat file to: {new_path}")
-        else:
-            raise RuntimeError(f"Could not uniquely identify downloaded chat file: {sorted(new_files)}")
 
         time.sleep(1)
         with open(request_path, "w", encoding="utf-8") as stream:

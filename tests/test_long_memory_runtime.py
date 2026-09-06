@@ -12,9 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from long_memory import connect_database, initialize_database
-from long_memory_runtime import (JsonlRunLog, LongMemory, MemoryConfig, MemoryPacket,
-                                 MemoryRef)
-from long_memory_integrations import bolt_memory_prompt
+from long_memory_runtime import (ExtractionOutputError, JsonlRunLog, LongMemory,
+                                 MemoryConfig, MemoryPacket, MemoryRef)
+from long_memory_integrations import AzureMemoryLLM, bolt_memory_prompt
 
 
 def proposal(title="Filter insight", kind="experience", relation="supports"):
@@ -173,6 +173,17 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(len(packet.experiences), 1)
         self.assertEqual(packet.experiences[0].supporting_trajectories, 2)
         self.assertEqual(self.memory._row(first)["version_no"], 1)
+
+    def test_invalid_support_target_is_retried_then_rejected(self):
+        self.trajectory()
+        candidate = self.make(active=False)
+        self.llm.responses["judge"] = {
+            "action": "SUPPORT", "target": vars(candidate), "reason": "Invalid self target"
+        }
+        self.assertEqual(self.memory.validate(candidate), "rejected")
+        self.assertEqual(self.memory._row(candidate)["status"], "rejected")
+        judge_calls = [call for call in self.llm.calls if call[0] == "judge"]
+        self.assertEqual(len(judge_calls), 3)
 
     def test_similarity_does_not_merge_and_consolidate_action_is_deferred(self):
         self.trajectory()
@@ -392,6 +403,17 @@ class RuntimeTests(unittest.TestCase):
             self.memory.validate(ref)
         self.assertEqual(self.memory._row(ref)["status"], "candidate")
 
+    def test_malformed_extraction_output_is_retried(self):
+        self.trajectory()
+        invalid = proposal()
+        invalid.pop("relation")
+        self.llm.responses["extract"] = {"memories": [invalid]}
+        with self.assertRaises(ExtractionOutputError):
+            self.memory.extract("t1")
+        self.assertEqual(self.memory.connection.execute(
+            "SELECT count(*) FROM experiences").fetchone()[0], 0)
+        self.assertEqual(len([call for call in self.llm.calls if call[0] == "extract"]), 3)
+
     def test_external_run_log_and_config_validation(self):
         path = Path(self.temp.name) / "run" / "memory.jsonl"
         logger = JsonlRunLog(path)
@@ -401,6 +423,50 @@ class RuntimeTests(unittest.TestCase):
                        {"retrieval_min_similarity": 2}, {"max_task_aspects": True}):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 MemoryConfig(**kwargs)
+
+    def test_memory_llm_long_rate_limit_delay_is_opt_in(self):
+        class RateLimitError(Exception):
+            status_code = 429
+
+        class Completions:
+            def __init__(self):
+                self.calls = 0
+
+            def create(self, **kwargs):
+                self.calls += 1
+                if self.calls < 3:
+                    raise RateLimitError("limited")
+                message = type("Message", (), {"content": '{"ok": true}'})()
+                choice = type("Choice", (), {"message": message})()
+                return type("Response", (), {"choices": [choice]})()
+
+        completions = Completions()
+        chat = type("Chat", (), {"completions": completions})()
+        client = type("Client", (), {"chat": chat})()
+        llm = AzureMemoryLLM(client, "memory", rate_limit_retries=1,
+                             rate_limit_base_seconds=2,
+                             rate_limit_long_retry_seconds=3600,
+                             rate_limit_long_retries=1)
+        with patch("long_memory_integrations.time.sleep") as sleep:
+            self.assertEqual(llm.generate("judge", {"instructions": "test"}), {"ok": True})
+        self.assertEqual(completions.calls, 3)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [2, 3600])
+
+    def test_memory_llm_does_not_wait_an_hour_by_default(self):
+        class RateLimitError(Exception):
+            status_code = 429
+
+        class Completions:
+            def create(self, **kwargs):
+                raise RateLimitError("limited")
+
+        chat = type("Chat", (), {"completions": Completions()})()
+        client = type("Client", (), {"chat": chat})()
+        llm = AzureMemoryLLM(client, "memory", rate_limit_retries=0)
+        with patch("long_memory_integrations.time.sleep") as sleep:
+            with self.assertRaises(RateLimitError):
+                llm.generate("judge", {"instructions": "test"})
+        sleep.assert_not_called()
 
 
 if __name__ == "__main__":

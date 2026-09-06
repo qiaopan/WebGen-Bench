@@ -125,6 +125,7 @@ def run_npm_install(apps, base_dir, commands):
                 raw_cmd,
                 _add_flag(raw_cmd, "--force"),
                 _add_flag(raw_cmd, "--legacy-peer-deps"),
+                _add_flag(raw_cmd, "--ignore-scripts"),
             ]
 
             for idx, cmd in enumerate(attempts, start=1):

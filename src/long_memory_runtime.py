@@ -90,6 +90,10 @@ class MemoryRef:
         return f"{self.kind}_record_id"
 
 
+class ExtractionOutputError(ValueError):
+    """The memory LLM returned an invalid extraction proposal."""
+
+
 @dataclass(frozen=True)
 class RetrievedMemory:
     ref: MemoryRef
@@ -425,17 +429,46 @@ class LongMemory:
         if row is None or row["run_status"] == "running" or row["split_group"] not in ("g1", "g3"):
             raise ValueError("Extraction requires a finished same-agent learning trajectory")
         evidence = self._evidence(dict(row))
-        result = self._call("extract", {"trajectory": dict(row), "evidence": evidence})
-        proposals = result.get("memories")
-        if not isinstance(proposals, list):
-            raise ValueError("Extraction must return a memories list (possibly empty)")
-        allowed = {_json(item["ref"]) for item in evidence}
-        prepared = []
-        for proposal in proposals:
-            refs = proposal.get("evidence_refs")
-            if not isinstance(refs, list) or not refs or any(_json(ref) not in allowed for ref in refs):
-                raise ValueError("Extracted evidence locator is not in supplied trajectory evidence")
-            prepared.append((self._prepare(proposal), proposal))
+        extract_payload = {"trajectory": dict(row), "evidence": evidence}
+        proposals = None
+        prepared = None
+        for attempt in range(3):
+            result = self._call("extract", {
+                **extract_payload,
+                **({} if attempt == 0 else {
+                    "correction": (
+                        "The previous extraction was invalid. Every memory must include "
+                        "evidence_refs, relation (supports or counterexample), and a "
+                        "non-empty note. Return only schema-valid memories."
+                    )
+                }),
+            })
+            proposals = result.get("memories")
+            try:
+                if not isinstance(proposals, list):
+                    raise ExtractionOutputError(
+                        "Extraction must return a memories list (possibly empty)")
+                allowed = {_json(item["ref"]) for item in evidence}
+                prepared = []
+                for proposal in proposals:
+                    if not isinstance(proposal, dict):
+                        raise ExtractionOutputError("Each extracted memory must be an object")
+                    refs = proposal.get("evidence_refs")
+                    if (not isinstance(refs, list) or not refs
+                            or any(_json(ref) not in allowed for ref in refs)):
+                        raise ExtractionOutputError(
+                            "Extracted evidence locator is not in supplied trajectory evidence")
+                    if proposal.get("relation") not in ("supports", "counterexample"):
+                        raise ExtractionOutputError(
+                            "Extracted memory relation must be supports or counterexample")
+                    if not isinstance(proposal.get("note"), str) or not proposal["note"].strip():
+                        raise ExtractionOutputError("Extracted memory note must be non-empty")
+                    prepared.append((self._prepare(proposal), proposal))
+                break
+            except ExtractionOutputError:
+                if attempt == 2:
+                    raise
+        assert prepared is not None
         with self._transaction():
             for (ref, memory), proposal in prepared:
                 self._insert(ref.table, memory)
@@ -524,10 +557,44 @@ class LongMemory:
                      if item["ref"]["kind"] == ref.kind]
         for neighbor in neighbors:
             neighbor["provenance"] = self._grounding(MemoryRef(**neighbor["ref"]))
-        judgement = self._call("judge", {"candidate": {"ref": asdict(ref),
+        judge_payload = {"candidate": {"ref": asdict(ref),
             "content": _content(ref.kind, row)}, "provenance": self._grounding(ref),
-            "neighbors": neighbors})
+            "neighbors": neighbors}
+        judgement = self._call("judge", judge_payload)
+        for _ in range(2):
+            action = judgement.get("action")
+            target = judgement.get("target")
+            valid_support = action != "SUPPORT" or (
+                isinstance(target, dict)
+                and target.get("kind") == ref.kind
+                and target != asdict(ref)
+                and target in [item["ref"] for item in neighbors]
+            )
+            if valid_support:
+                break
+            judgement = self._call("judge", {
+                **judge_payload,
+                "correction": (
+                    "The previous judgement was invalid: SUPPORT must target a different "
+                    "provided same-type active neighbor. Return KEEP, CONSOLIDATE, or REJECT, "
+                    "or SUPPORT with an exact target from neighbors only."
+                ),
+                "previous_judgement": judgement,
+            })
         action = judgement.get("action")
+        target = judgement.get("target")
+        valid_support = action != "SUPPORT" or (
+            isinstance(target, dict)
+            and target.get("kind") == ref.kind
+            and target != asdict(ref)
+            and target in [item["ref"] for item in neighbors]
+        )
+        if not valid_support:
+            judgement = {
+                "action": "REJECT",
+                "reason": "LLM returned an invalid SUPPORT target after retry",
+            }
+            action = "REJECT"
         if action not in ("KEEP", "SUPPORT", "CONSOLIDATE", "REJECT"):
             raise ValueError("Unsupported semantic judgement")
         with self._transaction():

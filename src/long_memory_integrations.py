@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -13,27 +15,77 @@ from long_memory_runtime import MemoryPacket
 class AzureMemoryLLM:
     """Structured MemoryLLM over an OpenAI-compatible Azure deployment."""
 
-    def __init__(self, client: Any, model_id: str, *, max_tokens: int = 4096):
+    def __init__(self, client: Any, model_id: str, *, max_tokens: int = 4096,
+                 rate_limit_retries: int | None = None,
+                 rate_limit_base_seconds: float | None = None,
+                 rate_limit_long_retry_seconds: float | None = None,
+                 rate_limit_long_retries: int | None = None):
         if not model_id.strip():
             raise ValueError("Memory LLM deployment name is required")
         self.client = client
         self.model_id = model_id
         self.max_tokens = max_tokens
+        self.rate_limit_retries = (int(os.environ.get("MEMORY_LLM_RATE_LIMIT_RETRIES", "6"))
+                                   if rate_limit_retries is None else rate_limit_retries)
+        self.rate_limit_base_seconds = (float(os.environ.get(
+            "MEMORY_LLM_RATE_LIMIT_BASE_SECONDS", "10"))
+            if rate_limit_base_seconds is None else rate_limit_base_seconds)
+        self.rate_limit_long_retry_seconds = (float(os.environ.get(
+            "MEMORY_LLM_LONG_RETRY_SECONDS", "300"))
+            if rate_limit_long_retry_seconds is None else rate_limit_long_retry_seconds)
+        self.rate_limit_long_retries = (int(os.environ.get(
+            "MEMORY_LLM_LONG_RETRIES", "0"))
+            if rate_limit_long_retries is None else rate_limit_long_retries)
+        if (self.rate_limit_retries < 0 or self.rate_limit_base_seconds < 0
+                or self.rate_limit_long_retry_seconds < 0
+                or self.rate_limit_long_retries < 0):
+            raise ValueError("Memory LLM retry settings must be nonnegative")
 
     def generate(self, operation: str, payload: Mapping[str, Any]) -> dict:
-        response = self.client.chat.completions.create(
-            model=self.model_id,
-            messages=[
+        arguments = {
+            "model": self.model_id,
+            "messages": [
                 {"role": "system", "content": str(payload["instructions"]) +
                  " Return one valid JSON object and no surrounding prose."},
                 {"role": "user", "content": json.dumps(
                     {"operation": operation, **{key: value for key, value in payload.items()
                      if key != "instructions"}}, ensure_ascii=False, default=str)},
             ],
-            response_format={"type": "json_object"},
-            temperature=0,
-            max_completion_tokens=self.max_tokens,
-        )
+            "response_format": {"type": "json_object"},
+            "temperature": 0,
+            "max_completion_tokens": self.max_tokens,
+        }
+        last_error = None
+        for attempt in range(self.rate_limit_retries + 1):
+            try:
+                response = self.client.chat.completions.create(**arguments)
+                break
+            except Exception as error:
+                if getattr(error, "status_code", None) != 429 or attempt >= self.rate_limit_retries:
+                    last_error = error
+                    break
+                retry_after = getattr(error, "response", None)
+                retry_after = getattr(retry_after, "headers", {}).get("retry-after")
+                try:
+                    delay = max(float(retry_after), 0.0)
+                except (TypeError, ValueError):
+                    delay = self.rate_limit_base_seconds * (2 ** attempt)
+                time.sleep(min(delay, 300.0))
+        if last_error is not None:
+            if getattr(last_error, "status_code", None) != 429:
+                raise last_error
+            for _ in range(self.rate_limit_long_retries):
+                time.sleep(self.rate_limit_long_retry_seconds)
+                try:
+                    response = self.client.chat.completions.create(**arguments)
+                    last_error = None
+                    break
+                except Exception as error:
+                    if getattr(error, "status_code", None) != 429:
+                        raise
+                    last_error = error
+            if last_error is not None:
+                raise last_error
         content = response.choices[0].message.content
         if not content:
             raise ValueError("Memory LLM returned empty content")
@@ -82,6 +134,7 @@ class BoltAgentAdapter:
     model: str
     provider: str = "OpenAILike"
     headless: bool = True
+    max_repair_attempts: int = 1
     last_memory: MemoryPacket | None = field(default=None, init=False)
 
     def run(self, task: str, memory: MemoryPacket) -> Any:
@@ -94,6 +147,7 @@ class BoltAgentAdapter:
             desired_model=self.model,
             provider=self.provider,
             headless=self.headless,
+            max_repair_attempts=self.max_repair_attempts,
         )
 
 

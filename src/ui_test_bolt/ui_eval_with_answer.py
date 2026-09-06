@@ -204,7 +204,11 @@ def main():
     args = parser.parse_args()
     in_dir = args.in_dir
     test_file = args.test_file
-    zip_files = [os.path.join(in_dir, file) for file in os.listdir(in_dir) if file.endswith(".zip") and not file.startswith("error")]
+    zip_files = sorted(
+        os.path.join(in_dir, file)
+        for file in os.listdir(in_dir)
+        if file.endswith(".zip") and not file.startswith("error")
+    )
     
     output_root = os.path.join(in_dir, "extracted")
     if not os.path.exists(output_root):
@@ -218,7 +222,8 @@ def main():
 
     force_rerun = os.environ.get("WEBVOYAGER_FORCE_RERUN", "0") == "1"
     if not force_rerun:
-        zip_files = zip_files[len(log_datas):]
+        completed = {str(Path(item["app_path"]).resolve()) for item in log_datas}
+        zip_files = [path for path in zip_files if str(Path(path).resolve()) not in completed]
 
     unzip_files(zip_files, output_root)
 
