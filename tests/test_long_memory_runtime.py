@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from long_memory import connect_database, initialize_database
 from long_memory_runtime import (JsonlRunLog, LongMemory, MemoryConfig, MemoryPacket,
                                  MemoryRef)
+from long_memory_integrations import bolt_memory_prompt
 
 
 def proposal(title="Filter insight", kind="experience", relation="supports"):
@@ -39,6 +40,9 @@ class FakeLLM:
             "judge": {"action": "KEEP", "reason": "Distinct knowledge"},
             "consolidate": {"action": "KEEP", "reason": "Distinct knowledge"},
             "aspects": {"aspects": ["Filtering", "Pagination"]},
+            "relevance": lambda payload: {"applicable": [item["ref"] for item in payload["candidates"]],
+                                           "reasons": {item["ref"]["record_id"]: "Applicable"
+                                                       for item in payload["candidates"]}},
         }[operation])
         if isinstance(response, Exception):
             raise response
@@ -99,6 +103,27 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(self.memory.extract_and_validate("t1"), [])
         self.assertEqual([call[0] for call in self.llm.calls], ["extract"])
         self.assertEqual(self.memory.connection.execute("SELECT count(*) FROM experiences").fetchone()[0], 0)
+
+    def test_bolt_adapter_preserves_memory_content_and_empty_packet(self):
+        self.assertEqual(bolt_memory_prompt("task", MemoryPacket()), "task")
+        self.trajectory()
+        ref = self.make()
+        packet = self.memory.retrieve("Filter")
+        prompt = bolt_memory_prompt("Build it", packet)
+        self.assertIn("Build it", prompt)
+        self.assertIn("Relevant Experiences", prompt)
+        self.assertIn(self.memory._row(ref)["lesson"], prompt)
+
+    def test_admission_duplicate_judgement_receives_only_same_type_neighbors(self):
+        self.trajectory()
+        self.make(kind="skill")
+        candidate = self.make(kind="experience", active=False)
+        self.llm.responses["judge"] = lambda payload: (
+            {"action": "KEEP", "reason": "Cross-type knowledge is distinct"}
+            if payload["neighbors"] == [] else
+            {"action": "REJECT", "reason": "Unexpected cross-type neighbor"}
+        )
+        self.assertEqual(self.memory.validate(candidate), "active")
 
     def test_candidates_and_rejections_are_never_retrieved(self):
         self.trajectory()
@@ -310,7 +335,7 @@ class RuntimeTests(unittest.TestCase):
             result = reader.retrieve("Filter").experiences
             self.assertEqual(result[0].ref, weaker)
             self.assertEqual(result[0].supporting_trajectories, 6)
-            audit = self.events[-1]["candidates"]["experience"]
+            audit = self.events[-1]["candidates"]["experience"]["discovered"]
             self.assertNotIn(unrelated.record_id, [item["ref"]["record_id"] for item in audit])
         with self.open(mode="read_only", config=MemoryConfig(evidence_weight=0)) as reader:
             self.assertEqual(reader.retrieve("Filter").experiences[0].ref, strong)
@@ -323,6 +348,21 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(packet, MemoryPacket())
         self.assertEqual(self.events[-1]["aspects"], ["a", "b", "c"])
         self.assertIn("not planning", self.llm.calls[-1][1]["instructions"])
+
+    def test_semantic_relevance_filters_before_evidence_reranking(self):
+        self.trajectory()
+        ref = self.make()
+        for index in range(2, 7):
+            self.trajectory(f"t{index}")
+            with self.memory._transaction():
+                self.memory._source(ref, trajectory_id=f"t{index}",
+                    evidence_refs=[{"step_id": "1"}], relation="supports", note="More evidence")
+        self.llm.responses["relevance"] = {
+            "applicable": [], "reasons": {ref.record_id: "Conflicts with current task constraints"}}
+        self.assertEqual(self.memory.retrieve("Filter a list"), MemoryPacket())
+        event = self.events[-1]
+        self.assertEqual(len(event["candidates"]["experience"]["discovered"]), 1)
+        self.assertEqual(event["candidates"]["experience"]["applicable_ranked"], [])
 
     def test_wrong_model_or_hash_and_archived_rows_cannot_be_retrieved(self):
         self.trajectory()

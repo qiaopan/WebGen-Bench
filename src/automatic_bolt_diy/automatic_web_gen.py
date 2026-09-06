@@ -1,5 +1,7 @@
 import os
 import time
+import hashlib
+import json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -7,8 +9,10 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://localhost:5173/",
-    desired_model="/mnt/cache/sharemath/models/qwen/Qwen2.5-Coder-32B-Instruct", provider="OpenAILike"):
-    print(f"Running automatic_web_gen with idx={idx}, instruction='{instruction}', download_dir='{download_dir}', url='{url}', desired_model='{desired_model}', provider='{provider}'")
+    desired_model="/mnt/cache/sharemath/models/qwen/Qwen2.5-Coder-32B-Instruct", provider="OpenAILike",
+    headless=False):
+    instruction_hash = hashlib.sha256(instruction.encode("utf-8")).hexdigest()
+    print(f"Running automatic_web_gen with idx={idx}, instruction_sha256={instruction_hash}, download_dir='{download_dir}', url='{url}', desired_model='{desired_model}', provider='{provider}'")
     # ---------------------------------------
     # 1) Set up Chrome & your download folder
     # ---------------------------------------
@@ -17,9 +21,26 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     if not os.path.exists(download_dir):
         os.makedirs(download_dir)
 
-    if os.path.exists(os.path.join(download_dir, f"{idx:06d}.json")) and os.path.exists(os.path.join(download_dir, f"{idx:06d}.zip")):
+    chat_path = os.path.join(download_dir, f"{idx:06d}.json")
+    zip_path = os.path.join(download_dir, f"{idx:06d}.zip")
+    request_path = os.path.join(download_dir, f"{idx:06d}.request.json")
+    request = {
+        "instruction_sha256": instruction_hash,
+        "model": desired_model, "provider": provider, "url": url,
+    }
+    existing = [os.path.exists(path) for path in (chat_path, zip_path)]
+    if all(existing):
+        if not os.path.isfile(request_path):
+            raise RuntimeError(f"Existing artifacts have no request metadata: {request_path}")
+        with open(request_path, encoding="utf-8") as stream:
+            existing_request = json.load(stream)
+        if existing_request != request:
+            raise RuntimeError(f"Existing artifacts belong to a different request: {request_path}")
         print(f"Files {idx:06d}.json and {idx:06d}.zip already exist. Skipping download.")
-        return
+        return {"chat_path": chat_path, "zip_path": zip_path, "request_path": request_path,
+                "skipped": True}
+    if any(existing):
+        raise RuntimeError(f"Partial prior output; use a fresh directory: {download_dir}")
 
     # If you want to explicitly configure the download folder and disable popups:
     from selenium.webdriver.chrome.options import Options
@@ -28,7 +49,8 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     # --- Headless mode ---
     # For Chrome ≥ 109, “--headless=new” is recommended.
     # If you’re on an older version, use "--headless" instead.
-    # chrome_options.add_argument("--headless=new")     # <‑‑ headless flag
+    if headless:
+        chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--window-size=1920,1080")  # helpful for some UIs
 
     prefs = {
@@ -104,8 +126,8 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             #         (By.XPATH, "//button[contains(text(), 'Download Code')]")
             #     )
             # )
-        except:
-            print("Timed out waiting for response or button state change.")
+        except Exception as error:
+            raise TimeoutError("Timed out waiting for Bolt response") from error
 
         time.sleep(10)
 
@@ -138,11 +160,11 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             zip_name = f"{idx:06d}.zip"
             new_path = os.path.join(download_dir, zip_name)
             if os.path.exists(new_path):
-                os.remove(new_path)  # Remove old file if it exists
+                raise FileExistsError(new_path)
             os.rename(old_path, new_path)
             print(f"Renamed code file to: {new_path}")
         else:
-            print("Could not uniquely identify the downloaded code file.")
+            raise RuntimeError(f"Could not uniquely identify downloaded code file: {sorted(new_files)}")
 
         #
         # --- STEP G: Export Chat -> rename to {idx:06d}.json
@@ -163,13 +185,18 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             json_name = f"{idx:06d}.json"
             new_path = os.path.join(download_dir, json_name)
             if os.path.exists(new_path):
-                os.remove(new_path)  # Remove old file if it exists
+                raise FileExistsError(new_path)
             os.rename(old_path, new_path)
             print(f"Renamed chat file to: {new_path}")
         else:
-            print("Could not uniquely identify the downloaded chat file.")
+            raise RuntimeError(f"Could not uniquely identify downloaded chat file: {sorted(new_files)}")
 
         time.sleep(1)
+        with open(request_path, "w", encoding="utf-8") as stream:
+            json.dump(request, stream, indent=2, sort_keys=True)
+            stream.write("\n")
+        return {"chat_path": chat_path, "zip_path": zip_path, "request_path": request_path,
+                "skipped": False}
 
     finally:
         driver.quit()

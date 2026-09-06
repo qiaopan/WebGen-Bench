@@ -145,6 +145,11 @@ PROMPT_VERSION = "long-memory-v2.1"
 OPERATIONS = {
     "extract": "Return {memories: [{kind: experience|skill, content: {...}, evidence_refs: "
                "[exact supplied ref objects], relation: supports|counterexample, note: string}]}. "
+               "For Experience content use text fields title, condition, lesson, recommended_action, "
+               "avoid_action, verification, limitations; lesson or one action is required. For Skill "
+               "content use name/goal/conditions/limitations as text, inputs as a JSON object, workflow "
+               "and completion_checks as nonempty JSON arrays, and optional tool_templates as a JSON "
+               "array or null. Never put plain text in inputs and never put an object in tool_templates. "
                "Return an empty memories list when appropriate.",
     "validate": "Check knowledge type, applicability, grounding, evidence relevance and "
                 "When/How/Done for skills. Return {valid: boolean, reason: string}.",
@@ -164,6 +169,14 @@ OPERATIONS = {
     "aspects": "Extract at most max_aspects short, distinct task topics/requirements for "
                "retrieval, using only the current task. This is not planning: no concrete "
                "implementation steps or new requirements. Return {aspects: [string]}.",
+    "relevance": "Embedding similarity supplied discovery candidates only. Decide which complete "
+                 "memory records are applicable to the current task. Exclude records whose domain, "
+                 "conditions or limitations do not fit, and records containing prescriptive details "
+                 "that conflict with the current task. Because records are injected whole, do not "
+                 "select a record merely because one fragment is generic. Evidence count is absent "
+                 "on purpose and must not affect applicability. Return {applicable: [{kind: "
+                 "experience|skill, record_id: string}], reasons: {record_id: string}} using only "
+                 "provided candidates. An empty applicable list is valid.",
 }
 
 
@@ -356,6 +369,11 @@ class LongMemory:
         if kind == "skill" and any(not isinstance(content.get(key), list) or not content[key]
                                    for key in ("workflow", "completion_checks")):
             raise ValueError("Skill requires When/How/Done")
+        if kind == "skill" and "inputs" in content and not isinstance(content["inputs"], dict):
+            raise ValueError("Skill inputs must be a JSON object")
+        if kind == "skill" and content.get("tool_templates") is not None and not isinstance(
+                content["tool_templates"], list):
+            raise ValueError("Skill tool_templates must be a JSON array or null")
         # Canonical defaults ensure the encoded text is identical after a DB round trip.
         content = {"limitations": "", **({"inputs": {}} if kind == "skill" else {}), **content}
         content = {key: value for key, value in content.items() if value is not None}
@@ -500,7 +518,10 @@ class LongMemory:
                 self._status(ref, "rejected")
             self.log({"operation": "admission", "ref": asdict(ref), "status": "rejected"})
             return "rejected"
-        neighbors = self._neighbors(ref, row)
+        # Admission detects duplicate/supporting knowledge within one knowledge
+        # type. Cross-type Experience/Skill derivation belongs to consolidation.
+        neighbors = [item for item in self._neighbors(ref, row)
+                     if item["ref"]["kind"] == ref.kind]
         for neighbor in neighbors:
             neighbor["provenance"] = self._grounding(MemoryRef(**neighbor["ref"]))
         judgement = self._call("judge", {"candidate": {"ref": asdict(ref),
@@ -606,22 +627,49 @@ class LongMemory:
         aspects = list(dict.fromkeys(value.strip() for value in aspects))[:self.config.max_task_aspects]
         # The original task is always a query; an empty decomposition is valid.
         vectors = self._embeddings(list(dict.fromkeys([task, *aspects])))
+        discovered, payload = {}, []
+        for kind in FIELDS:
+            discovered[kind] = self._discover(vectors, threshold=self.config.retrieval_min_similarity,
+                limit=self.config.retrieval_candidates_per_type, kind=kind)
+            payload.extend({"ref": asdict(ref), "content": _content(kind, row),
+                            "similarity": similarity}
+                           for ref, row, similarity in discovered[kind])
+        applicable: set[MemoryRef] = set()
+        relevance = {"applicable": [], "reasons": {}}
+        if payload:
+            relevance = self._call("relevance", {"task": task, "aspects": aspects,
+                                                  "candidates": payload})
+            values = relevance.get("applicable")
+            if not isinstance(values, list) or not isinstance(relevance.get("reasons", {}), dict):
+                raise ValueError("Relevance judgement requires applicable list and reasons object")
+            provided = {MemoryRef(**item["ref"]) for item in payload}
+            for value in values:
+                ref = MemoryRef(**value)
+                if ref not in provided:
+                    raise ValueError("Relevance judgement selected an unknown candidate")
+                applicable.add(ref)
+
         selected, audit = {}, {}
         for kind in FIELDS:
-            candidates = self._discover(vectors, threshold=self.config.retrieval_min_similarity,
-                limit=self.config.retrieval_candidates_per_type, kind=kind)
             ranked = []
-            for ref, row, similarity in candidates:
+            for ref, row, similarity in discovered[kind]:
+                if ref not in applicable:
+                    continue
                 count = len(self.provenance(ref, supports_only=True)["trajectories"])
                 score = similarity + self.config.evidence_weight * min(count, self.config.evidence_cap)
                 ranked.append(RetrievedMemory(ref, _content(kind, row), similarity, count, score))
             ranked.sort(key=lambda item: (-item.score, -item.similarity, item.ref.record_id))
             top_k = self.config.top_k_experiences if kind == "experience" else self.config.top_k_skills
             selected[kind] = tuple(ranked[:top_k])
-            audit[kind] = [asdict(item) for item in ranked]
+            audit[kind] = {
+                "discovered": [{"ref": asdict(ref), "similarity": similarity}
+                               for ref, _, similarity in discovered[kind]],
+                "applicable_ranked": [asdict(item) for item in ranked],
+            }
         packet = MemoryPacket(selected["experience"], selected["skill"])
         self.log({"operation": "retrieval", "agent_id": self.agent_id, "task": task,
-                  "aspects": aspects, "config": asdict(self.config), "candidates": audit,
+                  "aspects": aspects, "config": asdict(self.config), "relevance": relevance,
+                  "candidates": audit,
                   "selected": [asdict(item.ref) for item in (*packet.experiences, *packet.skills)],
                   "packet_hash": hashlib.sha256(packet.render().encode()).hexdigest()})
         return packet
