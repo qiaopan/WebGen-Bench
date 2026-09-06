@@ -62,6 +62,19 @@ Every generation output directory records the Git commit, dataset hash, model,
 provider, and Bolt URL. Reusing a directory with different settings fails rather
 than silently mixing results.
 
+## Long-memory storage initialization
+
+Initialize the four-table SQLite store without calling any model:
+
+```shell
+python3 scripts/init_long_memory.py
+```
+
+This creates or validates `outputs/memory/bolt/memory.db` without overwriting
+existing records. See [Long-memory storage](long_memory_storage.md) for the field
+definitions, versioning rules, and read-only command-line inspection examples.
+Storage initialization does not implement or enable the live memory adapter.
+
 ## Remaining live-memory integration
 
 The protocol switch and leakage rules are implemented, but the research-specific
