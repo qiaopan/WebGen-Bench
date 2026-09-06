@@ -4,7 +4,6 @@
 !.env.example
 
 # External repositories
-bolt.diy-Fork/
 
 # Experimental data
 data/*
