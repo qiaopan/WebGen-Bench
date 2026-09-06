@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "memory_llm": {
+    "deployment": "webgen-memory-gpt41-mini",
+    "max_completion_tokens": 4096,
+    "rate_limit_retries": 6,
+    "rate_limit_base_seconds": 10,
+    "rate_limit_max_wait_seconds": 300,
+    "rate_limit_long_retry_seconds": 300,
+    "rate_limit_long_retries": 0
+  },
+  "embedding": {"deployment": "webgen-memory-embedding", "dimensions": null},
+  "runtime": {
+    "min_consolidation_evidence": 3,
+    "max_task_aspects": 3,
+    "retrieval_candidates_per_type": 20,
+    "consolidation_candidates": 4,
+    "retrieval_min_similarity": 0.35,
+    "consolidation_min_similarity": 0.55,
+    "top_k_experiences": 5,
+    "top_k_skills": 3,
+    "evidence_weight": 0.05,
+    "evidence_cap": 5,
+    "max_grounding_trajectories": 5,
+    "max_grounding_edges": 12,
+    "max_evidence_items": 12,
+    "max_evidence_chars": 12000,
+    "max_outcome_chars": 2000
+  }
+}

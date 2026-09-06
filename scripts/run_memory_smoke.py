@@ -26,8 +26,9 @@ from automatic_web_gen import automatic_web_gen  # noqa: E402
 from long_memory import connect_database, initialize_database  # noqa: E402
 from long_memory_integrations import (AzureEmbedder, AzureMemoryLLM, BoltAgentAdapter,
                                       exported_chat_evidence)  # noqa: E402
-from long_memory_runtime import (JsonlRunLog, LongMemory, MemoryConfig, MemoryPacket,
+from long_memory_runtime import (JsonlRunLog, LongMemory, MemoryPacket,
                                  MemoryRef)  # noqa: E402
+from long_memory_settings import load_long_memory_settings  # noqa: E402
 
 
 def now() -> str:
@@ -116,17 +117,27 @@ def main() -> None:
     parser.add_argument("--database", type=Path,
                         default=PROJECT_ROOT / "outputs" / "memory" / "bolt" / "memory.db")
     parser.add_argument("--headed", action="store_true")
+    parser.add_argument("--memory-config", type=Path,
+                        default=PROJECT_ROOT / "config/long_memory.json")
     args = parser.parse_args()
     load_dotenv(PROJECT_ROOT / ".env")
 
     base_url = os.environ["WEBGEN_GENERATOR_BASE_URL"]
     api_key = os.environ.get("AZURE_OPENAI_API_KEY") or os.environ["DASHSCOPE_API_KEY"]
     generator_model = os.environ["WEBGEN_GENERATOR_API_MODEL"]
-    memory_model = os.environ.get("MEMORY_LLM_MODEL", generator_model)
-    embedding_model = os.environ["MEMORY_EMBEDDING_MODEL"]
+    settings = load_long_memory_settings(args.memory_config.resolve())
+    memory_model = settings.memory_llm["deployment"]
+    embedding_model = settings.embedding["deployment"]
     client = OpenAI(api_key=api_key, base_url=base_url, timeout=120, max_retries=2)
-    llm = AzureMemoryLLM(client, memory_model)
-    embedder = AzureEmbedder(client, embedding_model)
+    llm = AzureMemoryLLM(client, memory_model,
+        max_tokens=settings.memory_llm["max_completion_tokens"],
+        rate_limit_retries=settings.memory_llm["rate_limit_retries"],
+        rate_limit_base_seconds=settings.memory_llm["rate_limit_base_seconds"],
+        rate_limit_max_wait_seconds=settings.memory_llm["rate_limit_max_wait_seconds"],
+        rate_limit_long_retry_seconds=settings.memory_llm["rate_limit_long_retry_seconds"],
+        rate_limit_long_retries=settings.memory_llm["rate_limit_long_retries"])
+    embedder = AzureEmbedder(client, embedding_model,
+                             dimensions=settings.embedding["dimensions"])
 
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -143,7 +154,7 @@ def main() -> None:
                                       model=generator_model, output_dir=g1_dir,
                                       evaluation=g1_evaluation)
     with LongMemory(args.database, "bolt", memory_mode="learn", llm=llm, embedder=embedder,
-                    config=MemoryConfig(), evidence_loader=exported_chat_evidence, log=events) as memory:
+                    config=settings.memory, evidence_loader=exported_chat_evidence, log=events) as memory:
         linked = memory.connection.execute(
             "SELECT 'experience', experience_record_id FROM memory_sources "
             "WHERE trajectory_id=? AND experience_record_id IS NOT NULL "
@@ -170,7 +181,7 @@ def main() -> None:
         disabled_result = memory.run(g2["instruction"], adapter)
     adapter.output_dir = output / "g2-read-only"
     with LongMemory(snapshot, "bolt", memory_mode="read_only", llm=llm, embedder=embedder,
-                    config=MemoryConfig(), log=events) as memory:
+                    config=settings.memory, log=events) as memory:
         read_only_result = memory.run(g2["instruction"], adapter)
     if sha256(snapshot) != snapshot_hash_before:
         raise RuntimeError("Frozen memory changed during paired evaluation")

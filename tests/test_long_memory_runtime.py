@@ -15,6 +15,7 @@ from long_memory import connect_database, initialize_database
 from long_memory_runtime import (ExtractionOutputError, JsonlRunLog, LongMemory,
                                  MemoryConfig, MemoryPacket, MemoryRef)
 from long_memory_integrations import AzureMemoryLLM, bolt_memory_prompt
+from long_memory_settings import load_long_memory_settings
 
 
 def proposal(title="Filter insight", kind="experience", relation="supports"):
@@ -226,6 +227,59 @@ class RuntimeTests(unittest.TestCase):
                           if row["trajectory_id"] is None}, {ref.record_id for ref in originals})
         self.assertEqual(self.memory.retrieve("Filter").skills[0].supporting_trajectories, 3)
 
+    def test_consolidation_does_not_resend_full_trajectory_evidence(self):
+        for i in range(3):
+            self.trajectory(f"t{i}")
+            self.make(f"t{i}", title=f"Lesson {i}")
+
+        def consolidate(payload):
+            for memory in payload["memories"]:
+                provenance = memory["provenance"]
+                self.assertLessEqual(len(provenance["direct_sources"]), 12)
+                self.assertLessEqual(len(provenance["representative_trajectories"]), 5)
+                for trajectory in provenance["representative_trajectories"]:
+                    self.assertNotIn("evidence", trajectory)
+                    self.assertEqual(
+                        set(trajectory),
+                        {"trajectory_id", "task_id", "run_status", "outcome_summary"},
+                    )
+            return {"action": "KEEP", "reason": "Distinct knowledge"}
+
+        self.llm.responses["consolidate"] = consolidate
+        self.memory.consolidate()
+
+    def test_consolidation_accepts_flat_memory_content(self):
+        originals = []
+        for i in range(3):
+            self.trajectory(f"t{i}")
+            originals.append(self.make(f"t{i}", title=f"Lesson {i}"))
+        flat = proposal("General filtering procedure", "skill")
+        flat = {"kind": flat["kind"], **flat["content"]}
+        self.llm.responses["consolidate"] = {
+            "action": "CONSOLIDATE", "reason": "Supported procedure",
+            "source_memories": [vars(ref) for ref in originals], "memory": flat,
+        }
+        derived = self.memory.consolidate()[0]
+        self.assertEqual(derived.kind, "skill")
+
+    def test_consolidation_resumes_derived_candidate_before_new_checks(self):
+        originals = []
+        for i in range(3):
+            self.trajectory(f"t{i}")
+            originals.append(self.make(f"t{i}", title=f"Lesson {i}"))
+        derived, row = self.memory._prepare(proposal("Pending generalisation", "skill"))
+        with self.memory._transaction():
+            self.memory._insert(derived.table, row)
+            for parent in originals:
+                self.memory._source(derived, parent=parent, evidence_refs=[vars(parent)],
+                                    relation="supports", note="Pending consolidation")
+        self.llm.responses["judge"] = {"action": "KEEP", "reason": "Valid generalisation"}
+        self.llm.responses["consolidate"] = {"action": "KEEP", "reason": "Already covered"}
+        self.assertIn(derived, self.memory.consolidate())
+        self.assertEqual(self.memory._row(derived)["status"], "active")
+        operations = [operation for operation, _ in self.llm.calls]
+        self.assertLess(operations.index("validate"), operations.index("consolidate"))
+
     def test_semantic_selection_cannot_bypass_evidence_minimum(self):
         refs = []
         for i in range(3):
@@ -423,6 +477,13 @@ class RuntimeTests(unittest.TestCase):
                        {"retrieval_min_similarity": 2}, {"max_task_aspects": True}):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 MemoryConfig(**kwargs)
+
+    def test_versioned_long_memory_config_is_the_single_runner_source(self):
+        settings = load_long_memory_settings(ROOT / "config/long_memory.json")
+        self.assertEqual(settings.memory.consolidation_candidates, 4)
+        self.assertEqual(settings.memory.max_evidence_chars, 12000)
+        self.assertEqual(settings.memory_llm["deployment"], "webgen-memory-gpt41-mini")
+        self.assertEqual(settings.embedding["deployment"], "webgen-memory-embedding")
 
     def test_memory_llm_long_rate_limit_delay_is_opt_in(self):
         class RateLimitError(Exception):

@@ -114,6 +114,10 @@ integration must supply it. Unknown model identity remains null, not fabricated.
    SUPPORT adds provenance; CONSOLIDATE creates a candidate generalisation linked
    to exact source memories and runs the same admission flow. No SPLIT, deletion,
    ID renumbering, automatic similarity merge, or outcome-based reward ranking.
+   Consolidation operates on the current frontier: once an active higher-level
+   memory cites a source memory, that source remains stored and retrievable through
+   provenance but is not repeatedly expanded into later consolidation prompts.
+   A later pass combines new frontier evidence with prior higher-level memories.
 4. `retrieve(task)` extracts a few task aspects (topics/requirements, not an
    implementation plan). It queries both types with the original task and aspects,
    filters by agent/active status/frozen encoder/dimension/content hash, then uses
@@ -133,20 +137,28 @@ results. This avoids adding an operations/job table in this initial version.
 
 ## Configuration
 
-Pass `MemoryConfig(...)`; all values are validated at construction.
+Production runners load `config/long_memory.json` as the single versioned source
+for model deployments, request/retry settings and `MemoryConfig`. Secrets and
+service endpoints remain in `.env`. All values are validated at startup, and the
+configuration SHA-256 is recorded in experiment metadata.
 
 | Parameter | Default | Meaning |
 | --- | --- | --- |
 | `min_consolidation_evidence` | 3 | Minimum distinct supporting trajectories for a consolidation check. |
 | `max_task_aspects` | 3 | Maximum deduplicated retrieval aspects, plus the original task. |
 | `retrieval_candidates_per_type` | 20 | Semantic candidate pool per knowledge type, before evidence reranking. |
-| `consolidation_candidates` | 12 | Related active neighbors per seed, in addition to the seed. |
+| `consolidation_candidates` | 4 | Related current-frontier neighbors per seed, in addition to the seed. |
 | `retrieval_min_similarity` | 0.35 | Retrieval relevance gate. |
 | `consolidation_min_similarity` | 0.55 | Consolidation/duplicate discovery gate; never an automatic merge rule. |
 | `top_k_experiences` | 5 | Final Experience limit. |
 | `top_k_skills` | 3 | Final Skill limit. |
 | `evidence_weight` | 0.05 | Confidence adjustment within the relevant pool. |
 | `evidence_cap` | 5 | Cap the confidence adjustment, not the reported evidence count. |
+| `max_grounding_trajectories` | 5 | Representative trajectory summaries sent to semantic calls. |
+| `max_grounding_edges` | 12 | Direct provenance edges sent to semantic calls. |
+| `max_evidence_items` | 12 | Located evidence items supplied from one trajectory. |
+| `max_evidence_chars` | 12000 | Total deterministic evidence-text budget per trajectory. |
+| `max_outcome_chars` | 2000 | Outcome-summary text budget per representative trajectory. |
 
 Thresholds are initial experiment hyperparameters, not universal constants.
 Agent identity, memory mode, database snapshot, model/embedding implementations,

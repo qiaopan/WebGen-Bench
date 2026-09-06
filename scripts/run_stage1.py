@@ -28,7 +28,8 @@ from long_memory import connect_database, initialize_database  # noqa: E402
 from long_memory_integrations import (AzureEmbedder, AzureMemoryLLM, BoltAgentAdapter,
                                       exported_chat_evidence)  # noqa: E402
 from long_memory_runtime import (ExtractionOutputError, JsonlRunLog, LongMemory,
-                                 MemoryConfig, MemoryRef)  # noqa: E402
+                                 MemoryRef)  # noqa: E402
+from long_memory_settings import load_long_memory_settings  # noqa: E402
 
 
 def utc_now() -> str:
@@ -202,6 +203,10 @@ def main() -> None:
     parser.add_argument("--database", type=Path,
                         default=ROOT / "outputs/memory/bolt/memory.db")
     parser.add_argument("--headed", action="store_true")
+    parser.add_argument("--memory-config", type=Path,
+                        default=ROOT / "config/long_memory.json")
+    parser.add_argument("--stop-after-g1", action="store_true",
+                        help="Consolidate and freeze G1, then stop before G2 generation")
     args = parser.parse_args()
     load_dotenv(ROOT / ".env")
 
@@ -216,22 +221,43 @@ def main() -> None:
     base_url = os.environ["WEBGEN_GENERATOR_BASE_URL"]
     api_key = os.environ.get("AZURE_OPENAI_API_KEY") or os.environ["DASHSCOPE_API_KEY"]
     generator_model = os.environ["WEBGEN_GENERATOR_API_MODEL"]
-    memory_model = os.environ.get("MEMORY_LLM_MODEL", generator_model)
-    embedding_model = os.environ["MEMORY_EMBEDDING_MODEL"]
+    settings = load_long_memory_settings(args.memory_config.resolve())
+    memory_model = settings.memory_llm["deployment"]
+    embedding_model = settings.embedding["deployment"]
     max_repair_attempts = int(os.environ.get("WEBGEN_MAX_REPAIR_ATTEMPTS", "1"))
     metadata = {"git_commit": plan["git_commit"], "config_sha256": plan["config_sha256"],
                 "dataset_manifest_sha256": plan["dataset_manifest_sha256"], "url": args.url,
                 "generator_model": generator_model, "memory_model": memory_model,
                 "embedding_model": embedding_model}
+    metadata["memory_config_sha256"] = file_hash(args.memory_config.resolve())
     metadata_path = output / "run-metadata.json"
-    if metadata_path.is_file() and json.loads(metadata_path.read_text(encoding="utf-8")) != metadata:
-        raise RuntimeError(f"Stage 1 directory belongs to different frozen settings: {metadata_path}")
+    if metadata_path.is_file():
+        existing_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        comparable_existing = {key: existing_metadata.get(key) for key in metadata
+                               if key != "git_commit"}
+        comparable_current = {key: value for key, value in metadata.items()
+                              if key != "git_commit"}
+        if comparable_existing != comparable_current:
+            raise RuntimeError(
+                f"Stage 1 directory belongs to different frozen settings: {metadata_path}")
+        if existing_metadata.get("git_commit") != metadata["git_commit"]:
+            if "g1:frozen" in completed_keys(progress_path):
+                raise RuntimeError("Cannot change code revision after G1 memory is frozen")
+            metadata["generation_git_commit"] = existing_metadata.get(
+                "generation_git_commit", existing_metadata.get("git_commit"))
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     client = OpenAI(api_key=api_key, base_url=base_url, timeout=120, max_retries=2)
-    llm = AzureMemoryLLM(client, memory_model)
-    embedder = AzureEmbedder(client, embedding_model)
-    config = MemoryConfig()
+    llm = AzureMemoryLLM(client, memory_model,
+        max_tokens=settings.memory_llm["max_completion_tokens"],
+        rate_limit_retries=settings.memory_llm["rate_limit_retries"],
+        rate_limit_base_seconds=settings.memory_llm["rate_limit_base_seconds"],
+        rate_limit_max_wait_seconds=settings.memory_llm["rate_limit_max_wait_seconds"],
+        rate_limit_long_retry_seconds=settings.memory_llm["rate_limit_long_retry_seconds"],
+        rate_limit_long_retries=settings.memory_llm["rate_limit_long_retries"])
+    embedder = AzureEmbedder(client, embedding_model,
+                             dimensions=settings.embedding["dimensions"])
+    config = settings.memory
     initialize_database(args.database)
     completed = completed_keys(progress_path)
 
@@ -313,6 +339,11 @@ def main() -> None:
                                      "sha256": file_hash(snapshot)})
         completed.add("g1:frozen")
     snapshot_hash = file_hash(snapshot)
+
+    if args.stop_after_g1:
+        print(json.dumps({"pipeline_status": "g1_frozen",
+                          "frozen_memory_sha256": snapshot_hash}, indent=2), flush=True)
+        return
 
     g2_file = ROOT / "data/experiment_splits/groups/group_02_dev_evaluate.jsonl"
     g2_records = load_jsonl(g2_file)

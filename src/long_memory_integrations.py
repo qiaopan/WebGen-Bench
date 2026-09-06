@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -18,6 +17,7 @@ class AzureMemoryLLM:
     def __init__(self, client: Any, model_id: str, *, max_tokens: int = 4096,
                  rate_limit_retries: int | None = None,
                  rate_limit_base_seconds: float | None = None,
+                 rate_limit_max_wait_seconds: float | None = None,
                  rate_limit_long_retry_seconds: float | None = None,
                  rate_limit_long_retries: int | None = None):
         if not model_id.strip():
@@ -25,18 +25,17 @@ class AzureMemoryLLM:
         self.client = client
         self.model_id = model_id
         self.max_tokens = max_tokens
-        self.rate_limit_retries = (int(os.environ.get("MEMORY_LLM_RATE_LIMIT_RETRIES", "6"))
-                                   if rate_limit_retries is None else rate_limit_retries)
-        self.rate_limit_base_seconds = (float(os.environ.get(
-            "MEMORY_LLM_RATE_LIMIT_BASE_SECONDS", "10"))
-            if rate_limit_base_seconds is None else rate_limit_base_seconds)
-        self.rate_limit_long_retry_seconds = (float(os.environ.get(
-            "MEMORY_LLM_LONG_RETRY_SECONDS", "300"))
-            if rate_limit_long_retry_seconds is None else rate_limit_long_retry_seconds)
-        self.rate_limit_long_retries = (int(os.environ.get(
-            "MEMORY_LLM_LONG_RETRIES", "0"))
-            if rate_limit_long_retries is None else rate_limit_long_retries)
+        self.rate_limit_retries = 6 if rate_limit_retries is None else rate_limit_retries
+        self.rate_limit_base_seconds = (10 if rate_limit_base_seconds is None
+                                        else rate_limit_base_seconds)
+        self.rate_limit_max_wait_seconds = (300 if rate_limit_max_wait_seconds is None
+                                            else rate_limit_max_wait_seconds)
+        self.rate_limit_long_retry_seconds = (300 if rate_limit_long_retry_seconds is None
+                                              else rate_limit_long_retry_seconds)
+        self.rate_limit_long_retries = (0 if rate_limit_long_retries is None
+                                        else rate_limit_long_retries)
         if (self.rate_limit_retries < 0 or self.rate_limit_base_seconds < 0
+                or self.rate_limit_max_wait_seconds < 0
                 or self.rate_limit_long_retry_seconds < 0
                 or self.rate_limit_long_retries < 0):
             raise ValueError("Memory LLM retry settings must be nonnegative")
@@ -70,7 +69,7 @@ class AzureMemoryLLM:
                     delay = max(float(retry_after), 0.0)
                 except (TypeError, ValueError):
                     delay = self.rate_limit_base_seconds * (2 ** attempt)
-                time.sleep(min(delay, 300.0))
+                time.sleep(min(delay, self.rate_limit_max_wait_seconds))
         if last_error is not None:
             if getattr(last_error, "status_code", None) != 429:
                 raise last_error

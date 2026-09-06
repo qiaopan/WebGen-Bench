@@ -49,17 +49,26 @@ class MemoryConfig:
     min_consolidation_evidence: int = 3
     max_task_aspects: int = 3
     retrieval_candidates_per_type: int = 20
-    consolidation_candidates: int = 12
+    consolidation_candidates: int = 4
     retrieval_min_similarity: float = 0.35
     consolidation_min_similarity: float = 0.55
     top_k_experiences: int = 5
     top_k_skills: int = 3
     evidence_weight: float = 0.05
     evidence_cap: int = 5
+    max_grounding_trajectories: int = 5
+    max_grounding_edges: int = 12
+    max_evidence_items: int = 12
+    max_evidence_chars: int = 12000
+    max_outcome_chars: int = 2000
 
     def __post_init__(self) -> None:
         for key in ("min_consolidation_evidence", "max_task_aspects",
                     "retrieval_candidates_per_type", "consolidation_candidates", "evidence_cap"):
+            if type(getattr(self, key)) is not int or getattr(self, key) < 1:
+                raise ValueError(f"{key} must be a positive integer")
+        for key in ("max_grounding_trajectories", "max_grounding_edges",
+                    "max_evidence_items", "max_evidence_chars", "max_outcome_chars"):
             if type(getattr(self, key)) is not int or getattr(self, key) < 1:
                 raise ValueError(f"{key} must be a positive integer")
         for key in ("top_k_experiences", "top_k_skills"):
@@ -351,11 +360,43 @@ class LongMemory:
             raise ValueError("Evidence must be [{ref: nonempty locator object, content: ...}]")
         return evidence
 
-    def _grounding(self, ref: MemoryRef) -> dict:
+    def _bounded_evidence(self, trajectory: dict) -> list[dict]:
+        evidence = self._evidence(trajectory)[:self.config.max_evidence_items]
+        remaining = self.config.max_evidence_chars
+        bounded = []
+        for item in evidence:
+            encoded = _json(item["content"])
+            content = encoded[:remaining]
+            if len(encoded) > remaining:
+                content += "...[truncated; full evidence remains in trajectory storage]"
+            bounded.append({"ref": item["ref"], "content": content})
+            remaining = max(0, remaining - len(content))
+            if remaining == 0:
+                break
+        return bounded
+
+    def _compact_grounding(self, ref: MemoryRef, *, include_evidence: bool = False) -> dict:
+        """Bound model context while the database retains the complete provenance graph."""
         result = self.provenance(ref)
-        for trajectory in result["trajectories"]:
-            trajectory["evidence"] = self._evidence(trajectory)
-        return result
+        direct = [edge for edge in result["edges"] if edge[ref.column] == ref.record_id]
+        trajectories = sorted(result["trajectories"], key=lambda item: item["trajectory_id"])
+        summaries = []
+        for trajectory in trajectories[:self.config.max_grounding_trajectories]:
+            outcome = str(trajectory.get("evaluation_results") or "")
+            summary = {"trajectory_id": trajectory["trajectory_id"],
+                       "task_id": trajectory["task_id"],
+                       "run_status": trajectory["run_status"],
+                       "outcome_summary": outcome[:self.config.max_outcome_chars]}
+            if include_evidence:
+                summary["evidence"] = self._bounded_evidence(trajectory)
+            summaries.append(summary)
+        return {
+            "supporting_trajectory_count": len({item["trajectory_id"] for item in trajectories}),
+            "direct_sources": direct[:self.config.max_grounding_edges],
+            "representative_trajectories": summaries,
+            "truncated": (len(direct) > self.config.max_grounding_edges or
+                          len(trajectories) > self.config.max_grounding_trajectories),
+        }
 
     def _prepare(self, proposal: dict) -> tuple[MemoryRef, dict]:
         kind = proposal["kind"]
@@ -428,7 +469,7 @@ class LongMemory:
         ).fetchone()
         if row is None or row["run_status"] == "running" or row["split_group"] not in ("g1", "g3"):
             raise ValueError("Extraction requires a finished same-agent learning trajectory")
-        evidence = self._evidence(dict(row))
+        evidence = self._bounded_evidence(dict(row))
         extract_payload = {"trajectory": dict(row), "evidence": evidence}
         proposals = None
         prepared = None
@@ -500,7 +541,8 @@ class LongMemory:
                 found.append((MemoryRef(kind, row["record_id"]), row, similarity))
         return sorted(found, key=lambda item: (-item[2], item[0].record_id))[:limit]
 
-    def _neighbors(self, ref: MemoryRef, row: dict) -> list[dict]:
+    def _neighbors(self, ref: MemoryRef, row: dict,
+                   eligible: set[MemoryRef] | None = None) -> list[dict]:
         vectors = self._embeddings([_json(_content(ref.kind, row))])
         found = []
         for kind in FIELDS:
@@ -508,7 +550,7 @@ class LongMemory:
                 vectors, threshold=self.config.consolidation_min_similarity,
                 limit=self.config.consolidation_candidates, kind=kind,
             ):
-                if other != ref:
+                if other != ref and (eligible is None or other in eligible):
                     found.append({"ref": asdict(other), "content": _content(kind, content),
                                   "similarity": score})
         return sorted(found, key=lambda item: (-item["similarity"], item["ref"]["record_id"]))[
@@ -516,7 +558,8 @@ class LongMemory:
 
     def _valid(self, ref: MemoryRef) -> bool:
         result = self._call("validate", {"memory": {"ref": asdict(ref),
-            "content": _content(ref.kind, self._row(ref, "candidate"))}, "provenance": self._grounding(ref)})
+            "content": _content(ref.kind, self._row(ref, "candidate"))},
+            "provenance": self._compact_grounding(ref, include_evidence=True)})
         if type(result.get("valid")) is not bool or not isinstance(result.get("reason"), str):
             raise ValueError("Validation requires boolean valid and a reason")
         return result["valid"]
@@ -556,9 +599,10 @@ class LongMemory:
         neighbors = [item for item in self._neighbors(ref, row)
                      if item["ref"]["kind"] == ref.kind]
         for neighbor in neighbors:
-            neighbor["provenance"] = self._grounding(MemoryRef(**neighbor["ref"]))
+            neighbor["provenance"] = self._compact_grounding(MemoryRef(**neighbor["ref"]))
         judge_payload = {"candidate": {"ref": asdict(ref),
-            "content": _content(ref.kind, row)}, "provenance": self._grounding(ref),
+            "content": _content(ref.kind, row)},
+            "provenance": self._compact_grounding(ref),
             "neighbors": neighbors}
         judgement = self._call("judge", judge_payload)
         for _ in range(2):
@@ -627,12 +671,44 @@ class LongMemory:
         explicit version-refinement API can reuse the existing version columns.
         """
         self._writer()
-        seeds = [MemoryRef(kind, row[0]) for kind in FIELDS for row in self.connection.execute(
+        created = []
+        pending = [MemoryRef(row[0], row[1]) for row in self.connection.execute(
+            "SELECT 'experience',e.record_id FROM experiences e WHERE e.agent_id=? "
+            "AND e.status='candidate' AND EXISTS (SELECT 1 FROM memory_sources s "
+            "WHERE s.experience_record_id=e.record_id AND "
+            "(s.source_experience_record_id IS NOT NULL OR s.source_skill_record_id IS NOT NULL)) "
+            "UNION ALL "
+            "SELECT 'skill',k.record_id FROM skills k WHERE k.agent_id=? "
+            "AND k.status='candidate' AND EXISTS (SELECT 1 FROM memory_sources s "
+            "WHERE s.skill_record_id=k.record_id AND "
+            "(s.source_experience_record_id IS NOT NULL OR s.source_skill_record_id IS NOT NULL))",
+            (self.agent_id, self.agent_id))]
+        for ref in pending:
+            status = self.validate(ref)
+            self.log({"operation": "consolidation_resume", "agent_id": self.agent_id,
+                      "ref": asdict(ref), "status": status})
+            if status == "active":
+                created.append(ref)
+        active = {MemoryRef(kind, row[0]) for kind in FIELDS for row in self.connection.execute(
             f"SELECT record_id FROM {'experiences' if kind == 'experience' else 'skills'} "
-            "WHERE agent_id=? AND status='active' ORDER BY record_id", (self.agent_id,))]
-        seen, created = set(), []
+            "WHERE agent_id=? AND status='active'", (self.agent_id,))}
+        covered = set()
+        for row in self.connection.execute(
+            "SELECT s.source_experience_record_id,s.source_skill_record_id "
+            "FROM memory_sources s LEFT JOIN experiences e ON e.record_id=s.experience_record_id "
+            "LEFT JOIN skills k ON k.record_id=s.skill_record_id "
+            "WHERE (e.agent_id=? AND e.status='active') OR "
+            "(k.agent_id=? AND k.status='active')", (self.agent_id, self.agent_id)):
+            if row[0]:
+                covered.add(MemoryRef("experience", row[0]))
+            if row[1]:
+                covered.add(MemoryRef("skill", row[1]))
+        frontier = active - covered
+        seeds = sorted(frontier, key=lambda ref: (ref.kind, ref.record_id))
+        seen = set()
         for seed in seeds:
-            members = [seed] + [MemoryRef(**item["ref"]) for item in self._neighbors(seed, self._row(seed))]
+            members = [seed] + [MemoryRef(**item["ref"]) for item in
+                                self._neighbors(seed, self._row(seed), frontier)]
             signature = tuple(sorted((ref.kind, ref.record_id) for ref in members))
             if signature in seen:
                 continue
@@ -643,13 +719,38 @@ class LongMemory:
                 continue
             result = self._call("consolidate", {"min_consolidation_evidence": self.config.min_consolidation_evidence,
                 "memories": [{"ref": asdict(ref), "content": _content(ref.kind, self._row(ref, "active")),
-                              "provenance": self._grounding(ref)} for ref in members]})
+                              "provenance": self._compact_grounding(ref)}
+                             for ref in members]})
             action = result.get("action")
             if action in ("KEEP", "REJECT"):
                 continue
             if action not in ("SUPPORT", "CONSOLIDATE"):
                 raise ValueError("Unsupported consolidation judgement")
-            parents = list(dict.fromkeys(MemoryRef(**value) for value in result["source_memories"]))
+            requested_parents = list(dict.fromkeys(
+                MemoryRef(**value) for value in result["source_memories"]))
+            parents = []
+            for requested in requested_parents:
+                if requested in members:
+                    parents.append(requested)
+                    continue
+                containers = []
+                for member in members:
+                    graph = self.provenance(member)
+                    ancestors = {
+                        MemoryRef("experience", edge["source_experience_record_id"])
+                        if edge["source_experience_record_id"] else
+                        MemoryRef("skill", edge["source_skill_record_id"])
+                        for edge in graph["edges"]
+                        if (edge["source_experience_record_id"] or
+                            edge["source_skill_record_id"])
+                    }
+                    if requested in ancestors:
+                        containers.append(member)
+                if len(containers) == 1:
+                    parents.append(containers[0])
+                else:
+                    parents.append(requested)
+            parents = list(dict.fromkeys(parents))
             if not parents or any(ref not in members for ref in parents):
                 raise ValueError("Consolidation must cite provided memories")
             supporting = {t["trajectory_id"] for ref in parents
@@ -667,7 +768,13 @@ class LongMemory:
                         if parent != target:
                             self._support(target, parent, result["reason"])
                 continue
-            ref, row = self._prepare(result["memory"])
+            proposal = result["memory"]
+            if (isinstance(proposal, dict) and "content" not in proposal
+                    and proposal.get("kind") in FIELDS):
+                proposal = {"kind": proposal["kind"],
+                            "content": {key: value for key, value in proposal.items()
+                                        if key != "kind"}}
+            ref, row = self._prepare(proposal)
             with self._transaction():
                 for parent in parents:
                     self._row(parent, "active")
