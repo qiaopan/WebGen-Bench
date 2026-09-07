@@ -25,6 +25,8 @@
     "max_grounding_edges": 12,
     "max_evidence_items": 12,
     "max_evidence_chars": 12000,
-    "max_outcome_chars": 2000
+    "max_outcome_chars": 2000,
+    "schema_repair_retries": 2,
+    "hierarchy_dedup_similarity": 0.9
   }
 }

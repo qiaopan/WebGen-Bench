@@ -40,6 +40,7 @@ class FakeLLM:
             "validate": {"valid": True, "reason": "Grounded in the supplied evidence"},
             "judge": {"action": "KEEP", "reason": "Distinct knowledge"},
             "consolidate": {"action": "KEEP", "reason": "Distinct knowledge"},
+            "repair": lambda payload: {"memory": payload["invalid_memory"]},
             "aspects": {"aspects": ["Filtering", "Pagination"]},
             "relevance": lambda payload: {"applicable": [item["ref"] for item in payload["candidates"]],
                                            "reasons": {item["ref"]["record_id"]: "Applicable"
@@ -262,6 +263,39 @@ class RuntimeTests(unittest.TestCase):
         derived = self.memory.consolidate()[0]
         self.assertEqual(derived.kind, "skill")
 
+    def test_json_string_in_consolidated_memory_is_normalised_without_llm_repair(self):
+        originals = []
+        for i in range(3):
+            self.trajectory(f"t{i}")
+            originals.append(self.make(f"t{i}", title=f"Lesson {i}"))
+        normalisable = proposal("Normalised procedure", "skill")
+        normalisable["content"]["inputs"] = '{"framework":"React"}'
+        self.llm.responses["consolidate"] = {
+            "action": "CONSOLIDATE", "reason": "Supported procedure",
+            "source_memories": [vars(ref) for ref in originals], "memory": normalisable,
+        }
+        derived = self.memory.consolidate()[0]
+        self.assertEqual(json.loads(self.memory._row(derived)["inputs"]), {"framework": "React"})
+        self.assertNotIn("repair", [operation for operation, _ in self.llm.calls])
+
+    def test_unrepairable_consolidated_memory_raises_instead_of_losing_evidence(self):
+        originals = []
+        for i in range(3):
+            self.trajectory(f"t{i}")
+            originals.append(self.make(f"t{i}", title=f"Lesson {i}"))
+        invalid = proposal("Invalid procedure", "skill")
+        invalid["content"]["inputs"] = "not an object"
+        self.llm.responses["consolidate"] = {
+            "action": "CONSOLIDATE", "reason": "Attempted procedure",
+            "source_memories": [vars(ref) for ref in originals], "memory": invalid,
+        }
+        self.llm.responses["repair"] = {"memory": invalid}
+        with self.assertRaises(ExtractionOutputError):
+            self.memory.consolidate()
+        self.assertEqual(self.memory.connection.execute(
+            "SELECT count(*) FROM skills").fetchone()[0], 0)
+        self.assertEqual(len([call for call in self.llm.calls if call[0] == "repair"]), 2)
+
     def test_consolidation_resumes_derived_candidate_before_new_checks(self):
         originals = []
         for i in range(3):
@@ -289,8 +323,7 @@ class RuntimeTests(unittest.TestCase):
             "action": "CONSOLIDATE", "reason": "Only one source actually supports this",
             "source_memories": [vars(refs[0])], "memory": proposal("Generalisation"),
         }
-        with self.assertRaisesRegex(ValueError, "minimum"):
-            self.memory.consolidate()
+        self.assertEqual(self.memory.consolidate(), [])
         self.assertEqual(self.memory.connection.execute("SELECT count(*) FROM experiences").fetchone()[0], 3)
 
     def test_generalisation_supporting_its_source_adds_leaves_without_a_cycle(self):
@@ -429,6 +462,26 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(len(event["candidates"]["experience"]["discovered"]), 1)
         self.assertEqual(event["candidates"]["experience"]["applicable_ranked"], [])
 
+    def test_hierarchy_retrieval_injects_only_the_more_specific_relevant_memory(self):
+        originals = []
+        for index in range(3):
+            self.trajectory(f"t{index}")
+            originals.append(self.make(f"t{index}", title=f"Filtering lesson {index}"))
+        derived, row = self.memory._prepare(proposal("General filtering insight"))
+        with self.memory._transaction():
+            self.memory._insert(derived.table, row)
+            for parent in originals:
+                self.memory._source(derived, parent=parent, evidence_refs=[vars(parent)],
+                                    relation="supports", note="Generalised evidence")
+            self.memory._status(derived, "active")
+
+        packet = self.memory.retrieve("Filter a list")
+        returned = {item.ref for item in packet.experiences}
+        self.assertIn(derived, returned)
+        self.assertTrue(returned.isdisjoint(originals))
+        suppressed = self.events[-1]["hierarchy_suppressed"]
+        self.assertEqual({MemoryRef(**item["ref"]) for item in suppressed}, set(originals))
+
     def test_wrong_model_or_hash_and_archived_rows_cannot_be_retrieved(self):
         self.trajectory()
         ref = self.make()
@@ -474,7 +527,8 @@ class RuntimeTests(unittest.TestCase):
         logger({"operation": "test", "error": "Example error"})
         self.assertEqual(json.loads(path.read_text())["operation"], "test")
         for kwargs in ({"min_consolidation_evidence": 0}, {"evidence_weight": float("nan")},
-                       {"retrieval_min_similarity": 2}, {"max_task_aspects": True}):
+                       {"retrieval_min_similarity": 2}, {"max_task_aspects": True},
+                       {"schema_repair_retries": -1}):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 MemoryConfig(**kwargs)
 
@@ -482,6 +536,8 @@ class RuntimeTests(unittest.TestCase):
         settings = load_long_memory_settings(ROOT / "config/long_memory.json")
         self.assertEqual(settings.memory.consolidation_candidates, 4)
         self.assertEqual(settings.memory.max_evidence_chars, 12000)
+        self.assertEqual(settings.memory.schema_repair_retries, 2)
+        self.assertEqual(settings.memory.hierarchy_dedup_similarity, 0.9)
         self.assertEqual(settings.memory_llm["deployment"], "webgen-memory-gpt41-mini")
         self.assertEqual(settings.embedding["deployment"], "webgen-memory-embedding")
 

@@ -125,8 +125,12 @@ integration must supply it. Unknown model identity remains null, not fabricated.
    before evidence counting; each type's semantic candidate pool is bounded.
 5. Within that relevant pool only, rank by
    `similarity + evidence_weight * min(distinct_supporting_trajectories, evidence_cap)`.
-   Return separate Experience/Skill Top-K lists, possibly empty. There is no
-   consolidated flag bonus. The adapter receives the original stored content.
+   Before Top-K, compare relevant memories that have a direct or transitive
+   provenance relationship. When a same-type parent/derived pair is near-duplicate,
+   retain only the one with greater task similarity (ties prefer the derived memory).
+   Return separate Experience/Skill Top-K lists, possibly empty. This suppression
+   affects only the retrieval packet: both rows and all provenance remain stored.
+   There is no consolidated flag bonus. The adapter receives the original stored content.
 
 Consolidation is an explicit caller-scheduled pass, not a background scheduler.
 The threshold controls whether a higher-level check runs during that pass.
@@ -134,6 +138,13 @@ Repeated extraction is not an exactly-once job queue: retry already-created
 candidates by ID using `validate()`. Semantic SUPPORT handles repeated knowledge;
 run orchestration should checkpoint completed extraction calls, including empty
 results. This avoids adding an operations/job table in this initial version.
+
+The database keeps strict JSON/type constraints. Provider output is normalized
+before insertion (including JSON objects/arrays returned as encoded strings). If
+that is insufficient, consolidation asks the memory model for a bounded schema-only
+repair. An unrepairable result raises a retryable pipeline error; it is neither
+inserted nor silently counted as complete, and G1 cannot be consolidated/frozen
+while an extraction remains pending.
 
 ## Configuration
 
@@ -159,6 +170,8 @@ configuration SHA-256 is recorded in experiment metadata.
 | `max_evidence_items` | 12 | Located evidence items supplied from one trajectory. |
 | `max_evidence_chars` | 12000 | Total deterministic evidence-text budget per trajectory. |
 | `max_outcome_chars` | 2000 | Outcome-summary text budget per representative trajectory. |
+| `schema_repair_retries` | 2 | Schema-only repair calls after deterministic normalization fails; `0` disables them. |
+| `hierarchy_dedup_similarity` | 0.9 | Near-duplicate gate for related same-type parent/derived memories during retrieval only. |
 
 Thresholds are initial experiment hyperparameters, not universal constants.
 Agent identity, memory mode, database snapshot, model/embedding implementations,

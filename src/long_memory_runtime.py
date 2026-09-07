@@ -61,6 +61,8 @@ class MemoryConfig:
     max_evidence_items: int = 12
     max_evidence_chars: int = 12000
     max_outcome_chars: int = 2000
+    schema_repair_retries: int = 2
+    hierarchy_dedup_similarity: float = 0.9
 
     def __post_init__(self) -> None:
         for key in ("min_consolidation_evidence", "max_task_aspects",
@@ -71,10 +73,11 @@ class MemoryConfig:
                     "max_evidence_items", "max_evidence_chars", "max_outcome_chars"):
             if type(getattr(self, key)) is not int or getattr(self, key) < 1:
                 raise ValueError(f"{key} must be a positive integer")
-        for key in ("top_k_experiences", "top_k_skills"):
+        for key in ("top_k_experiences", "top_k_skills", "schema_repair_retries"):
             if type(getattr(self, key)) is not int or getattr(self, key) < 0:
                 raise ValueError(f"{key} must be a nonnegative integer")
-        for key in ("retrieval_min_similarity", "consolidation_min_similarity"):
+        for key in ("retrieval_min_similarity", "consolidation_min_similarity",
+                    "hierarchy_dedup_similarity"):
             if not math.isfinite(getattr(self, key)) or not -1 <= getattr(self, key) <= 1:
                 raise ValueError(f"{key} must be finite and in [-1, 1]")
         if not math.isfinite(self.evidence_weight) or self.evidence_weight < 0:
@@ -190,6 +193,8 @@ OPERATIONS = {
                  "on purpose and must not affect applicability. Return {applicable: [{kind: "
                  "experience|skill, record_id: string}], reasons: {record_id: string}} using only "
                  "provided candidates. An empty applicable list is valid.",
+    "repair": "Repair only the supplied memory JSON structure to match the required Experience "
+              "or Skill schema. Preserve its meaning and wording. Return {memory: {kind, content}}.",
 }
 
 
@@ -203,6 +208,27 @@ def _content(kind: str, row: Mapping[str, Any]) -> dict:
         if isinstance(result[key], str):
             result[key] = json.loads(result[key])
     return result
+
+
+def _normalise_proposal(proposal: Any) -> dict:
+    if not isinstance(proposal, dict):
+        raise ValueError("Memory proposal must be an object")
+    if "content" not in proposal and proposal.get("kind") in FIELDS:
+        proposal = {"kind": proposal["kind"],
+                    "content": {key: value for key, value in proposal.items() if key != "kind"}}
+    proposal = dict(proposal)
+    content = proposal.get("content")
+    if not isinstance(content, dict):
+        raise ValueError("Memory content must be an object")
+    content = dict(content)
+    for key in JSON_FIELDS & content.keys():
+        if isinstance(content[key], str):
+            try:
+                content[key] = json.loads(content[key])
+            except json.JSONDecodeError:
+                pass
+    proposal["content"] = content
+    return proposal
 
 
 def _vector(values: Sequence[float]) -> tuple[float, ...]:
@@ -481,7 +507,8 @@ class LongMemory:
                         "The previous extraction was invalid. Every memory must include "
                         "evidence_refs, relation (supports or counterexample), and a "
                         "non-empty note. Return only schema-valid memories."
-                    )
+                    ),
+                    "previous_output": proposals,
                 }),
             })
             proposals = result.get("memories")
@@ -504,7 +531,11 @@ class LongMemory:
                             "Extracted memory relation must be supports or counterexample")
                     if not isinstance(proposal.get("note"), str) or not proposal["note"].strip():
                         raise ExtractionOutputError("Extracted memory note must be non-empty")
-                    prepared.append((self._prepare(proposal), proposal))
+                    try:
+                        proposal = _normalise_proposal(proposal)
+                        prepared.append((self._prepare(proposal), proposal))
+                    except (KeyError, TypeError, ValueError) as error:
+                        raise ExtractionOutputError(str(error)) from error
                 break
             except ExtractionOutputError:
                 if attempt == 2:
@@ -707,6 +738,8 @@ class LongMemory:
         seeds = sorted(frontier, key=lambda ref: (ref.kind, ref.record_id))
         seen = set()
         for seed in seeds:
+            if seed not in frontier:
+                continue
             members = [seed] + [MemoryRef(**item["ref"]) for item in
                                 self._neighbors(seed, self._row(seed), frontier)]
             signature = tuple(sorted((ref.kind, ref.record_id) for ref in members))
@@ -756,7 +789,11 @@ class LongMemory:
             supporting = {t["trajectory_id"] for ref in parents
                           for t in self.provenance(ref, supports_only=True)["trajectories"]}
             if len(supporting) < self.config.min_consolidation_evidence:
-                raise ValueError("Selected evidence is below the distinct-trajectory minimum")
+                self.log({"operation": "consolidation_skip", "agent_id": self.agent_id,
+                          "reason": "selected evidence below distinct-trajectory minimum",
+                          "parents": [asdict(parent) for parent in parents],
+                          "supporting_trajectories": len(supporting)})
+                continue
             if action == "SUPPORT":
                 target = MemoryRef(**result["target"])
                 if target not in members:
@@ -768,13 +805,22 @@ class LongMemory:
                         if parent != target:
                             self._support(target, parent, result["reason"])
                 continue
-            proposal = result["memory"]
-            if (isinstance(proposal, dict) and "content" not in proposal
-                    and proposal.get("kind") in FIELDS):
-                proposal = {"kind": proposal["kind"],
-                            "content": {key: value for key, value in proposal.items()
-                                        if key != "kind"}}
-            ref, row = self._prepare(proposal)
+            proposal = result.get("memory")
+            for repair_attempt in range(self.config.schema_repair_retries + 1):
+                try:
+                    proposal = _normalise_proposal(proposal)
+                    ref, row = self._prepare(proposal)
+                    break
+                except (KeyError, TypeError, ValueError) as error:
+                    if repair_attempt >= self.config.schema_repair_retries:
+                        raise ExtractionOutputError(
+                            f"Consolidated memory remains invalid after repair: {error}") from error
+                    repaired = self._call("repair", {
+                        "invalid_memory": proposal,
+                        "schema_error": str(error),
+                        "required_fields": FIELDS,
+                    })
+                    proposal = repaired.get("memory")
             with self._transaction():
                 for parent in parents:
                     self._row(parent, "active")
@@ -782,11 +828,55 @@ class LongMemory:
                 for parent in parents:
                     self._source(ref, parent=parent, evidence_refs=[asdict(parent)],
                                  relation="supports", note=result["reason"])
-            self.validate(ref)  # Same automated admission as extracted memory.
-            created.append(ref)
+            status = self.validate(ref)  # Same automated admission as extracted memory.
+            if status == "active":
+                frontier.difference_update(parents)
+                created.append(ref)
             self.log({"operation": "consolidation_commit", "agent_id": self.agent_id,
-                      "ref": asdict(ref), "parents": [asdict(parent) for parent in parents]})
+                      "ref": asdict(ref), "status": status,
+                      "parents": [asdict(parent) for parent in parents]})
         return created
+
+    def _stored_vector(self, ref: MemoryRef) -> tuple[float, ...]:
+        row = self._row(ref, "active")
+        return _vector(struct.unpack(f"<{row['embedding_dim']}f", row["embedding"]))
+
+    def _ancestor_refs(self, ref: MemoryRef) -> set[MemoryRef]:
+        return {
+            MemoryRef("experience", edge["source_experience_record_id"])
+            if edge["source_experience_record_id"] else
+            MemoryRef("skill", edge["source_skill_record_id"])
+            for edge in self.provenance(ref)["edges"]
+            if edge["source_experience_record_id"] or edge["source_skill_record_id"]
+        }
+
+    def _deduplicate_hierarchy(self, applicable: set[MemoryRef],
+                               task_similarity: dict[MemoryRef, float]) -> tuple[set[MemoryRef], list[dict]]:
+        kept, suppressed = set(applicable), []
+        refs = sorted(applicable, key=lambda ref: (ref.kind, ref.record_id))
+        ancestors = {ref: self._ancestor_refs(ref) for ref in refs}
+        vectors = {ref: self._stored_vector(ref) for ref in refs}
+        for index, left in enumerate(refs):
+            if left not in kept:
+                continue
+            for right in refs[index + 1:]:
+                if right not in kept or left.kind != right.kind:
+                    continue
+                if left not in ancestors[right] and right not in ancestors[left]:
+                    continue
+                memory_similarity = sum(a * b for a, b in zip(vectors[left], vectors[right]))
+                if memory_similarity < self.config.hierarchy_dedup_similarity:
+                    continue
+                if task_similarity[left] == task_similarity[right]:
+                    loser = left if left in ancestors[right] else right
+                    winner = right if loser == left else left
+                else:
+                    winner, loser = ((left, right) if task_similarity[left] > task_similarity[right]
+                                     else (right, left))
+                kept.discard(loser)
+                suppressed.append({"ref": asdict(loser), "preferred": asdict(winner),
+                                   "memory_similarity": memory_similarity})
+        return kept, suppressed
 
     @_log_errors
     def retrieve(self, task: str) -> MemoryPacket:
@@ -823,6 +913,11 @@ class LongMemory:
                     raise ValueError("Relevance judgement selected an unknown candidate")
                 applicable.add(ref)
 
+        task_similarity = {ref: similarity for values in discovered.values()
+                           for ref, _, similarity in values}
+        applicable, hierarchy_suppressed = self._deduplicate_hierarchy(
+            applicable, task_similarity)
+
         selected, audit = {}, {}
         for kind in FIELDS:
             ranked = []
@@ -843,7 +938,7 @@ class LongMemory:
         packet = MemoryPacket(selected["experience"], selected["skill"])
         self.log({"operation": "retrieval", "agent_id": self.agent_id, "task": task,
                   "aspects": aspects, "config": asdict(self.config), "relevance": relevance,
-                  "candidates": audit,
+                  "candidates": audit, "hierarchy_suppressed": hierarchy_suppressed,
                   "selected": [asdict(item.ref) for item in (*packet.experiences, *packet.skills)],
                   "packet_hash": hashlib.sha256(packet.render().encode()).hexdigest()})
         return packet

@@ -59,7 +59,11 @@ def append_event(path: Path, event: dict) -> None:
 def completed_keys(path: Path) -> set[str]:
     if not path.is_file():
         return set()
-    return {item["key"] for item in load_jsonl(path) if item.get("status") == "complete"}
+    latest = {}
+    for item in load_jsonl(path):
+        if "key" in item:
+            latest[item["key"]] = item.get("status")
+    return {key for key, status in latest.items() if status == "complete"}
 
 
 def extraction_validated(path: Path, trajectory_id: str) -> bool:
@@ -207,6 +211,8 @@ def main() -> None:
                         default=ROOT / "config/long_memory.json")
     parser.add_argument("--stop-after-g1", action="store_true",
                         help="Consolidate and freeze G1, then stop before G2 generation")
+    parser.add_argument("--accept-frozen-retrieval-update", action="store_true",
+                        help="Use a revised retrieval runtime with the verified existing G1 snapshot")
     args = parser.parse_args()
     load_dotenv(ROOT / ".env")
 
@@ -233,16 +239,39 @@ def main() -> None:
     metadata_path = output / "run-metadata.json"
     if metadata_path.is_file():
         existing_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        for key in ("generation_git_commit", "generation_memory_config_sha256",
+                    "retrieval_policy_updated_after_freeze"):
+            if key in existing_metadata:
+                metadata[key] = existing_metadata[key]
+        revision_keys = {"git_commit", "memory_config_sha256"}
         comparable_existing = {key: existing_metadata.get(key) for key in metadata
-                               if key != "git_commit"}
+                               if key not in revision_keys}
         comparable_current = {key: value for key, value in metadata.items()
-                              if key != "git_commit"}
+                              if key not in revision_keys}
         if comparable_existing != comparable_current:
             raise RuntimeError(
                 f"Stage 1 directory belongs to different frozen settings: {metadata_path}")
-        if existing_metadata.get("git_commit") != metadata["git_commit"]:
-            if "g1:frozen" in completed_keys(progress_path):
-                raise RuntimeError("Cannot change code revision after G1 memory is frozen")
+        revision_changed = (
+            existing_metadata.get("git_commit") != metadata["git_commit"] or
+            existing_metadata.get("memory_config_sha256") != metadata["memory_config_sha256"]
+        )
+        if revision_changed and "g1:frozen" in completed_keys(progress_path):
+            if not args.accept_frozen_retrieval_update:
+                raise RuntimeError(
+                    "G1 is frozen under an earlier code/config revision; pass "
+                    "--accept-frozen-retrieval-update to retain that snapshot and use the new "
+                    "retrieval policy")
+            snapshot = output / "frozen-memory.db"
+            frozen_events = [item for item in load_jsonl(progress_path)
+                             if item.get("key") == "g1:frozen" and item.get("status") == "complete"]
+            if not snapshot.is_file() or not frozen_events or file_hash(snapshot) != frozen_events[-1].get("sha256"):
+                raise RuntimeError("The existing frozen G1 snapshot failed integrity verification")
+            metadata["generation_git_commit"] = existing_metadata.get(
+                "generation_git_commit", existing_metadata.get("git_commit"))
+            metadata["generation_memory_config_sha256"] = existing_metadata.get(
+                "generation_memory_config_sha256", existing_metadata.get("memory_config_sha256"))
+            metadata["retrieval_policy_updated_after_freeze"] = True
+        elif existing_metadata.get("git_commit") != metadata["git_commit"]:
             metadata["generation_git_commit"] = existing_metadata.get(
                 "generation_git_commit", existing_metadata.get("git_commit"))
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -301,15 +330,15 @@ def main() -> None:
                     except ExtractionOutputError as error:
                         append_event(progress_path, {
                             "key": key,
-                            "status": "complete",
+                            "status": "retryable_schema_error",
                             "trajectory_id": trajectory_id,
-                            "memory_status": "skipped_invalid_llm_output",
+                            "memory_status": "pending_invalid_llm_output",
                             "error": str(error),
                             "candidate_refs": [],
                         })
-                        completed.add(key)
-                        print(f"[stage1] completed {position}/{len(g1_records)} G1 "
-                              f"(memory skipped: {error})", flush=True)
+                        completed.discard(key)
+                        print(f"[stage1] pending {position}/{len(g1_records)} G1 "
+                              f"(memory schema retry required: {error})", flush=True)
                         continue
         else:
             refs = []
@@ -320,6 +349,10 @@ def main() -> None:
                                                         for ref in refs]})
         completed.add(key)
         print(f"[stage1] completed {position}/{len(g1_records)} G1", flush=True)
+
+    expected_g1 = {f"g1:{task['id']}" for task in g1_records}
+    if not expected_g1 <= completed:
+        raise RuntimeError("Cannot consolidate or freeze while G1 memory extraction is pending")
 
     if "g1:consolidated" not in completed:
         with LongMemory(args.database, "bolt", memory_mode="learn", llm=llm,
