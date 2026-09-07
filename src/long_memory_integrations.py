@@ -134,13 +134,17 @@ class BoltAgentAdapter:
     provider: str = "OpenAILike"
     headless: bool = True
     max_repair_attempts: int = 1
+    generation_guard: str = ""
     last_memory: MemoryPacket | None = field(default=None, init=False)
 
     def run(self, task: str, memory: MemoryPacket) -> Any:
         self.last_memory = memory
+        prompt = bolt_memory_prompt(task, memory)
+        if self.generation_guard:
+            prompt += "\n\nFINAL IMPLEMENTATION CONSTRAINTS:\n" + self.generation_guard
         return self.generate(
             idx=self.index,
-            instruction=bolt_memory_prompt(task, memory),
+            instruction=prompt,
             download_dir=str(self.output_dir),
             url=self.url,
             desired_model=self.model,

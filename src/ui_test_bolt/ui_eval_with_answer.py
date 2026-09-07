@@ -207,7 +207,7 @@ def main():
     zip_files = sorted(
         os.path.join(in_dir, file)
         for file in os.listdir(in_dir)
-        if file.endswith(".zip") and not file.startswith("error")
+        if re.fullmatch(r"\d{6}\.zip", file)
     )
     
     output_root = os.path.join(in_dir, "extracted")

@@ -113,7 +113,14 @@ def main():
     in_dir = args.in_dir
     test_file = args.t
     test_datas = load_jsonl(test_file)
-    zip_files = [os.path.join(in_dir, file) for file in os.listdir(in_dir) if file.endswith(".zip") and file.startswith("00")]
+    # Only canonical finalized artifacts are evaluable.  Retry/repair archives
+    # (for example ``000006.attempt-1.failed.zip``) intentionally have no
+    # matching chat export and must not enter the appearance batch.
+    zip_files = [
+        os.path.join(in_dir, file)
+        for file in sorted(os.listdir(in_dir))
+        if re.fullmatch(r"\d{6}\.zip", file)
+    ]
     
     output_root = os.path.join(in_dir, "extracted")
     if not os.path.exists(output_root):

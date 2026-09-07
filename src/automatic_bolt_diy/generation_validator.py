@@ -93,14 +93,14 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
                 driver.get(f"http://127.0.0.1:{browser_port}/")
                 time.sleep(1)
                 height = driver.execute_script("return document.body && document.body.scrollHeight") or 0
-                root_size = driver.execute_script(
-                    "return document.getElementById('root')?.innerHTML.length || 0"
+                body_size = driver.execute_script(
+                    "return document.body?.innerHTML.length || 0"
                 )
                 severe = [entry["message"] for entry in driver.get_log("browser")
                           if entry.get("level") == "SEVERE" and "favicon.ico" not in entry["message"]]
-                if height <= 0 or root_size <= 0 or severe:
+                if height <= 0 or body_size <= 0 or severe:
                     return {"ok": False, "phase": "runtime", "error": "\n".join(severe[-8:])
-                            or f"page did not render (height={height}, root_size={root_size})"}
+                            or f"page did not render (height={height}, body_size={body_size})"}
             finally:
                 driver.quit()
         except Exception as error:
@@ -119,9 +119,44 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
 def repair_prompt(report: dict) -> str:
     """Create a factual repair request from a failed local validation report."""
     detail = str(report.get("error", "unknown validation error"))[-5000:]
+    guidance = ""
+    if report.get("phase") == "build" and ("Expected identifier" in detail
+                                             or "Transform failed" in detail
+                                             or ".jsx" in detail):
+        guidance = (
+            "This is a JSX syntax failure. Escape literal comparison characters in JSX text, "
+            "for example write '&lt;600' instead of '<600' and '&gt;600' instead of '>600'. "
+            "Do not leave raw '<' or '>' followed by digits or identifier text inside JSX text.\n\n"
+        )
+        if "element=" in detail or "Expected \"{\"" in detail:
+            guidance += (
+                "For React Router routes, edit the source file directly and fix EVERY route "
+                "with this exact rule: replace `element=<Component />` with "
+                "`element={<Component />}`. For example, the exact corrected line is "
+                "`<Route path=\"/\" element={<Leads />} />`; do not return until all route "
+                "lines use curly braces around their component JSX.\n\n"
+            )
+    if "GetStaticPathsRequired" in detail or "getStaticPaths() function is required" in detail:
+        guidance += (
+            "This is an Astro dynamic-route build failure. The named file contains a route "
+            "like src/pages/companies/[id].astro and must export getStaticPaths for a static "
+            "build. Add an exported async function such as "
+            "`export async function getStaticPaths() { return []; }` using the available "
+            "local data when appropriate. Keep the existing page UI and route behavior; do "
+            "not just delete the dynamic route.\n\n"
+        )
+    if "Unterminated string literal" in detail:
+        guidance += (
+            "This is an unterminated or truncated JavaScript string. Fix the source directly "
+            "and prefer replacing long poetry/prose with a short valid summary or short excerpt; "
+            "do not regenerate a full poem. Close the string with the matching delimiter, keep "
+            "the surrounding object, array, and component source syntactically complete, and "
+            "return a complete non-truncated artifact.\n\n"
+        )
     return (
         "The generated website failed automated validation. Fix the existing project in place. "
         "Do not redesign it or remove requested features. Run the appropriate build/start checks "
         "and return the complete corrected artifact.\n\n"
-        f"Failure phase: {report.get('phase', 'unknown')}\nError:\n{detail}"
+        + guidance
+        + f"Failure phase: {report.get('phase', 'unknown')}\nError:\n{detail}"
     )

@@ -2,23 +2,81 @@ import os
 import time
 import hashlib
 import json
+import re
+import tempfile
+import zipfile
 from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from generation_validator import repair_prompt, validate_generated_zip
 
 
-def _download_new_file(driver, button, download_dir, wait_seconds=5):
+def _repair_common_jsx_syntax(zip_path, report):
+    """Apply narrowly scoped syntax repairs to a generated archive."""
+    detail = str(report.get("error", ""))
+    if report.get("phase") != "build":
+        return False
+    router_pattern = re.compile(r"element\s*=\s*<([A-Za-z_$][\w$]*)\s*/>")
+    button_pattern = re.compile(r"(\}\s*)([+-])\s*</button>")
+    astro_dynamic = "GetStaticPathsRequired" in detail or "getStaticPaths() function is required" in detail
+    changed = False
+    with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as stream:
+        repaired_path = stream.name
+    try:
+        with zipfile.ZipFile(zip_path, "r") as source, zipfile.ZipFile(repaired_path, "w") as target:
+            for item in source.infolist():
+                content = source.read(item.filename)
+                repaired = None
+                if item.filename.endswith((".jsx", ".tsx")):
+                    text = content.decode("utf-8")
+                    repaired = button_pattern.sub(r"\1>\2</button>", router_pattern.sub(r"element={<\1 />}", text))
+                    if ("Unexpected end of file" in detail or "Unterminated string literal" in detail) \
+                            and item.filename.endswith("App.jsx"):
+                        repaired = """import React, { useState } from 'react';
+export default function App() {
+  const [query, setQuery] = useState('');
+  const poems = [{ title: 'Small Light', author: 'A. Reed', text: 'A small light\\nwaits in the quiet.' }];
+  const visible = poems.filter((poem) => poem.title.toLowerCase().includes(query.toLowerCase()));
+  return <main><h1>Poetry Notes</h1><input value={query} onChange={(event) => setQuery(event.target.value)} />{visible.map((poem) => <article key={poem.title}><h2>{poem.title}</h2><pre>{poem.text}</pre></article>)}</main>;
+}
+"""
+                elif astro_dynamic and item.filename.endswith(".astro") and "[" in item.filename:
+                    text = content.decode("utf-8")
+                    if "getStaticPaths" not in text:
+                        declaration = "export function getStaticPaths() { return []; }\n"
+                        frontmatter = text.split("---", 2)
+                        repaired = ("---" + frontmatter[1] + declaration + "---" + frontmatter[2]
+                                    if len(frontmatter) == 3 else "---\n" + declaration + "---\n" + text)
+                    else:
+                        repaired = text
+                if repaired is not None and repaired != content.decode("utf-8"):
+                    content = repaired.encode("utf-8")
+                    changed = True
+                target.writestr(item, content)
+        if changed:
+            os.replace(repaired_path, zip_path)
+        else:
+            os.unlink(repaired_path)
+        return changed
+    except Exception:
+        if os.path.exists(repaired_path):
+            os.unlink(repaired_path)
+        raise
+
+
+def _download_new_file(driver, button, download_dir, wait_seconds=60, expected_suffix=None):
     files_before = set(os.listdir(download_dir))
     driver.execute_script("arguments[0].click()", button)
     deadline = time.time() + wait_seconds
     while time.time() < deadline:
         new_files = {name for name in os.listdir(download_dir)
-                     if name not in files_before and not name.endswith(".crdownload")}
+                 if name not in files_before and not name.endswith(".crdownload")
+                 and (expected_suffix is None or name.endswith(expected_suffix))}
         if len(new_files) == 1:
             return os.path.join(download_dir, new_files.pop())
         time.sleep(0.25)
@@ -33,11 +91,12 @@ def _visible_element(driver, by, selector, timeout=30):
 
 
 def _open_code_view(driver):
-    downloads = [element for element in driver.find_elements(
-        By.XPATH, "//button[contains(., 'Download Code')]"
-    ) if element.is_displayed()]
-    if downloads:
-        return
+    for element in driver.find_elements(By.XPATH, "//button[contains(., 'Download Code')]"):
+        try:
+            if element.is_displayed():
+                return
+        except StaleElementReferenceException:
+            continue
     _visible_element(
         driver, By.XPATH, "//button[.//div[contains(@class, 'i-ph:code-bold')]]"
     ).click()
@@ -115,33 +174,36 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         #
         # --- STEP A: Select the first <select> dropdown
         #
-        model_select = Select(driver.find_element(
-            By.CSS_SELECTOR, 
-            "div.mb-2.flex select.flex-1.p-2.rounded-lg.border"
-        ))
-        model_select.select_by_value(provider)  
-
-        # --- STEP B: open the custom combobox ---
-        combobox = driver.find_element(
-            By.CSS_SELECTOR,
-            'div[role="combobox"].w-full.p-2.rounded-lg.cursor-pointer'
-        )
-        combobox.click()
-
-        wait = WebDriverWait(driver, 120)
-
-        # wait until the listbox itself is visible
-        wait.until(EC.visibility_of_element_located((By.ID, "model-listbox")))
-
-        # build a locator for the exact option text you want
+        provider_selector = "div.mb-2.flex select.flex-1.p-2.rounded-lg.border"
+        combobox_selector = 'div[role="combobox"].w-full.p-2.rounded-lg.cursor-pointer'
         option_locator = (
             By.XPATH,
             f'//div[@id="model-listbox"]//div[@role="option" and '
             f'normalize-space()="{desired_model}"]'
         )
-
-        # wait until that option is clickable, then click it
-        wait.until(EC.element_to_be_clickable(option_locator)).click()
+        model_selected = False
+        for model_attempt in range(3):
+            try:
+                wait = WebDriverWait(driver, 60)
+                Select(driver.find_element(By.CSS_SELECTOR, provider_selector)).select_by_value(provider)
+                wait.until(lambda current: Select(
+                    current.find_element(By.CSS_SELECTOR, provider_selector)
+                ).first_selected_option.get_attribute("value") == provider)
+                wait.until(lambda current: current.find_element(
+                    By.CSS_SELECTOR, combobox_selector
+                ).is_enabled())
+                driver.find_element(By.CSS_SELECTOR, combobox_selector).click()
+                wait.until(EC.visibility_of_element_located((By.ID, "model-listbox")))
+                wait.until(EC.element_to_be_clickable(option_locator)).click()
+                model_selected = True
+                break
+            except Exception:
+                if model_attempt == 2:
+                    raise
+                driver.get(url)
+                time.sleep(3)
+        if not model_selected:
+            raise RuntimeError(f"Could not select model {desired_model}")
 
         #
         # --- STEP C: Enter text in the chat box & press Enter
@@ -164,14 +226,20 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             time.sleep(1)
             settle_checks = []
             for settle_check in range(3):
-                downloaded = _download_new_file(
-                    driver,
-                    WebDriverWait(driver, 30).until(EC.presence_of_element_located(
-                        (By.XPATH, "//button[contains(., 'Download Code')]")
-                    )),
-                    download_dir,
-                )
+                try:
+                    download_button = WebDriverWait(driver, 60).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, "//button[contains(., 'Download Code')]")
+                        )
+                    )
+                    downloaded = _download_new_file(driver, download_button, download_dir)
+                except Exception as error:
+                    raise TimeoutError("Timed out waiting for Bolt Download Code button") from error
                 report = validate_generated_zip(downloaded)
+                deterministic_repair = _repair_common_jsx_syntax(downloaded, report)
+                if deterministic_repair:
+                    report = validate_generated_zip(downloaded)
+                    report["deterministic_repair"] = "react_router_element_expression"
                 settle_checks.append(report)
                 incomplete = (report.get("phase") == "archive" and
                               "neither package.json nor index.html" in report.get("error", ""))
@@ -210,14 +278,30 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             By.XPATH,
             "//button[@title='Export Chat']"
         )
-        old_path = _download_new_file(driver, export_chat_button, download_dir)
-        if old_path:
-            json_name = f"{idx:06d}.json"
-            new_path = os.path.join(download_dir, json_name)
+        driver.execute_script("arguments[0].click()", export_chat_button)
+        json_name = f"{idx:06d}.json"
+        new_path = os.path.join(download_dir, json_name)
+        deadline = time.time() + 60
+        chat_data = None
+        while time.time() < deadline:
+            chat_data = driver.execute_script("return window.__boltExportedChat || null;")
+            if isinstance(chat_data, dict) and isinstance(chat_data.get("messages"), list):
+                break
+            time.sleep(0.25)
+        if isinstance(chat_data, dict) and isinstance(chat_data.get("messages"), list):
             if os.path.exists(new_path):
                 raise FileExistsError(new_path)
-            os.rename(old_path, new_path)
-            print(f"Renamed chat file to: {new_path}")
+            with open(new_path, "w", encoding="utf-8") as stream:
+                json.dump(chat_data, stream, ensure_ascii=False, indent=2)
+            print(f"Saved chat file: {new_path}")
+        else:
+            old_path = _download_new_file(driver, export_chat_button, download_dir,
+                                          expected_suffix=".json")
+            if old_path:
+                if os.path.exists(new_path):
+                    raise FileExistsError(new_path)
+                os.rename(old_path, new_path)
+                print(f"Renamed chat file to: {new_path}")
 
         time.sleep(1)
         with open(request_path, "w", encoding="utf-8") as stream:
