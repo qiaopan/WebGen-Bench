@@ -40,7 +40,6 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
             return {"ok": False, "phase": "archive", "error": str(error)}
 
         package_path = app_dir / "package.json"
-        port = _free_port()
         if package_path.is_file():
             try:
                 package = json.loads(package_path.read_text(encoding="utf-8"))
@@ -62,10 +61,14 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
             script = "dev" if "dev" in scripts else "start" if "start" in scripts else None
             if script is None:
                 return {"ok": False, "phase": "start", "error": "no dev or start script"}
+            # Reserve only after archive/package validation, but before the
+            # chosen server command needs the port number.
+            port = _free_port()
             command = ["npm", "run", script]
             if script == "dev":
                 command += ["--", "--host", "127.0.0.1", "--port", str(port)]
         elif (app_dir / "index.html").is_file():
+            port = _free_port()
             command = [sys.executable, "-m", "http.server", str(port),
                        "--bind", "127.0.0.1"]
         else:

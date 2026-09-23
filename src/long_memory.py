@@ -1,4 +1,4 @@
-"""Initialize and open the four-table, file-backed long-memory store.
+"""Initialize and open the file-backed long-memory store.
 
 Runtime policies and thin integration interfaces live in long_memory_runtime.py.
 """
@@ -12,10 +12,10 @@ from pathlib import Path
 from typing import Iterator
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 APPLICATION_ID = 0x57474D31  # WGM1: WebGen Memory, format 1.
 SCHEMA_PATH = Path(__file__).with_name("long_memory_schema.sql")
-TABLE_NAMES = ("trajectories", "experiences", "skills", "memory_sources")
+TABLE_NAMES = ("trajectories", "reflection_cases", "experiences", "skills", "memory_sources")
 
 
 def _require_sqlite_features() -> None:
@@ -80,7 +80,7 @@ def _configure(connection: sqlite3.Connection, *, read_only: bool) -> None:
 
 
 def initialize_database(path: str | Path) -> Path:
-    """Create an empty store atomically, or validate an existing version-2 store.
+    """Create an empty store atomically, or validate an existing version-3 store.
 
     Existing data is never dropped or overwritten. Unknown databases and schema
     versions are rejected. Initialization is an explicit setup operation, never

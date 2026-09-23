@@ -1,0 +1,496 @@
+{
+  "protocol": "continual-domain-block-v1",
+  "input": "data/test.jsonl",
+  "input_sha256": "e6451c1c5aed85ab01a15ab7c6be2bc737d4df28ca8b9ae15805a237878dee29",
+  "task_count": 101,
+  "domain_count": 20,
+  "memory_scope": "global_per_agent",
+  "domain_policy": "Domain is a retrieval preference derived from public task content, not a separate memory store or a hard cross-domain exclusion.",
+  "within_domain_order": "stable_task_id",
+  "batches": [
+    {
+      "batch": 1,
+      "application_type": "Company Brochure Sites",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_01.jsonl",
+      "task_count": 8,
+      "task_ids": [
+        "000014",
+        "000015",
+        "000016",
+        "000017",
+        "000018",
+        "000019",
+        "000020",
+        "000021"
+      ]
+    },
+    {
+      "batch": 2,
+      "application_type": "Discussion Forums",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_02.jsonl",
+      "task_count": 8,
+      "task_ids": [
+        "000026",
+        "000027",
+        "000028",
+        "000029",
+        "000030",
+        "000031",
+        "000032",
+        "000033"
+      ]
+    },
+    {
+      "batch": 3,
+      "application_type": "E-commerce Web Applications",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_03.jsonl",
+      "task_count": 8,
+      "task_ids": [
+        "000034",
+        "000035",
+        "000036",
+        "000037",
+        "000038",
+        "000039",
+        "000040",
+        "000041"
+      ]
+    },
+    {
+      "batch": 4,
+      "application_type": "Learning Platforms",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_04.jsonl",
+      "task_count": 8,
+      "task_ids": [
+        "000055",
+        "000056",
+        "000057",
+        "000058",
+        "000059",
+        "000060",
+        "000061",
+        "000062"
+      ]
+    },
+    {
+      "batch": 5,
+      "application_type": "Browser-Based Games",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_05.jsonl",
+      "task_count": 7,
+      "task_ids": [
+        "000007",
+        "000008",
+        "000009",
+        "000010",
+        "000011",
+        "000012",
+        "000013"
+      ]
+    },
+    {
+      "batch": 6,
+      "application_type": "Analytics Platforms/Dashboards",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_06.jsonl",
+      "task_count": 6,
+      "task_ids": [
+        "000001",
+        "000002",
+        "000003",
+        "000004",
+        "000005",
+        "000006"
+      ]
+    },
+    {
+      "batch": 7,
+      "application_type": "News and Information Sites",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_07.jsonl",
+      "task_count": 6,
+      "task_ids": [
+        "000063",
+        "000064",
+        "000065",
+        "000066",
+        "000067",
+        "000068"
+      ]
+    },
+    {
+      "batch": 8,
+      "application_type": "Personal Portfolio Sites",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_08.jsonl",
+      "task_count": 6,
+      "task_ids": [
+        "000071",
+        "000072",
+        "000073",
+        "000074",
+        "000075",
+        "000076"
+      ]
+    },
+    {
+      "batch": 9,
+      "application_type": "Travel Booking Portals",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_09.jsonl",
+      "task_count": 6,
+      "task_ids": [
+        "000096",
+        "000097",
+        "000098",
+        "000099",
+        "000100",
+        "000101"
+      ]
+    },
+    {
+      "batch": 10,
+      "application_type": "Productivity Applications",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_10.jsonl",
+      "task_count": 5,
+      "task_ids": [
+        "000077",
+        "000078",
+        "000079",
+        "000080",
+        "000081"
+      ]
+    },
+    {
+      "batch": 11,
+      "application_type": "CRM Systems",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_11.jsonl",
+      "task_count": 4,
+      "task_ids": [
+        "000022",
+        "000023",
+        "000024",
+        "000025"
+      ]
+    },
+    {
+      "batch": 12,
+      "application_type": "ERP Platforms",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_12.jsonl",
+      "task_count": 4,
+      "task_ids": [
+        "000044",
+        "000045",
+        "000046",
+        "000047"
+      ]
+    },
+    {
+      "batch": 13,
+      "application_type": "Job Search Platforms",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_13.jsonl",
+      "task_count": 4,
+      "task_ids": [
+        "000051",
+        "000052",
+        "000053",
+        "000054"
+      ]
+    },
+    {
+      "batch": 14,
+      "application_type": "Project Management Tools",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_14.jsonl",
+      "task_count": 4,
+      "task_ids": [
+        "000082",
+        "000083",
+        "000084",
+        "000085"
+      ]
+    },
+    {
+      "batch": 15,
+      "application_type": "Publishing/Blogging Platforms",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_15.jsonl",
+      "task_count": 4,
+      "task_ids": [
+        "000086",
+        "000087",
+        "000088",
+        "000089"
+      ]
+    },
+    {
+      "batch": 16,
+      "application_type": "Social Media Platforms",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_16.jsonl",
+      "task_count": 4,
+      "task_ids": [
+        "000090",
+        "000091",
+        "000092",
+        "000093"
+      ]
+    },
+    {
+      "batch": 17,
+      "application_type": "Internal Tools",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_17.jsonl",
+      "task_count": 3,
+      "task_ids": [
+        "000048",
+        "000049",
+        "000050"
+      ]
+    },
+    {
+      "batch": 18,
+      "application_type": "Email Clients",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_18.jsonl",
+      "task_count": 2,
+      "task_ids": [
+        "000042",
+        "000043"
+      ]
+    },
+    {
+      "batch": 19,
+      "application_type": "Personal Blog Sites",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_19.jsonl",
+      "task_count": 2,
+      "task_ids": [
+        "000069",
+        "000070"
+      ]
+    },
+    {
+      "batch": 20,
+      "application_type": "Streaming and Interactive Platforms",
+      "file": "data/experiment_splits/continual_domain_blocks/batch_20.jsonl",
+      "task_count": 2,
+      "task_ids": [
+        "000094",
+        "000095"
+      ]
+    }
+  ],
+  "domains": [
+    {
+      "application_type": "Company Brochure Sites",
+      "task_count": 8,
+      "task_ids": [
+        "000014",
+        "000015",
+        "000016",
+        "000017",
+        "000018",
+        "000019",
+        "000020",
+        "000021"
+      ]
+    },
+    {
+      "application_type": "Discussion Forums",
+      "task_count": 8,
+      "task_ids": [
+        "000026",
+        "000027",
+        "000028",
+        "000029",
+        "000030",
+        "000031",
+        "000032",
+        "000033"
+      ]
+    },
+    {
+      "application_type": "E-commerce Web Applications",
+      "task_count": 8,
+      "task_ids": [
+        "000034",
+        "000035",
+        "000036",
+        "000037",
+        "000038",
+        "000039",
+        "000040",
+        "000041"
+      ]
+    },
+    {
+      "application_type": "Learning Platforms",
+      "task_count": 8,
+      "task_ids": [
+        "000055",
+        "000056",
+        "000057",
+        "000058",
+        "000059",
+        "000060",
+        "000061",
+        "000062"
+      ]
+    },
+    {
+      "application_type": "Browser-Based Games",
+      "task_count": 7,
+      "task_ids": [
+        "000007",
+        "000008",
+        "000009",
+        "000010",
+        "000011",
+        "000012",
+        "000013"
+      ]
+    },
+    {
+      "application_type": "Analytics Platforms/Dashboards",
+      "task_count": 6,
+      "task_ids": [
+        "000001",
+        "000002",
+        "000003",
+        "000004",
+        "000005",
+        "000006"
+      ]
+    },
+    {
+      "application_type": "News and Information Sites",
+      "task_count": 6,
+      "task_ids": [
+        "000063",
+        "000064",
+        "000065",
+        "000066",
+        "000067",
+        "000068"
+      ]
+    },
+    {
+      "application_type": "Personal Portfolio Sites",
+      "task_count": 6,
+      "task_ids": [
+        "000071",
+        "000072",
+        "000073",
+        "000074",
+        "000075",
+        "000076"
+      ]
+    },
+    {
+      "application_type": "Travel Booking Portals",
+      "task_count": 6,
+      "task_ids": [
+        "000096",
+        "000097",
+        "000098",
+        "000099",
+        "000100",
+        "000101"
+      ]
+    },
+    {
+      "application_type": "Productivity Applications",
+      "task_count": 5,
+      "task_ids": [
+        "000077",
+        "000078",
+        "000079",
+        "000080",
+        "000081"
+      ]
+    },
+    {
+      "application_type": "CRM Systems",
+      "task_count": 4,
+      "task_ids": [
+        "000022",
+        "000023",
+        "000024",
+        "000025"
+      ]
+    },
+    {
+      "application_type": "ERP Platforms",
+      "task_count": 4,
+      "task_ids": [
+        "000044",
+        "000045",
+        "000046",
+        "000047"
+      ]
+    },
+    {
+      "application_type": "Job Search Platforms",
+      "task_count": 4,
+      "task_ids": [
+        "000051",
+        "000052",
+        "000053",
+        "000054"
+      ]
+    },
+    {
+      "application_type": "Project Management Tools",
+      "task_count": 4,
+      "task_ids": [
+        "000082",
+        "000083",
+        "000084",
+        "000085"
+      ]
+    },
+    {
+      "application_type": "Publishing/Blogging Platforms",
+      "task_count": 4,
+      "task_ids": [
+        "000086",
+        "000087",
+        "000088",
+        "000089"
+      ]
+    },
+    {
+      "application_type": "Social Media Platforms",
+      "task_count": 4,
+      "task_ids": [
+        "000090",
+        "000091",
+        "000092",
+        "000093"
+      ]
+    },
+    {
+      "application_type": "Internal Tools",
+      "task_count": 3,
+      "task_ids": [
+        "000048",
+        "000049",
+        "000050"
+      ]
+    },
+    {
+      "application_type": "Email Clients",
+      "task_count": 2,
+      "task_ids": [
+        "000042",
+        "000043"
+      ]
+    },
+    {
+      "application_type": "Personal Blog Sites",
+      "task_count": 2,
+      "task_ids": [
+        "000069",
+        "000070"
+      ]
+    },
+    {
+      "application_type": "Streaming and Interactive Platforms",
+      "task_count": 2,
+      "task_ids": [
+        "000094",
+        "000095"
+      ]
+    }
+  ]
+}

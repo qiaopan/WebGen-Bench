@@ -13,7 +13,8 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from long_memory import connect_database, initialize_database
 from long_memory_runtime import (ExtractionOutputError, JsonlRunLog, LongMemory,
-                                 MemoryConfig, MemoryPacket, MemoryRef)
+                                 MemoryConfig, MemoryPacket, MemoryRef, OPERATIONS,
+                                 RetrievedMemory, _normalise_evidence_refs)
 from long_memory_integrations import AzureMemoryLLM, bolt_memory_prompt
 from long_memory_settings import load_long_memory_settings
 
@@ -41,7 +42,8 @@ class FakeLLM:
             "judge": {"action": "KEEP", "reason": "Distinct knowledge"},
             "consolidate": {"action": "KEEP", "reason": "Distinct knowledge"},
             "repair": lambda payload: {"memory": payload["invalid_memory"]},
-            "aspects": {"aspects": ["Filtering", "Pagination"]},
+            "aspects": {"aspects": ["Filtering", "Pagination"],
+                        "complexity": "medium", "complexity_reason": "A small stateful flow"},
             "relevance": lambda payload: {"applicable": [item["ref"] for item in payload["candidates"]],
                                            "reasons": {item["ref"]["record_id"]: "Applicable"
                                                        for item in payload["candidates"]}},
@@ -55,6 +57,7 @@ class FakeEmbedder:
     model_id = "offline-test@1"
 
     def embed(self, texts):
+        self.calls = getattr(self, "calls", []) + [list(texts)]
         return [[0.0, 1.0] if "unrelated" in text else
                 [0.8, 0.6] if "weaker" in text else [1.0, 0.0] for text in texts]
 
@@ -70,19 +73,63 @@ class RuntimeTests(unittest.TestCase):
         self.memory = self.open()
         self.addCleanup(self.memory.close)
 
+    def test_v3_extraction_policy_requires_functional_loops_not_web_templates(self):
+        self.assertIn("trigger/user input -> operation or state change -> observable result",
+                      OPERATIONS["extract"])
+        self.assertIn("one supplied partial/failed evaluation result", OPERATIONS["extract"])
+        self.assertIn("whole website summaries", OPERATIONS["validate"])
+        self.assertIn("same trigger -> operation/state change -> observable result",
+                      OPERATIONS["judge"])
+
+    def test_legacy_evidence_check_and_message_ordinals_are_normalised(self):
+        evidence = [
+            {"ref": {"kind": "chat_message", "message_index": 1, "role": "assistant"},
+             "content": "implementation evidence"},
+            {"ref": {"kind": "evaluation_result", "result_index": 0},
+             "content": json.dumps({"check": "task000001_0", "answer": "YES"})},
+        ]
+        self.assertEqual(
+            _normalise_evidence_refs([{"check": "task000001_0"}], evidence),
+            [evidence[1]["ref"]],
+        )
+        self.assertEqual(
+            _normalise_evidence_refs([{"message_index": 0}], evidence),
+            [evidence[0]["ref"]],
+        )
+        self.assertEqual(
+            _normalise_evidence_refs([{"ref": evidence[0]["ref"]}], evidence),
+            [evidence[0]["ref"]],
+        )
+
+    def test_bounded_evidence_keeps_late_locators_after_a_long_transcript(self):
+        self.memory.config = MemoryConfig(max_evidence_items=3, max_evidence_chars=30)
+        self.memory.evidence_loader = lambda row: [
+            {"ref": {"message_index": 1}, "content": "x" * 200},
+            {"ref": {"result_index": 0}, "content": {"check": "first"}},
+            {"ref": {"result_index": 1}, "content": {"check": "second"}},
+        ]
+        bounded = self.memory._bounded_evidence({})
+        self.assertEqual([item["ref"] for item in bounded], [
+            {"message_index": 1}, {"result_index": 0}, {"result_index": 1},
+        ])
+        self.assertLessEqual(sum(len(item["content"]) for item in bounded), 30)
+
     def open(self, mode="learn", agent="bolt", config=None, **overrides):
         return LongMemory(self.path, agent, memory_mode=mode, llm=self.llm,
-                          embedder=FakeEmbedder(), config=config, log=self.events.append,
+                          embedder=FakeEmbedder(),
+                          config=config or MemoryConfig(),
+                          log=self.events.append,
                           evidence_loader=lambda row: [{"ref": {"step_id": "1"},
                               "content": "Observed list results and the recorded outcome"}], **overrides)
 
-    def trajectory(self, id="t1", agent="bolt", outcome="failure", status="completed"):
+    def trajectory(self, id="t1", agent="bolt", outcome="failure", status="completed", domain=None):
         with connect_database(self.path, read_only=False) as connection:
             connection.execute(
                 "INSERT INTO trajectories (trajectory_id,task_id,agent_id,attempt_no,split_group,"
                 "task_request,run_config,trace_path,run_status,finished_at,evaluation_results) "
-                "VALUES (?,?,?,1,'g1','Filter a list','{}','trace.json',?,?,?)",
-                (id, id, agent, status, None if status == "running" else "2026-09-06T00:00:00Z",
+                "VALUES (?,?,?,1,'g1','Filter a list',?,'trace.json',?,?,?)",
+                (id, id, agent, json.dumps({"source_application_type": domain} if domain else {}),
+                 status, None if status == "running" else "2026-09-06T00:00:00Z",
                  json.dumps([{"outcome": outcome}])),
             )
         connection.close()
@@ -106,8 +153,43 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual([call[0] for call in self.llm.calls], ["extract"])
         self.assertEqual(self.memory.connection.execute("SELECT count(*) FROM experiences").fetchone()[0], 0)
 
+    def test_one_validated_trajectory_is_immediately_retrievable_by_default(self):
+        self.trajectory("t1")
+        ref = self.make("t1", title="Confirm a submitted form")
+        self.assertEqual(self.memory._row(ref)["status"], "active")
+
+    def test_two_independent_trajectories_are_required_before_candidate_is_retrievable(self):
+        self.memory.close()
+        self.memory = self.open(config=MemoryConfig(min_activation_evidence=2))
+        self.trajectory("t1")
+        self.trajectory("t2")
+        first = self.make("t1", title="Persist selected filter")
+        self.assertEqual(self.memory._row(first)["status"], "candidate")
+        self.llm.responses["extract"] = {"memories": [proposal("Persist selected filter")]}
+        second = self.memory.extract("t2")[0]
+        self.llm.responses["judge"] = lambda payload: {
+            "action": "SUPPORT", "target": payload["neighbors"][0]["ref"],
+            "reason": "Independent trajectory confirms the same state-update loop",
+        }
+        self.assertEqual(self.memory.validate(second), "rejected")
+        self.assertEqual(self.memory._row(first)["status"], "active")
+
+    def test_same_domain_is_a_soft_reranking_preference_not_a_filter(self):
+        self.trajectory("t_same", domain="Discussion Forums")
+        self.trajectory("t_other", domain="E-commerce Web Applications")
+        same = self.make("t_same", title="Forum comment state update")
+        self.make("t_other", title="Commerce review state update")
+        self.memory.config = MemoryConfig(min_activation_evidence=1,
+                                          complexity_routing_enabled=False,
+                                          retrieval_min_similarity=-1,
+                                          domain_match_weight=0.5)
+        packet = self.memory.retrieve("Let users add comments", task_domain="Discussion Forums")
+        self.assertEqual(packet.experiences[0].ref, same)
+
     def test_bolt_adapter_preserves_memory_content_and_empty_packet(self):
-        self.assertEqual(bolt_memory_prompt("task", MemoryPacket()), "task")
+        prompt = bolt_memory_prompt("task", MemoryPacket())
+        self.assertTrue(prompt.startswith("task"))
+        self.assertIn("BASE IMPLEMENTATION RELIABILITY CONSTRAINTS", prompt)
         self.trajectory()
         ref = self.make()
         packet = self.memory.retrieve("Filter")
@@ -154,13 +236,25 @@ class RuntimeTests(unittest.TestCase):
         experience = self.make()
         skill = self.make(kind="skill")
         self.trajectory("t2", outcome="success")
-        self.make("t2")
-        packet = self.memory.retrieve("Filter a list")
+        self.make("t2", title="Filter insight alternative")
+        with self.open(mode="read_only", config=MemoryConfig(top_k_experiences=2)) as reader:
+            packet = reader.retrieve("Filter a list")
         self.assertEqual(len(packet.experiences), 2)
         self.assertEqual(packet.skills[0].ref, skill)
         self.assertEqual(self.memory.provenance(experience, supports_only=True)["trajectories"][0]
                          ["evaluation_results"], '[{"outcome": "failure"}]')
         self.assertEqual(self.memory._row(skill)["experience_refs"], "[]")
+
+    def test_retrieval_sends_one_of_exact_duplicate_candidates_to_relevance(self):
+        self.trajectory()
+        first = self.make(title="Duplicate filtering lesson")
+        self.trajectory("t2")
+        second = self.make("t2", title="Duplicate filtering lesson")
+        with self.open(mode="read_only", config=MemoryConfig(top_k_experiences=2)) as reader:
+            packet = reader.retrieve("Filter a list")
+        self.assertIn(packet.experiences[0].ref, (first, second))
+        self.assertEqual(len(packet.experiences), 1)
+        self.assertEqual(len(self.events[-1]["duplicate_candidates"]), 1)
 
     def test_support_adds_evidence_without_duplicate_active_memory(self):
         self.trajectory()
@@ -192,7 +286,8 @@ class RuntimeTests(unittest.TestCase):
         self.make()
         self.llm.responses["judge"] = {"action": "CONSOLIDATE", "reason": "Potential pattern"}
         self.make(title="Different knowledge")
-        self.assertEqual(len(self.memory.retrieve("Filter").experiences), 2)
+        with self.open(mode="read_only", config=MemoryConfig(top_k_experiences=2)) as reader:
+            self.assertEqual(len(reader.retrieve("Filter").experiences), 2)
         self.assertNotIn("consolidate", [operation for operation, _ in self.llm.calls])
 
     def test_consolidation_counts_independent_trajectories_not_memories(self):
@@ -441,11 +536,69 @@ class RuntimeTests(unittest.TestCase):
     def test_task_aspects_are_bounded_and_retrieval_may_be_empty(self):
         self.trajectory()
         self.make(title="unrelated memory")
-        self.llm.responses["aspects"] = {"aspects": ["a", "a", "b", "c", "d"]}
+        self.llm.responses["aspects"] = {"aspects": ["a", "a", "b", "c", "d"],
+                                          "complexity": "medium",
+                                          "complexity_reason": "Test fixture"}
         packet = self.memory.retrieve("Filter")
         self.assertEqual(packet, MemoryPacket())
         self.assertEqual(self.events[-1]["aspects"], ["a", "b", "c"])
         self.assertIn("not planning", self.llm.calls[-1][1]["instructions"])
+
+    def test_frozen_preflight_classification_skips_a_second_aspects_call(self):
+        self.trajectory()
+        self.make(title="Filter insight")
+        before = len(self.llm.calls)
+        packet = self.memory.retrieve("Filter", preclassified={
+            "aspects": ["Filter a list"], "complexity": "simple",
+            "complexity_reason": "One atomic filtering interaction",
+        })
+        self.assertTrue(packet.experiences)
+        self.assertNotIn("aspects", [operation for operation, _ in self.llm.calls[before:]])
+        self.assertEqual(self.events[-1]["classification_source"], "manifest")
+        self.assertEqual(self.events[-1]["retrieval_strategy"], "hard_only")
+
+    def test_retrieval_queries_functional_aspects_and_projects_candidate_content(self):
+        self.trajectory()
+        self.make(kind="skill")
+        self.memory.embedder.calls = []
+        self.memory.retrieve("A long task that mentions a colour and generic navigation")
+        self.assertEqual(self.memory.embedder.calls[0], ["Filtering", "Pagination"])
+        relevance = [payload for operation, payload in self.llm.calls if operation == "relevance"][-1]
+        content = relevance["candidates"][0]["content"]
+        self.assertNotIn("inputs", content)
+        self.assertNotIn("tool_templates", content)
+
+    def test_simple_complexity_uses_hard_only_without_extra_relevance_call(self):
+        self.trajectory()
+        self.make(title="Filter insight")
+        self.llm.responses["aspects"] = {
+            "aspects": ["Filter"], "complexity": "simple",
+            "complexity_reason": "One atomic filtering interaction",
+        }
+        packet = self.memory.retrieve("Filter a list")
+        self.assertEqual(len(packet.experiences), 1)
+        self.assertNotIn("relevance", [operation for operation, _ in self.llm.calls])
+        self.assertEqual(self.events[-1]["retrieval_strategy"], "hard_only")
+
+    def test_prompt_packet_is_bounded_without_rewriting_stored_memory(self):
+        content = {
+            "name": "Useful procedure", "goal": "Complete a task", "conditions": "When needed",
+            "inputs": {"large": "metadata that is not generator guidance"},
+            "workflow": ["first", "second", "third"],
+            "completion_checks": ["one", "two", "three"],
+            "limitations": "Keep the original limitation",
+        }
+        original = dict(content)
+        item = RetrievedMemory(MemoryRef("skill", "s1"), content, 0.8, 1, 0.82)
+        packet = MemoryPacket(skills=(item,), max_prompt_chars=2000,
+                              max_workflow_steps=2, max_completion_checks=2)
+        rendered = packet.render()
+        self.assertLessEqual(len(rendered), 2000)
+        self.assertIn('"first"', rendered)
+        self.assertNotIn('"third"', rendered)
+        self.assertNotIn('"inputs"', rendered)
+        self.assertEqual(item.content, original)
+        self.assertEqual(packet.prompt_refs(), (item.ref,))
 
     def test_semantic_relevance_filters_before_evidence_reranking(self):
         self.trajectory()
@@ -461,6 +614,28 @@ class RuntimeTests(unittest.TestCase):
         event = self.events[-1]
         self.assertEqual(len(event["candidates"]["experience"]["discovered"]), 1)
         self.assertEqual(event["candidates"]["experience"]["applicable_ranked"], [])
+
+    def test_llm_case_gate_can_accept_a_semantic_match_without_lexical_anchor(self):
+        self.trajectory()
+        ref = self.make(title="Persist booking confirmation after reservation")
+        self.memory.config = MemoryConfig(retrieval_min_similarity=-1,
+                                          medium_retrieval_strategy="hard_soft")
+        self.llm.responses["relevance"] = {
+            "decisions": [{"kind": ref.kind, "record_id": ref.record_id,
+                           "verdict": "soft_transfer",
+                           "matched_current_requirement": "save a selected appointment",
+                           "matched_case_feature": "reservation confirmation",
+                           "reason": "Same submit-to-confirm state transition"}],
+            "applicable": [vars(ref)],
+            "reasons": {ref.record_id: "Same state transition"},
+        }
+        packet = self.memory.retrieve("Allow people to choose an appointment slot", preclassified={
+            "aspects": ["choose an appointment slot"], "complexity": "medium",
+            "complexity_reason": "One stateful booking flow",
+        })
+        self.assertEqual(packet.experiences[0].ref, ref)
+        candidate = self.events[-1]["relevance"]
+        self.assertEqual(candidate["decisions"][0]["verdict"], "soft_transfer")
 
     def test_hierarchy_retrieval_injects_only_the_more_specific_relevant_memory(self):
         originals = []
@@ -528,6 +703,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(json.loads(path.read_text())["operation"], "test")
         for kwargs in ({"min_consolidation_evidence": 0}, {"evidence_weight": float("nan")},
                        {"retrieval_min_similarity": 2}, {"max_task_aspects": True},
+                       {"include_full_task_in_retrieval": 1},
                        {"schema_repair_retries": -1}):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 MemoryConfig(**kwargs)
@@ -535,6 +711,10 @@ class RuntimeTests(unittest.TestCase):
     def test_versioned_long_memory_config_is_the_single_runner_source(self):
         settings = load_long_memory_settings(ROOT / "config/long_memory.json")
         self.assertEqual(settings.memory.consolidation_candidates, 4)
+        self.assertEqual(settings.memory.retrieval_candidates_per_type, 8)
+        self.assertEqual(settings.memory.top_k_experiences, 1)
+        self.assertEqual(settings.memory.top_k_skills, 1)
+        self.assertEqual(settings.memory.max_prompt_memory_chars, 3600)
         self.assertEqual(settings.memory.max_evidence_chars, 12000)
         self.assertEqual(settings.memory.schema_repair_retries, 2)
         self.assertEqual(settings.memory.hierarchy_dedup_similarity, 0.9)

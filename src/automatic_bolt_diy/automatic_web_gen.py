@@ -3,7 +3,10 @@ import time
 import hashlib
 import json
 import re
+import shutil
 import tempfile
+import urllib.error
+import urllib.request
 import zipfile
 from pathlib import Path
 from selenium import webdriver
@@ -23,6 +26,13 @@ def _repair_common_jsx_syntax(zip_path, report):
         return False
     router_pattern = re.compile(r"element\s*=\s*<([A-Za-z_$][\w$]*)\s*/>")
     button_pattern = re.compile(r"(\}\s*)([+-])\s*</button>")
+    # This only matches the text directly inside one JSX element, e.g.
+    # ``<option>Bad (<550)</option>``.  It deliberately cannot match a
+    # JavaScript expression such as ``if (score < 550)`` because braces and
+    # nested tags are excluded from the text-node pattern.
+    jsx_text_less_than_number = re.compile(
+        r"(?<=>)([^<>{]*)(<)(\s*\d[^<>{]*)(?=<)"
+    )
     astro_dynamic = "GetStaticPathsRequired" in detail or "getStaticPaths() function is required" in detail
     changed = False
     with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as stream:
@@ -34,7 +44,10 @@ def _repair_common_jsx_syntax(zip_path, report):
                 repaired = None
                 if item.filename.endswith((".jsx", ".tsx")):
                     text = content.decode("utf-8")
-                    repaired = button_pattern.sub(r"\1>\2</button>", router_pattern.sub(r"element={<\1 />}", text))
+                    repaired = button_pattern.sub(
+                        r"\1>\2</button>", router_pattern.sub(r"element={<\1 />}", text))
+                    repaired = jsx_text_less_than_number.sub(
+                        r"\1&lt;\3", repaired)
                     if ("Unexpected end of file" in detail or "Unterminated string literal" in detail) \
                             and item.filename.endswith("App.jsx"):
                         repaired = """import React, { useState } from 'react';
@@ -62,7 +75,7 @@ export default function App() {
             os.replace(repaired_path, zip_path)
         else:
             os.unlink(repaired_path)
-        return changed
+        return "jsx_syntax" if changed else None
     except Exception:
         if os.path.exists(repaired_path):
             os.unlink(repaired_path)
@@ -117,6 +130,10 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     desired_model="/mnt/cache/sharemath/models/qwen/Qwen2.5-Coder-32B-Instruct", provider="OpenAILike",
     headless=False, max_repair_attempts=1):
     instruction_hash = hashlib.sha256(instruction.encode("utf-8")).hexdigest()
+    download_button_timeout = int(os.environ.get(
+        "WEBGEN_DOWNLOAD_BUTTON_TIMEOUT_SECONDS", "120"))
+    if download_button_timeout < 10:
+        raise ValueError("WEBGEN_DOWNLOAD_BUTTON_TIMEOUT_SECONDS must be at least 10")
     print(f"Running automatic_web_gen with idx={idx}, instruction_sha256={instruction_hash}, download_dir='{download_dir}', url='{url}', desired_model='{desired_model}', provider='{provider}'")
     # ---------------------------------------
     # 1) Set up Chrome & your download folder
@@ -129,11 +146,16 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     chat_path = os.path.join(download_dir, f"{idx:06d}.json")
     zip_path = os.path.join(download_dir, f"{idx:06d}.zip")
     request_path = os.path.join(download_dir, f"{idx:06d}.request.json")
+    prompt_path = os.path.join(download_dir, f"{idx:06d}.prompt.txt")
     request = {
         "instruction_sha256": instruction_hash,
         "model": desired_model, "provider": provider, "url": url,
         "max_repair_attempts": max_repair_attempts,
     }
+    # Bolt's exported chat may omit the exact text submitted to the textarea.
+    # Keep a local, human-readable snapshot so prompt provenance is auditable.
+    with open(prompt_path, "w", encoding="utf-8") as stream:
+        stream.write(instruction)
     existing = [os.path.exists(path) for path in (chat_path, zip_path)]
     if all(existing):
         if not os.path.isfile(request_path):
@@ -148,9 +170,21 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     if any(existing):
         raise RuntimeError(f"Partial prior output; use a fresh directory: {download_dir}")
 
+    # Fail before launching Chrome when the local Bolt service is unavailable.  Previously
+    # this surfaced much later as an opaque ChromeDriver stack trace.
+    try:
+        with urllib.request.urlopen(url, timeout=10) as response:
+            if response.status >= 400:
+                raise RuntimeError(f"Bolt service returned HTTP {response.status}: {url}")
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
+        raise RuntimeError(
+            f"Bolt service is unavailable at {url}. Start it before running generation."
+        ) from error
+
     # If you want to explicitly configure the download folder and disable popups:
     from selenium.webdriver.chrome.options import Options
     chrome_options = Options()
+    profile_dir = tempfile.mkdtemp(prefix="webgen-bolt-chrome-")
 
     # --- Headless mode ---
     # For Chrome ≥ 109, “--headless=new” is recommended.
@@ -158,6 +192,10 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
     if headless:
         chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--window-size=1920,1080")  # helpful for some UIs
+    chrome_options.add_argument(f"--user-data-dir={profile_dir}")
+    chrome_options.add_argument("--no-first-run")
+    chrome_options.add_argument("--no-default-browser-check")
+    chrome_options.add_argument("--disable-extensions")
 
     prefs = {
         "download.default_directory": download_dir,
@@ -165,9 +203,10 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         "download.directory_upgrade": True
     }
     chrome_options.add_experimental_option("prefs", prefs)
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = None
 
     try:
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get(url)
         time.sleep(2)
 
@@ -227,19 +266,23 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             settle_checks = []
             for settle_check in range(3):
                 try:
-                    download_button = WebDriverWait(driver, 60).until(
-                        EC.presence_of_element_located(
-                            (By.XPATH, "//button[contains(., 'Download Code')]")
-                        )
-                    )
+                    # A tiny/incomplete archive means Bolt may still be switching views. Reopen
+                    # the code pane on every settling attempt instead of waiting forever in the
+                    # previous pane for a button that is no longer mounted.
+                    _open_code_view(driver)
+                    download_button = _visible_element(
+                        driver, By.XPATH, "//button[contains(., 'Download Code')]",
+                        timeout=download_button_timeout)
                     downloaded = _download_new_file(driver, download_button, download_dir)
                 except Exception as error:
-                    raise TimeoutError("Timed out waiting for Bolt Download Code button") from error
+                    raise TimeoutError(
+                        "Timed out waiting for Bolt Download Code button after reopening code view"
+                    ) from error
                 report = validate_generated_zip(downloaded)
                 deterministic_repair = _repair_common_jsx_syntax(downloaded, report)
                 if deterministic_repair:
                     report = validate_generated_zip(downloaded)
-                    report["deterministic_repair"] = "react_router_element_expression"
+                    report["deterministic_repair"] = deterministic_repair
                 settle_checks.append(report)
                 incomplete = (report.get("phase") == "archive" and
                               "neither package.json nor index.html" in report.get("error", ""))
@@ -308,10 +351,13 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
             json.dump(request, stream, indent=2, sort_keys=True)
             stream.write("\n")
         return {"chat_path": chat_path, "zip_path": zip_path, "request_path": request_path,
+                "prompt_path": prompt_path,
                 "skipped": False}
 
     finally:
-        driver.quit()
+        if driver is not None:
+            driver.quit()
+        shutil.rmtree(profile_dir, ignore_errors=True)
 
 if __name__ == "__main__":
     main(idx=1)

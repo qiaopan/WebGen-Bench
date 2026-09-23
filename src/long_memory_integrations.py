@@ -114,13 +114,26 @@ class AzureEmbedder:
 
 def bolt_memory_prompt(task: str, memory: MemoryPacket) -> str:
     """Format only. Stored memory content is copied without summarisation."""
-    if not memory.experiences and not memory.skills:
-        return task
-    return (
-        task
-        + "\n\nUse the following retrieved long-term memory only where it applies. "
-          "It contains historical guidance, not new task requirements.\n\n"
-        + memory.render()
+    prompt = task
+    rendered_memory = memory.render()
+    if rendered_memory:
+        prompt += (
+        "\n\nHISTORICAL LONG-TERM CASES (REFERENCE ONLY):\n"
+        "The current task requirement above is binding and has the highest priority. "
+        "The following cases are historical evidence, not new requirements. Do not copy "
+        "their old business content, text, colours, or layout; use them only when they "
+        "happen to apply to the current task.\n\n"
+        + rendered_memory
+        )
+    # Baseline reliability constraints apply to both No Memory and Long Memory;
+    # memory can add task-specific lessons but must not be the sole safeguard.
+    return prompt + (
+        "\n\nBASE IMPLEMENTATION RELIABILITY CONSTRAINTS:\n"
+        "Return a complete, buildable application. Before finishing, run the "
+        "project build check and fix all syntax errors. In React/JSX, never write "
+        "dynamic text as `<{value}>`; use `{value}` or escaped text such as "
+        "`&lt;{value}&gt;`. Escape literal comparison text too: use `&lt;550`, "
+        "not `<550`, inside a JSX text node. Ensure every JSX tag and expression is closed."
     )
 
 
@@ -174,6 +187,24 @@ def exported_chat_evidence(trajectory: dict) -> list[dict]:
             "ref": {"kind": "evaluation_result", "result_index": index},
             "content": result,
         })
+        # The final evaluator summary alone loses the browser's observed action
+        # sequence.  Preserve assistant-only GUI steps as evidence; evaluator
+        # prompts (which can contain benchmark-only expected results) are never
+        # copied into continual memory evidence.
+        path = result.get("evidence") if isinstance(result, dict) else None
+        if not isinstance(path, str) or not path.endswith("interact_messages.json"):
+            continue
+        try:
+            messages = json.loads(Path(path).read_text(encoding="utf-8"))
+        except (OSError, ValueError, TypeError):
+            continue
+        assistant_steps = [str(message.get("content", "")) for message in messages
+                           if message.get("role") == "assistant" and message.get("content")]
+        if assistant_steps:
+            evidence.append({
+                "ref": {"kind": "gui_trajectory", "result_index": index},
+                "content": "\n".join(assistant_steps),
+            })
     if not evidence:
         raise ValueError(f"No usable chat messages in {path}")
     return evidence

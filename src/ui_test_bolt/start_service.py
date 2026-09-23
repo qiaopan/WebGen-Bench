@@ -94,7 +94,11 @@ def write_ecosystem_file(config, output_file):
 
 def remove_npm_run_dev(command_line: str) -> str:
     parts = [part.strip() for part in command_line.split("&&")]
-    filtered_parts = [part for part in parts if part != "npm run dev" and part != "npm run start" and part != "npm start"]
+    # Generated shell actions sometimes include flags (for example
+    # ``npm run dev -- --open``).  A development server is a long-running
+    # action and must be started by PM2 later, never during dependency setup.
+    dev_server = re.compile(r"^npm\s+(?:run\s+)?(?:dev|start)(?:\s|$)")
+    filtered_parts = [part for part in parts if not dev_server.match(part)]
     return " && ".join(filtered_parts)
 
 

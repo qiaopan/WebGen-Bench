@@ -13,12 +13,14 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 def _get_client():
     api_key = (
-        os.getenv("AZURE_OPENAI_API_KEY", "").strip()
+        os.getenv("WEBGEN_EVALUATOR_API_KEY", "").strip()
+        or os.getenv("AZURE_OPENAI_API_KEY", "").strip()
         or os.getenv("DASHSCOPE_API_KEY", "").strip()
     )
     base_url = os.getenv(
-        "APPEARANCE_BASE_URL",
-        os.getenv("WEBVOYAGER_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
+        "WEBGEN_EVALUATOR_BASE_URL",
+        os.getenv("APPEARANCE_BASE_URL", os.getenv(
+            "WEBVOYAGER_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")),
     ).strip()
     if not api_key:
         raise RuntimeError(
@@ -34,8 +36,9 @@ def encode_image(image_path):
 
 def get_score_result(image_paths, instruction, model=None):
     model = model or os.getenv(
-        "APPEARANCE_API_MODEL",
-        os.getenv("WEBVOYAGER_API_MODEL", "qwen3-vl-32b-instruct"),
+        "WEBGEN_EVALUATOR_MODEL",
+        os.getenv("APPEARANCE_API_MODEL", os.getenv(
+            "WEBVOYAGER_API_MODEL", "qwen3-vl-32b-instruct")),
     )
     base64_images = []
     

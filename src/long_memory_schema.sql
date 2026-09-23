@@ -1,4 +1,4 @@
--- Version 2 of the long-memory store. Initialize through long_memory.py.
+-- Version 3 of the long-memory store. Initialize through long_memory.py.
 -- Large traces, code, and screenshots remain in files referenced by this store.
 
 CREATE TABLE trajectories (
@@ -32,6 +32,46 @@ CREATE TABLE trajectories (
     CHECK ((run_status = 'running' AND finished_at IS NULL) OR
            (run_status <> 'running' AND finished_at IS NOT NULL))
 ) STRICT;
+
+-- A reflection case is deliberately more concrete than an Experience or Skill.
+-- It preserves one task-local user flow (or visual observation) for direct,
+-- cross-task case retrieval. Raw evaluator/GUI evidence remains in trajectories;
+-- evidence_refs records the stable internal locators, not machine-specific paths.
+CREATE TABLE reflection_cases (
+    case_id TEXT PRIMARY KEY,
+    trajectory_id TEXT NOT NULL REFERENCES trajectories(trajectory_id) ON DELETE RESTRICT,
+    agent_id TEXT NOT NULL CHECK (length(trim(agent_id)) > 0),
+    channel TEXT NOT NULL CHECK (channel IN ('functional', 'appearance')),
+    outcome TEXT NOT NULL CHECK (outcome IN ('success', 'partial', 'failure', 'observation')),
+    task_requirement TEXT NOT NULL CHECK (length(trim(task_requirement)) > 0),
+    feature_object TEXT NOT NULL CHECK (length(trim(feature_object)) > 0),
+    user_trigger TEXT NOT NULL CHECK (length(trim(user_trigger)) > 0),
+    expected_state_change TEXT NOT NULL CHECK (length(trim(expected_state_change)) > 0),
+    observed_result TEXT NOT NULL CHECK (length(trim(observed_result)) > 0),
+    root_cause_or_hypothesis TEXT NOT NULL CHECK (length(trim(root_cause_or_hypothesis)) > 0),
+    preventative_action TEXT NOT NULL CHECK (length(trim(preventative_action)) > 0),
+    verification TEXT NOT NULL CHECK (length(trim(verification)) > 0),
+    transfer_limits TEXT NOT NULL CHECK (length(trim(transfer_limits)) > 0),
+    evidence_refs TEXT NOT NULL CHECK (json_valid(evidence_refs) AND json_type(evidence_refs) = 'array'),
+    provenance_status TEXT NOT NULL CHECK (provenance_status IN ('exact_or_normalised', 'unresolved')),
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+    embedding BLOB,
+    embedding_model TEXT,
+    embedding_dim INTEGER,
+    embedding_text_hash TEXT,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    CHECK (
+        (embedding IS NULL AND embedding_model IS NULL AND embedding_dim IS NULL AND embedding_text_hash IS NULL)
+        OR
+        (embedding IS NOT NULL AND embedding_model IS NOT NULL AND length(trim(embedding_model)) > 0
+         AND embedding_dim IS NOT NULL AND embedding_dim > 0 AND length(embedding) = embedding_dim * 4
+         AND embedding_text_hash IS NOT NULL AND length(embedding_text_hash) = 64
+         AND embedding_text_hash NOT GLOB '*[^0-9a-f]*')
+    )
+) STRICT;
+CREATE INDEX reflection_cases_retrieval
+    ON reflection_cases(agent_id, embedding_model, embedding_dim) WHERE status = 'active';
+CREATE INDEX reflection_cases_by_trajectory ON reflection_cases(trajectory_id);
 
 CREATE TABLE experiences (
     record_id TEXT PRIMARY KEY,

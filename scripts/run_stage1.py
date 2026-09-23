@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import sqlite3
 import subprocess
@@ -18,6 +19,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from selenium.common.exceptions import WebDriverException
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -50,6 +52,30 @@ def load_jsonl(path: Path) -> list[dict]:
             if line.strip()]
 
 
+def load_complexity_manifest(path: Path) -> dict[str, dict]:
+    """Load preflight classifications frozen before target generation."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rows = data.get("rows")
+    if not isinstance(rows, list):
+        raise ValueError("Complexity manifest requires a rows array")
+    manifest = {}
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("task_id"), str):
+            raise ValueError("Complexity manifest rows require string task_id")
+        task_id = row["task_id"]
+        if task_id in manifest:
+            raise ValueError(f"Complexity manifest repeats task ID: {task_id}")
+        aspects, complexity, reason = (row.get("aspects"), row.get("complexity"),
+                                       row.get("complexity_reason"))
+        if (complexity not in ("simple", "medium", "complex") or
+                not isinstance(reason, str) or not isinstance(aspects, list) or
+                any(not isinstance(item, str) or not item.strip() for item in aspects)):
+            raise ValueError(f"Invalid complexity classification for task {task_id}")
+        manifest[task_id] = {"aspects": aspects, "complexity": complexity,
+                             "complexity_reason": reason}
+    return manifest
+
+
 def append_event(path: Path, event: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as stream:
@@ -68,6 +94,8 @@ def completed_keys(path: Path) -> set[str]:
 
 
 def extraction_validated(path: Path, trajectory_id: str) -> bool:
+    if not path.is_file():
+        return False
     events = load_jsonl(path)
     extraction = next((item for item in events
                        if item.get("operation") == "extraction_commit"
@@ -84,6 +112,8 @@ def extraction_validated(path: Path, trajectory_id: str) -> bool:
 
 
 def extraction_refs(path: Path, trajectory_id: str) -> list[MemoryRef]:
+    if not path.is_file():
+        return []
     for item in load_jsonl(path):
         if item.get("operation") == "extraction_commit" and item.get("trajectory_id") == trajectory_id:
             return [MemoryRef(**ref) for ref in item.get("candidates", [])]
@@ -144,15 +174,41 @@ def evaluations(output_dir: Path, position: int) -> list[dict]:
                        any(token in str(message.get("content", ""))
                            for token in ("ANSWER;", "YES", "NO", "PARTIAL"))), "")
         outcome = "partial" if "PARTIAL" in answer else "passed" if "YES" in answer else "failed"
+        transcript = "\n".join(str(m.get("content", "")) for m in messages)
+        budget_exhausted = "maximum number of allowed interactions" in transcript.lower()
+        reached_target = not budget_exhausted and outcome == "passed"
+        if budget_exhausted:
+            failure_stage, failure_type = "interaction", "interaction_budget_exhausted"
+            failure_reason = "评测 agent 在达到交互上限前未完成目标操作"
+        elif outcome == "failed":
+            failure_stage, failure_type = "functional", "logic_failure"
+            failure_reason = "评测结果为 NO，目标功能未完成"
+        elif outcome == "partial":
+            failure_stage, failure_type = "functional", "incomplete_result"
+            failure_reason = "评测结果为 PARTIAL，目标只完成了一部分"
+        else:
+            failure_stage = failure_type = failure_reason = None
         values.append({"check": path.parent.name, "outcome": outcome,
-                       "answer": answer, "evidence": str(path.resolve())})
+                       "answer": answer, "evidence": str(path.resolve()),
+                       "failure_stage": failure_stage, "failure_type": failure_type,
+                       "failure_reason": failure_reason,
+                       "reached_target_action": reached_target,
+                       "logic_failure_observed": failure_type == "logic_failure"})
     appearance = output_dir / f"extracted/{position:06d}/shots/result.json"
     if appearance.is_file():
         result = json.loads(appearance.read_text(encoding="utf-8"))
+        model_output = result.get("model_output") or ""
+        grade_match = re.search(r"Grade\s*:\s*([1-5])", model_output, re.IGNORECASE)
+        grade = int(grade_match.group(1)) if grade_match else None
         values.append({"check": "appearance", "outcome": "scored",
                        "model_output": result.get("model_output"),
                        "model": result.get("model"), "usage": result.get("usage"),
-                       "evidence": str(appearance.resolve())})
+                       "evidence": str(appearance.resolve()), "score": grade,
+                       "failure_stage": "appearance" if grade is not None and grade < 5 else None,
+                       "failure_type": "appearance_quality_issue" if grade is not None and grade < 5 else None,
+                       "failure_reason": ("外观评分低于满分；具体分析保留在 model_output 中"
+                                          if grade is not None and grade < 5 else None),
+                       "reached_target_action": None, "logic_failure_observed": False})
     if not values:
         raise RuntimeError(f"No evaluation result for position {position}: {output_dir}")
     return values
@@ -193,13 +249,17 @@ def upsert_trajectory(db_path: Path, task: dict, position: int, result: dict,
 
 def ui_summary(output_dir: Path) -> dict:
     counts = {"passed": 0, "partial": 0, "failed": 0}
+    tasks = []
     for path in (output_dir / "extracted/results").glob("task*/interact_messages.json"):
         messages = json.loads(path.read_text(encoding="utf-8"))
         answer = "\n".join(str(item.get("content", "")) for item in messages
                            if item.get("role") == "assistant")
         outcome = "partial" if "PARTIAL" in answer else "passed" if "YES" in answer else "failed"
         counts[outcome] += 1
-    return {"counts": counts, "total": sum(counts.values())}
+        tasks.append({"check": path.parent.name, "outcome": outcome,
+                      "answer": answer, "evidence": str(path.resolve())})
+    tasks.sort(key=lambda item: item["check"])
+    return {"counts": counts, "total": sum(counts.values()), "tasks": tasks}
 
 
 def main() -> None:
@@ -215,7 +275,21 @@ def main() -> None:
                         help="Consolidate and freeze G1, then stop before G2 generation")
     parser.add_argument("--accept-frozen-retrieval-update", action="store_true",
                         help="Use a revised retrieval runtime with the verified existing G1 snapshot")
+    parser.add_argument("--reuse-g1-output", type=Path,
+                        help="Reuse completed G1 generation/evaluation artifacts while rebuilding memory")
+    parser.add_argument("--reuse-frozen-memory", type=Path,
+                        help="Reuse a verified frozen G1 database and skip all G1 processing")
+    parser.add_argument("--g2-task-ids",
+                        help="Comma-separated G2 record IDs for a diagnostic subset (default: all)")
+    parser.add_argument("--g2-modes", nargs="+", choices=("disabled", "read_only"),
+                        default=("disabled", "read_only"),
+                        help="Generation modes for G2; use read_only alone for a memory-only pilot")
+    parser.add_argument("--complexity-manifest", type=Path,
+                        help="Frozen preflight JSON; read_only G2 uses its labels/aspects without "
+                             "a second LLM classification")
     args = parser.parse_args()
+    if args.reuse_g1_output and args.reuse_frozen_memory:
+        parser.error("--reuse-g1-output and --reuse-frozen-memory are mutually exclusive")
     load_dotenv(ROOT / ".env")
 
     output = args.output.resolve()
@@ -233,14 +307,29 @@ def main() -> None:
     memory_model = settings.memory_llm["deployment"]
     embedding_model = settings.embedding["deployment"]
     max_repair_attempts = int(os.environ.get("WEBGEN_MAX_REPAIR_ATTEMPTS", "1"))
+    requested_g2_ids = (None if not args.g2_task_ids else [
+        value.strip() for value in args.g2_task_ids.split(",") if value.strip()])
+    complexity_manifest = (load_complexity_manifest(args.complexity_manifest.resolve())
+                           if args.complexity_manifest else None)
     metadata = {"git_commit": plan["git_commit"], "config_sha256": plan["config_sha256"],
                 "dataset_manifest_sha256": plan["dataset_manifest_sha256"], "url": args.url,
                 "generator_model": generator_model, "memory_model": memory_model,
-                "embedding_model": embedding_model}
+                "embedding_model": embedding_model, "g2_task_ids": requested_g2_ids,
+                "g2_modes": list(args.g2_modes), "reuse_g1_output": (
+                    str(args.reuse_g1_output.resolve()) if args.reuse_g1_output else None),
+                "reuse_frozen_memory": (
+                    str(args.reuse_frozen_memory.resolve()) if args.reuse_frozen_memory else None)}
+    metadata["complexity_manifest_sha256"] = (
+        file_hash(args.complexity_manifest.resolve()) if args.complexity_manifest else None)
     metadata["memory_config_sha256"] = file_hash(args.memory_config.resolve())
     metadata_path = output / "run-metadata.json"
     if metadata_path.is_file():
         existing_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        # Resuming an existing frozen-memory run may omit the source flag;
+        # inherit it from the run metadata so a transient generation failure
+        # does not force a new directory or duplicate completed work.
+        if args.reuse_frozen_memory is None and existing_metadata.get("reuse_frozen_memory"):
+            metadata["reuse_frozen_memory"] = existing_metadata["reuse_frozen_memory"]
         for key in ("generation_git_commit", "generation_memory_config_sha256",
                     "retrieval_policy_updated_after_freeze"):
             if key in existing_metadata:
@@ -289,12 +378,56 @@ def main() -> None:
     embedder = AzureEmbedder(client, embedding_model,
                              dimensions=settings.embedding["dimensions"])
     config = settings.memory
-    initialize_database(args.database)
     completed = completed_keys(progress_path)
+
+    # A focused G2 retest must not rebuild G1 memories.  Materialise a private
+    # copy of the supplied frozen database, then mark its G1 lifecycle as reused.
+    # The original snapshot remains read-only input for this run.
+    if args.reuse_frozen_memory:
+        source_snapshot = args.reuse_frozen_memory.resolve()
+        if not source_snapshot.is_file():
+            raise FileNotFoundError(f"Frozen memory database does not exist: {source_snapshot}")
+        if completed:
+            raise RuntimeError(
+                "--reuse-frozen-memory requires a fresh output directory; "
+                "use a new --output path to preserve prior run history")
+        output_snapshot = output / "frozen-memory.db"
+        database_path = args.database.resolve()
+        if database_path.exists() or output_snapshot.exists():
+            raise RuntimeError(
+                "--reuse-frozen-memory will not overwrite an existing database or snapshot; "
+                "use a fresh --output and --database path")
+        database_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_snapshot, database_path)
+        shutil.copy2(source_snapshot, output_snapshot)
+        with connect_database(output_snapshot) as connection:
+            connection.execute("SELECT 1 FROM trajectories LIMIT 1").fetchone()
+            connection.execute("SELECT 1 FROM experiences LIMIT 1").fetchone()
+            connection.execute("SELECT 1 FROM skills LIMIT 1").fetchone()
+        frozen_hash = file_hash(output_snapshot)
+        g1_file_for_reuse = ROOT / "data/experiment_splits/groups/group_01_memory_seed.jsonl"
+        for task in load_jsonl(g1_file_for_reuse):
+            key = f"g1:{task['id']}"
+            append_event(progress_path, {"key": key, "status": "complete",
+                                         "reused_frozen_memory": str(source_snapshot)})
+            completed.add(key)
+        append_event(progress_path, {"key": "g1:consolidated", "status": "complete",
+                                     "reused_frozen_memory": str(source_snapshot)})
+        append_event(progress_path, {"key": "g1:frozen", "status": "complete",
+                                     "sha256": frozen_hash,
+                                     "reused_frozen_memory": str(source_snapshot)})
+        completed.update({"g1:consolidated", "g1:frozen"})
+    else:
+        initialize_database(args.database)
 
     g1_file = ROOT / "data/experiment_splits/groups/group_01_memory_seed.jsonl"
     g1_records = load_jsonl(g1_file)
-    g1_dir = output / "memory_seed/g1/learn"
+    if args.reuse_frozen_memory:
+        # Lifecycle events were recorded above for provenance; do not walk and
+        # misleadingly print all 21 G1 records during a G2-only retest.
+        g1_records = []
+    g1_dir = (args.reuse_g1_output.resolve() if args.reuse_g1_output
+              else output / "memory_seed/g1/learn")
     for position, task in enumerate(g1_records, start=1):
         key = f"g1:{task['id']}"
         generated_key = key + ":generated"
@@ -303,6 +436,11 @@ def main() -> None:
             continue
         if generated_key in completed:
             result = artifact(g1_dir, position)
+        elif args.reuse_g1_output:
+            result = artifact(g1_dir, position)
+            append_event(progress_path, {"key": generated_key, "status": "complete",
+                                         "reused": True})
+            completed.add(generated_key)
         else:
             adapter = BoltAgentAdapter(automatic_web_gen, position, g1_dir, args.url,
                                        generator_model, headless=not args.headed,
@@ -312,7 +450,8 @@ def main() -> None:
                 result = memory.run(task["instruction"], adapter)
             append_event(progress_path, {"key": generated_key, "status": "complete"})
             completed.add(generated_key)
-        run_evaluators(g1_dir, g1_file, position)
+        if not args.reuse_g1_output:
+            run_evaluators(g1_dir, g1_file, position)
         evaluation = evaluations(g1_dir, position)
         trajectory_id = upsert_trajectory(args.database, task, position, result, g1_dir,
                                           generator_model, evaluation)
@@ -382,8 +521,17 @@ def main() -> None:
 
     g2_file = ROOT / "data/experiment_splits/groups/group_02_dev_evaluate.jsonl"
     g2_records = load_jsonl(g2_file)
+    known_g2_ids = {str(task["id"]) for task in g2_records}
+    if requested_g2_ids is not None and (unknown := set(requested_g2_ids) - known_g2_ids):
+        raise ValueError(f"Unknown G2 task IDs: {sorted(unknown)}")
+    manifest_scope = (known_g2_ids if requested_g2_ids is None else set(requested_g2_ids))
+    if complexity_manifest is not None and (missing := manifest_scope - set(complexity_manifest)):
+        raise ValueError(f"Complexity manifest lacks selected G2 task IDs: {sorted(missing)}")
     for position, task in enumerate(g2_records, start=1):
-        modes = ("disabled", "read_only") if position % 2 else ("read_only", "disabled")
+        if requested_g2_ids is not None and str(task["id"]) not in requested_g2_ids:
+            continue
+        paired_order = ("disabled", "read_only") if position % 2 else ("read_only", "disabled")
+        modes = tuple(mode for mode in paired_order if mode in args.g2_modes)
         for mode in modes:
             key = f"g2:{task['id']}:{mode}:generated"
             if key in completed:
@@ -434,8 +582,9 @@ def main() -> None:
                         try:
                             memory.run(generation_instruction, adapter)
                             break
-                        except (TimeoutError, RuntimeError) as error:
-                            retryable = isinstance(error, TimeoutError) or "Generated website failed validation" in str(error)
+                        except (TimeoutError, RuntimeError, WebDriverException) as error:
+                            retryable = (isinstance(error, (TimeoutError, WebDriverException))
+                                         or "Generated website failed validation" in str(error))
                             if not retryable or attempt == 2:
                                 raise
                             print(f"[stage1] retrying G2 {position}/{len(g2_records)} "
@@ -444,12 +593,16 @@ def main() -> None:
             else:
                 with LongMemory(snapshot, "bolt", memory_mode="read_only", llm=llm,
                                 embedder=embedder, config=config, log=memory_log) as memory:
+                    preclassified = (complexity_manifest.get(str(task["id"]))
+                                     if complexity_manifest is not None else None)
                     for attempt in range(3):
                         try:
-                            memory.run(generation_instruction, adapter)
+                            memory.run(generation_instruction, adapter,
+                                       preclassified=preclassified)
                             break
-                        except (TimeoutError, RuntimeError) as error:
-                            retryable = isinstance(error, TimeoutError) or "Generated website failed validation" in str(error)
+                        except (TimeoutError, RuntimeError, WebDriverException) as error:
+                            retryable = (isinstance(error, (TimeoutError, WebDriverException))
+                                         or "Generated website failed validation" in str(error))
                             if not retryable or attempt == 2:
                                 raise
                             print(f"[stage1] retrying G2 {position}/{len(g2_records)} "
@@ -462,7 +615,7 @@ def main() -> None:
             print(f"[stage1] generated G2 {position}/{len(g2_records)} {mode}", flush=True)
 
     summaries = {}
-    for mode in ("disabled", "read_only"):
+    for mode in args.g2_modes:
         key = f"g2:{mode}:evaluated"
         destination = output / f"development_evaluation/g2/{mode}"
         if key not in completed:
@@ -486,6 +639,9 @@ def main() -> None:
               "plan_event_count": plan["event_count"], "mode_event_counts": plan["mode_event_counts"],
               "frozen_memory_sha256": snapshot_hash, "table_counts": counts,
               "memory_status_counts": memory_statuses, "g2_evaluation": summaries,
+              "diagnostic_subset": {"g2_task_ids": requested_g2_ids,
+                                    "g2_modes": list(args.g2_modes),
+                                    "reused_g1_output": bool(args.reuse_g1_output)},
               **metadata}
     (output / "stage1-report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

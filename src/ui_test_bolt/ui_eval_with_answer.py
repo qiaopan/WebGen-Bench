@@ -152,7 +152,7 @@ def create_tasks_test(test_file, ports, tasks_file):
 def run_webvoyager(input_dir):
     input_dir = Path(input_dir)                  # Path object for convenience
 
-    api_key = os.environ.get("AZURE_OPENAI_API_KEY") or os.environ.get(
+    api_key = os.environ.get("WEBGEN_EVALUATOR_API_KEY") or os.environ.get("AZURE_OPENAI_API_KEY") or os.environ.get(
         "DASHSCOPE_API_KEY"
     )
     if not api_key:
@@ -162,12 +162,16 @@ def run_webvoyager(input_dir):
         )
 
     base_url = os.environ.get(
-        "WEBVOYAGER_BASE_URL",
+        "WEBGEN_EVALUATOR_BASE_URL",
+        os.environ.get("WEBVOYAGER_BASE_URL",
         "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        ),
     )
     api_model = os.environ.get(
-        "WEBVOYAGER_API_MODEL",
+        "WEBGEN_EVALUATOR_MODEL",
+        os.environ.get("WEBVOYAGER_API_MODEL",
         "qwen3-vl-32b-instruct",
+        ),
     )
     num_workers = os.environ.get("WEBVOYAGER_NUM_WORKERS", "1")
 
