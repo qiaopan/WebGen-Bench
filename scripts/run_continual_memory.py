@@ -301,11 +301,24 @@ def main() -> None:
                         adapted = llm.generate("manual_case_implementation_adaptation", {
                             "instructions": "For each historical case, compare it against the supplied task aspects. Reject any concrete field or action absent from the matched aspect (for example, do not add DOB when no aspect requires DOB), but preserve transferable abstract principles such as clear validation feedback. Return JSON {patterns:[{applicable,matched_aspect_index,matched_feature,implementation_pattern,verification,reason}]}.",
                             "current_task": task["instruction"], "task_aspects": task_aspects,
-                            "historical_cases": manual_memory})
+                            "historical_cases": manual_memory,
+                            "adaptation_policy": "Output implementation constraints only. Translate any historical GUI trigger or verification into code/design requirements; never output click/select/open/navigate/observe instructions."})
                         patterns = adapted.get("patterns", []) if isinstance(adapted, dict) else []
+                        forbidden = ("click", "select", "open the", "navigate to", "observe", "verify by", "user clicks")
                         usable = [str(item.get("implementation_pattern", "")).strip()
                                   for item in patterns if isinstance(item, dict) and item.get("applicable")
-                                  and str(item.get("implementation_pattern", "")).strip()]
+                                  and str(item.get("implementation_pattern", "")).strip()
+                                  and not any(term in str(item.get("implementation_pattern", "")).lower() for term in forbidden)]
+                        memory_log.log({
+                            "operation": "manual_case_adaptation",
+                            "task_id": str(task["id"]),
+                            "source_file": str(args.manual_memory_file.resolve()),
+                            "source_sha256": hashlib.sha256(manual_memory.encode("utf-8")).hexdigest(),
+                            "task_aspects": task_aspects,
+                            "raw_patterns": patterns,
+                            "accepted_patterns": usable,
+                            "retrieval_mode": "manual",
+                        })
                         if usable:
                             instruction = task["instruction"] + "\n\nCURRENT-TASK IMPLEMENTATION PATTERNS:\n- " + "\n- ".join(usable)
                     result = run_with_retries(memory, instruction, adapter,

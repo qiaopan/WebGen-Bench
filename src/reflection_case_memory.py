@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 import sqlite3
 import struct
 import uuid
@@ -42,8 +43,9 @@ feature object, a user trigger, and an expected visible state change. Appearance
 aspects must state a concrete visual requirement. Return JSON only:
 {"functional_aspects":[{"feature_object":str,"user_trigger":str,
 "expected_state_change":str}],"appearance_aspects":[{"visual_requirement":str}]}.
-Return at most three functional aspects and one appearance aspect. Empty lists are
-valid when that channel is absent."""
+Enumerate every explicit functional object and every concrete visual requirement in
+the public requirement; do not merge or omit aspects to satisfy a count limit. Empty
+lists are valid only when that channel is absent."""
 
 
 CASE_FUNCTIONAL_RELEVANCE_INSTRUCTIONS = """Judge only functional historical cases.
@@ -67,9 +69,13 @@ matched_current_requirement, reason, and 1-3 current-task implementation_checks.
 CASE_IMPLEMENTATION_ADAPTATION_INSTRUCTIONS = """You are the second-stage memory
 reviewer. The current task is binding. For each selected historical case, discard
 irrelevant business content and retain only a transferable lesson. Rewrite it as a
-short executable implementation pattern containing trigger, required UI/state
-behaviour, and verification action. Do not invent requirements or copy old wording,
-colours, or layout. Return JSON only:
+short current-task code/design constraint for the generator: name what must be
+implemented, the required UI/state behaviour, and the concrete completeness or
+quality condition. Do not write GUI-test instructions or evaluator actions. Never
+say click, select, open, navigate, observe, or verify by interacting; historical
+trigger/verification text is evidence only and must be translated into code/design
+requirements. Do not invent requirements or copy old wording, colours, or layout.
+Return JSON only:
 {"patterns":[{"case_id":str,"applicable":bool,"reason":str,
 "implementation_pattern":str}]}"""
 
@@ -287,7 +293,19 @@ class ReflectionCaseMemory:
                                                         for key in ("feature_object", "user_trigger", "expected_state_change"))]
         appearance = [item for item in raw.get("appearance_aspects", [])
                       if isinstance(item, dict) and str(item.get("visual_requirement", "")).strip()]
-        return {"functional": functional[:self.config.max_task_aspects], "appearance": appearance[:1]}
+        return {"functional": functional[:self.config.max_task_aspects],
+                "appearance": appearance[:1]}
+
+    @staticmethod
+    def requirement_checklist(aspects: Mapping[str, list[dict]]) -> str:
+        """Compact current-task checklist for the generator prompt."""
+        lines: list[str] = []
+        for item in aspects.get("functional", []):
+            lines.append("- Functional requirement: " + str(item.get("feature_object", ""))
+                         + "; expected result: " + str(item.get("expected_state_change", "")))
+        for item in aspects.get("appearance", []):
+            lines.append("- Appearance requirement: " + str(item.get("visual_requirement", "")))
+        return "CURRENT-TASK REQUIREMENT CHECKLIST:\n" + "\n".join(lines) if lines else ""
 
     @staticmethod
     def _aspect_text(channel: str, aspect: Mapping[str, Any]) -> str:
@@ -317,6 +335,29 @@ class ReflectionCaseMemory:
                                for idx, query in enumerate(queries))
             if score >= self.config.retrieval_min_similarity:
                 discovered[row["case_id"]] = (RetrievedCase(row["case_id"], content, score), score, index)
+        # Lightweight lexical backstop: if embeddings produce no candidates,
+        # recover cases sharing concrete feature words with the current aspect.
+        # The LLM relevance gate still makes the final selection; this only
+        # prevents an empty vector result from short-circuiting retrieval.
+        if not discovered:
+            for raw in self.connection.execute(
+                "SELECT * FROM reflection_cases WHERE agent_id=? AND status='active' AND channel=?",
+                (self.agent_id, channel),
+            ):
+                row = dict(raw)
+                content = self._case_content(row)
+                case_text = _json(content).lower()
+                best_overlap = 0.0
+                best_index = 0
+                for index, aspect in enumerate(aspects):
+                    aspect_text = self._aspect_text(channel, aspect).lower()
+                    left = set(re.findall(r"[a-z0-9]{3,}", aspect_text))
+                    right = set(re.findall(r"[a-z0-9]{3,}", case_text))
+                    overlap = len(left & right) / max(1, len(left))
+                    if overlap > best_overlap:
+                        best_overlap, best_index = overlap, index
+                if best_overlap > 0:
+                    discovered[row["case_id"]] = (RetrievedCase(row["case_id"], content, best_overlap), best_overlap, best_index)
         for raw in self.connection.execute(
             "SELECT * FROM experiences WHERE agent_id=? AND status='active' AND embedding_model=? AND embedding_dim=?",
             (self.agent_id, self.embedder.model_id, len(queries[0]))):
@@ -343,10 +384,11 @@ class ReflectionCaseMemory:
                  "matched_aspect_index": index}
                 for item, score, index in ranked[:self.config.case_retrieval_candidates_per_channel]]
 
-    def retrieve(self, task: str, *, top_k: int = 2) -> CasePacket:
+    def retrieve(self, task: str, *, top_k: int = 2,
+                 preclassified: dict[str, list[dict]] | None = None) -> CasePacket:
         if not task.strip():
             raise ValueError("Case retrieval needs a task")
-        aspects = self._aspects(task)
+        aspects = preclassified if preclassified is not None else self._aspects(task)
         functional_by_aspect = [self._discover_channel("functional", [aspect])
                                 for aspect in aspects["functional"]]
         appearance_by_aspect = [self._discover_channel("appearance", [aspect])
@@ -442,4 +484,8 @@ class ReflectionCaseMemory:
         # ``task_domain`` is deliberately accepted for the same adapter contract
         # as LongMemory. Case-only retrieval has no domain hard filter.
         del task_domain
-        return adapter.run(task, self.retrieve(task))
+        aspects = self._aspects(task)
+        checklist = self.requirement_checklist(aspects)
+        packet = self.retrieve(task, preclassified=aspects)
+        prompt_task = task + ("\n\n" + checklist if checklist else "")
+        return adapter.run(prompt_task, packet)

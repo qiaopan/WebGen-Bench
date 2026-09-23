@@ -1,0 +1,29 @@
+HISTORICAL CASES TO ADAPT FOR CURRENT TASK 000016
+
+Use only transferable implementation lessons. Do not copy the historical business
+domain, wording, colours, or layout. The current task requirement is binding.
+
+CASE A — Exact navigation labels and routes
+Trigger: user clicks required navigation labels.
+Expected change: the corresponding page or section becomes visible and the active
+label remains identifiable.
+Lesson: use the exact labels from the current requirement, bind each to real content,
+and verify every route/section by clicking it.
+
+CASE B — Complete multi-section website
+Trigger: user browses a website with several required sections.
+Observed risk: individual sections may exist while the overall site feels incomplete
+because navigation does not clearly expose all required sections.
+Lesson: provide distinct, discoverable sections for every required content group and
+keep the navigation path short.
+
+CASE C — Form submission confirmation
+Trigger: user fills required fields and submits a form.
+Expected change: a visible confirmation state appears after valid submission.
+Lesson: use explicit local submission state and a persistent success message; do not
+rely on an implicit or invisible submission.
+
+TASK-SPECIFIC ADAPTATION
+First decompose the current task into functional and appearance aspects. Keep only
+the historical lessons that match those aspects, then rewrite them as concrete
+implementation and verification instructions for the current task.
