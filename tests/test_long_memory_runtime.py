@@ -718,7 +718,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(settings.memory.max_evidence_chars, 12000)
         self.assertEqual(settings.memory.schema_repair_retries, 2)
         self.assertEqual(settings.memory.hierarchy_dedup_similarity, 0.9)
-        self.assertEqual(settings.memory_llm["deployment"], "webgen-memory-gpt41-mini")
+        self.assertEqual(settings.memory_llm["deployment"], "webgen-memory-gpt4o")
         self.assertEqual(settings.embedding["deployment"], "webgen-memory-embedding")
 
     def test_memory_llm_long_rate_limit_delay_is_opt_in(self):

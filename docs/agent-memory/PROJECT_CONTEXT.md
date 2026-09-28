@@ -38,12 +38,23 @@ functional/appearance aspects 与人工选定 cases，过滤不匹配的具体�
 
 ## 模型与接口
 
-当前配置的 Azure deployments 按约定为：
+默认 Azure-only 配置的 deployments 按约定为：
 
-- generator: `webgen-generator-gpt41-mini`;
-- memory/reflection: `webgen-memory-gpt41-mini`;
-- evaluator: `webgen-evaluator-gpt54-mini`;
+- generator: `webgen-generator-gpt4o`（Azure GPT-4o，version `2024-11-20`）；
+- memory: `webgen-memory-gpt4o`（Azure GPT-4o，version `2024-11-20`）；
+- reflection: `webgen-evaluator-gpt54-mini`（仅完成任务后的反思）；
+- functional evaluator: `webgen-functional-evaluator-gpt4o`（Azure GPT-4o，version `2024-11-20`）；
+- appearance evaluator: `webgen-appearance-evaluator-gpt4o`（Azure GPT-4o，version `2024-11-20`）；
 - embedder: `webgen-memory-embedding`.
+
+2026-09-28 起另有一个**论文近似的本地 5090 baseline profile**，不得与 Azure-only 结果混用：
+
+- generator: `WebGen-LM-7B`，经 localhost OpenAI-compatible endpoint；
+- functional evaluator: `qwen2.5-vl-32b-awq`（Qwen2.5-VL-32B-Instruct-AWQ），经另一 localhost endpoint；
+- appearance evaluator: Azure `webgen-appearance-evaluator-gpt4o`；
+- memory/reflection 与 embedding: Azure `webgen-memory-gpt4o`、`webgen-memory-embedding`（No Memory 条件不调用它们）。
+
+代码通过角色专用 `WEBGEN_GENERATOR_*`、`WEBGEN_FUNCTIONAL_EVALUATOR_*`、`WEBGEN_APPEARANCE_EVALUATOR_*` 环境变量路由；只保留旧通用 evaluator 变量作回退。运行前使用 `scripts/preflight_reflective_models.py` 验证所有角色。local endpoints 由 SSH tunnel 提供，具体连接凭据不进入仓库文档。
 
 薄接口为 `MemoryLLM`、`Embedder` 和 `AgentAdapter`。Memory core 不应依赖 provider/plugin framework，也不应改变 `AgentAdapter` 返回内容的语义。
 
@@ -52,7 +63,7 @@ functional/appearance aspects 与人工选定 cases，过滤不匹配的具体�
 每个生成网站都使用 functional GUI/WebVoyager-style checks 和 screenshot appearance evaluator 评测。raw evaluator trajectories 作为 evidence 保留。每个 check 的结果应保留 Pass/Partial/Fail，以及可用时的 structured attribution（例如 logic failure、interaction-budget exhaustion、appearance issue）。
 
 Generation prompt provenance 通过每个生成目录下的 `000001.prompt.txt` 保存；新 runner 也会把
-prompt（或其路径）放入 trajectory `run_config`。Bolt exported chat JSON 不是完整 prompt 的权威来源。
+prompt（或其路径）放入 trajectory `run_config`。二者记录的是“打算发送”的文本；Bolt exported chat JSON（`000001.json`）才是模型实际收到内容的权威来源。2026-09-26 之前 Bolt 会在第一个换行处截断 prompt（已修复，见 DECISIONS.md），runner 现在用 `prompt_delivered` 核对二者是否一致。
 
 Long Memory 不得使用 hidden final-evaluation instructions/results 修复同一个 formal benchmark task。post-task reflection 可以为后续任务创建 memory。同任务 reflection/retry 仅是 diagnostic experiment，必须明确标注。正式结论的各 comparison arms 应使用相同 generator/evaluator/task settings。
 

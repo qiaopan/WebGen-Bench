@@ -103,6 +103,18 @@ def _visible_element(driver, by, selector, timeout=30):
     return WebDriverWait(driver, timeout).until(locate)
 
 
+def _type_message(text_box, text):
+    """Type a possibly multi-line message into Bolt's chat box without sending it.
+
+    A plain newline is an Enter key press, which Bolt treats as "send" (or "stop" while streaming), so
+    everything after the first newline used to be lost. Shift+Enter inserts a line break instead."""
+    for index, line in enumerate(text.split("\n")):
+        if index:
+            text_box.send_keys(Keys.SHIFT, Keys.ENTER)
+        if line:
+            text_box.send_keys(line)
+
+
 def _open_code_view(driver):
     for element in driver.find_elements(By.XPATH, "//button[contains(., 'Download Code')]"):
         try:
@@ -128,7 +140,7 @@ def _wait_generation_complete(driver, timeout=1200, require_artifact=False):
 
 def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://localhost:5173/",
     desired_model="/mnt/cache/sharemath/models/qwen/Qwen2.5-Coder-32B-Instruct", provider="OpenAILike",
-    headless=False, max_repair_attempts=1):
+    headless=False, max_repair_attempts=1, repair_hint=None, compliance_check=None):
     instruction_hash = hashlib.sha256(instruction.encode("utf-8")).hexdigest()
     download_button_timeout = int(os.environ.get(
         "WEBGEN_DOWNLOAD_BUTTON_TIMEOUT_SECONDS", "120"))
@@ -249,7 +261,7 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         #
         text_box = driver.find_element(By.CSS_SELECTOR, "textarea")
         text_box.clear()
-        text_box.send_keys(instruction)
+        _type_message(text_box, instruction)
         text_box.send_keys(Keys.ENTER)
 
         try:
@@ -259,7 +271,9 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
 
         validation_attempts = []
         validation_path = os.path.join(download_dir, f"{idx:06d}.generation.json")
-        for attempt in range(max_repair_attempts + 1):
+        compliance_done, precheck_archive = False, None
+        last_attempt = max_repair_attempts + (1 if compliance_check else 0)
+        for attempt in range(last_attempt + 1):
             time.sleep(10)
             _open_code_view(driver)
             time.sleep(1)
@@ -300,17 +314,40 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
                 json.dump({"max_repair_attempts": max_repair_attempts,
                            "attempts": validation_attempts}, stream, indent=2)
             if report["ok"]:
-                os.rename(downloaded, zip_path)
-                print(f"Validated and renamed code file to: {zip_path}")
+                note = ""
+                if compliance_check and not compliance_done and attempt < last_attempt:
+                    compliance_done = True
+                    note = compliance_check(downloaded)
+                    report["compliance_note"] = note[-3000:]
+                    with open(validation_path, "w", encoding="utf-8") as stream:
+                        json.dump({"max_repair_attempts": max_repair_attempts,
+                                   "attempts": validation_attempts}, stream, indent=2)
+                if not note:
+                    os.rename(downloaded, zip_path)
+                    print(f"Validated and renamed code file to: {zip_path}")
+                    break
+                # Validated, but the guidance check found gaps: keep this build as the fallback and
+                # ask for one extra repair round.
+                precheck_archive = os.path.join(download_dir, f"{idx:06d}.attempt-{attempt + 1}.precheck.zip")
+                Path(downloaded).rename(precheck_archive)
+                text_box = _visible_element(driver, By.CSS_SELECTOR, "textarea")
+                _type_message(text_box, note)
+                text_box.send_keys(Keys.ENTER)
+                _wait_generation_complete(driver)
+                continue
+            failed_archive = os.path.join(download_dir, f"{idx:06d}.attempt-{attempt + 1}.failed.zip")
+            Path(downloaded).rename(failed_archive)
+            if attempt == last_attempt and precheck_archive:
+                # The extra guidance round broke the build: fall back to the validated earlier one.
+                os.rename(precheck_archive, zip_path)
+                print(f"Guidance round failed validation; using earlier validated build: {zip_path}")
                 break
-            Path(downloaded).rename(
-                os.path.join(download_dir, f"{idx:06d}.attempt-{attempt + 1}.failed.zip")
-            )
-            if attempt == max_repair_attempts:
+            if attempt == last_attempt:
                 raise RuntimeError(f"Generated website failed validation after repair: {report}")
 
             text_box = _visible_element(driver, By.CSS_SELECTOR, "textarea")
-            text_box.send_keys(repair_prompt(report))
+            extra_hint = repair_hint(report, failed_archive, attempt + 1) if repair_hint else ""
+            _type_message(text_box, repair_prompt(report) + extra_hint)
             text_box.send_keys(Keys.ENTER)
             _wait_generation_complete(driver)
 

@@ -33,13 +33,19 @@ sys.path.insert(0, str(ROOT / "src" / "automatic_bolt_diy"))
 
 from automatic_web_gen import automatic_web_gen  # noqa: E402
 from long_memory import connect_database, initialize_database  # noqa: E402
-from long_memory_integrations import (AzureEmbedder, AzureMemoryLLM, BoltAgentAdapter,
-                                      exported_chat_evidence)  # noqa: E402
+from guidance_selfcheck import make_compliance_check
+from generation_failure_memory import (failed_evaluation, failed_generation_evidence, failure_reflection,
+                                       repair_hint_factory)
+from memory_statistics import (BUILD_FAILURE_LABEL, setup_label, build_check_rows, detect_stack, known_categories, known_labels, label_causes,
+                               record_checks, record_run)
+from long_memory_integrations import (AzureEmbedder, AzureMemoryLLM, BoltAgentAdapter, memory_llm_from_settings,
+                                      exported_chat_evidence, case_reflection_evidence,
+                                      earlier_trajectories, setup_history)  # noqa: E402
 from long_memory_runtime import ExtractionOutputError, JsonlRunLog, LongMemory  # noqa: E402
 from long_memory_settings import load_long_memory_settings  # noqa: E402
 from post_task_reflection import (append_reflection, create_reflection,
                                   reflective_evidence_loader)  # noqa: E402
-from reflection_case_memory import ReflectionCaseMemory  # noqa: E402
+from reflection_case_memory import CasePacket, ReflectionCaseMemory, RetrievedCase  # noqa: E402
 from run_stage1 import (artifact, completed_keys, evaluations, extraction_refs,
                         extraction_validated, file_hash, run_evaluators)  # noqa: E402
 
@@ -125,7 +131,8 @@ def write_single_task(path: Path, task: dict) -> None:
 
 
 def upsert_trajectory(database: Path, task: dict, result: dict, destination: Path,
-                      model: str, evaluation: list[dict], batch_number: int) -> str:
+                      model: str, evaluation: list[dict], batch_number: int,
+                      delivered: bool | None = None) -> str:
     chat = Path(result["chat_path"]).resolve()
     archive = Path(result["zip_path"]).resolve()
     with connect_database(database, read_only=False) as connection:
@@ -154,12 +161,135 @@ def upsert_trajectory(database: Path, task: dict, result: dict, destination: Pat
              json.dumps({"model": model, "memory_mode": "continual", "protocol": "continual",
                          "batch": batch_number, "source_application_type": task["application_type"],
                          "output_directory": str(destination.resolve()),
-                         "generation_prompt": generation_prompt,
+                         "generation_prompt": generation_prompt, "prompt_delivered": delivered,
                          "generation_prompt_path": str(prompt_path) if prompt_path.is_file() else ""}, sort_keys=True),
              str(chat), json.dumps([{"path": str(archive), "sha256": file_hash(archive)}],
                                    sort_keys=True), encoded, utc_now()),
         )
     return trajectory_id
+
+
+def insert_failed_trajectory(database: Path, task: dict, destination: Path, model: str,
+                             batch_number: int, evidence: dict, evaluation: list[dict]) -> str:
+    """Generation never produced a working project: keep it as provenance, status execution_error."""
+    archives = [Path(a) for a in sorted(destination.glob("000001.attempt-*.failed.zip"))]
+    with connect_database(database, read_only=False) as connection:
+        attempt = connection.execute(
+            "SELECT COALESCE(MAX(attempt_no),0)+1 FROM trajectories WHERE agent_id=? AND task_id=?",
+            ("bolt", str(task["id"]))).fetchone()[0]
+        trajectory_id = uuid.uuid4().hex
+        prompt_path = destination / "000001.prompt.txt"
+        connection.execute(
+            "INSERT INTO trajectories (trajectory_id,task_id,agent_id,attempt_no,split_group,"
+            "task_request,run_config,trace_path,artifact_refs,run_status,evaluation_results,finished_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?,'execution_error',?,?)",
+            (trajectory_id, str(task["id"]), "bolt", attempt, "g3", task["instruction"],
+             json.dumps({"model": model, "memory_mode": "continual", "protocol": "continual",
+                         "batch": batch_number, "source_application_type": task["application_type"],
+                         "output_directory": str(destination.resolve()), "generation_failed": True,
+                         "generation_prompt": prompt_path.read_text(encoding="utf-8") if prompt_path.is_file() else "",
+                         "attempts": evidence["attempts"]}, sort_keys=True),
+             evidence["report"], json.dumps([{"path": str(a.resolve()), "sha256": file_hash(a)} for a in archives],
+                                            sort_keys=True),
+             json.dumps(evaluation, ensure_ascii=False, sort_keys=True), utc_now()))
+    return trajectory_id
+
+
+def prompt_delivered(result: dict) -> bool | None:
+    """Did Bolt receive the whole prompt? Compares the prompt we typed with the first user message in the
+    exported chat (what the model actually got). None when either file is missing."""
+    import re
+    try:
+        sent = Path(result["prompt_path"]).read_text(encoding="utf-8")
+        messages = json.loads(Path(result["chat_path"]).read_text(encoding="utf-8")).get("messages", [])
+        first = next(m for m in messages if m.get("role") == "user")["content"]
+    except (KeyError, OSError, ValueError, StopIteration):
+        return None
+    received = " ".join(str(part.get("text", "")) for part in first) if isinstance(first, list) else str(first)
+    norm = lambda text: re.sub(r"\s+", " ", text).strip()
+    return norm(sent) in norm(received)
+
+
+def guidance_run_info(llm, adapter, archive: str, delivered: bool | None) -> dict:
+    """Which memory lines this run's prompt carried, and how many the generated code actually implements
+    (one small Memory-LLM call per line; only when delivery was verified)."""
+    from guidance_selfcheck import check_requirement, project_code
+    packet = adapter.last_memory
+    patterns = [str(c.content.get("implementation_pattern", "")).strip() for c in getattr(packet, "cases", ())]
+    lines = [text for text in [*patterns, *getattr(packet, "common", ())] if text]
+    ids = [*(c.case_id for c in getattr(packet, "cases", ())), *getattr(packet, "common_case_ids", ())]
+    info = {"delivered": delivered, "case_ids": list(dict.fromkeys(ids)), "total": len(lines) or None, "followed": None}
+    if lines and delivered:
+        code = project_code(archive)
+        info["followed"] = sum(check_requirement(llm, text, code)["verdict"] == "yes" for text in lines)
+    return info
+
+
+def statistics_outcomes(evaluation: list[dict]) -> dict:
+    counts = {"passed": 0, "partial": 0, "failed": 0}
+    for item in evaluation:
+        if item.get("check") != "appearance" and item.get("outcome") in counts:
+            counts[item["outcome"]] += 1
+    return counts
+
+
+def record_statistics(database: Path, llm, task: dict, trajectory_id: str, archive: str, evaluation: list[dict],
+                      causes: list[str], destination: Path, *, generation_ok: bool,
+                      cases: list[dict] | None = None, guidance: dict | None = None) -> None:
+    """Append this run's facts to the statistics table (Long Memory arm only)."""
+    report = destination / "000001.generation.json"
+    attempts = (len(json.loads(report.read_text(encoding="utf-8")).get("attempts", []))
+                if report.is_file() else None)
+    phase = None
+    if not generation_ok and attempts:
+        phase = json.loads(report.read_text(encoding="utf-8"))["attempts"][-1].get("phase")
+    with connect_database(database, read_only=True) as connection:
+        existing = known_labels(connection, "bolt")
+    stack = detect_stack(archive) if archive else "unknown"
+    lost = statistics_outcomes(evaluation)["failed"]
+    outcomes: dict[str, dict[str, int]] = {}
+
+    def add(label: str, kind: str, amount: int = 1) -> None:
+        outcomes.setdefault(label, {})
+        outcomes[label][kind] = outcomes[label].get(kind, 0) + amount
+
+    if generation_ok:
+        labels = label_causes(llm, causes, existing)
+        for label, item in zip(labels, cases or []):
+            add(label, "failed" if item.get("outcome") == "failure" else "partial")
+        implementation = [c for c in (cases or []) if str(c.get("feature_object", "")).startswith("[implementation]")]
+        if implementation:
+            labels = [*labels, setup_label(stack)]
+            for item in implementation:
+                add(setup_label(stack), "failed" if item.get("outcome") == "failure" else "partial")
+    else:
+        # A generation that never built loses every check.
+        labels = [BUILD_FAILURE_LABEL, setup_label(stack)]
+        add(BUILD_FAILURE_LABEL, "failed", lost)
+        add(setup_label(stack), "failed", lost)
+    record_run(database, agent_id="bolt", task_id=str(task["id"]), trajectory_id=trajectory_id,
+               stack=stack, generation_ok=generation_ok,
+               generation_attempts=attempts, failure_phase=phase,
+               outcomes=statistics_outcomes(evaluation), causes=labels, cause_outcomes=outcomes,
+               prompt_delivered=(guidance or {}).get("delivered"),
+               guidance_case_ids=(guidance or {}).get("case_ids", ()),
+               guidance_total=(guidance or {}).get("total"), guidance_followed=(guidance or {}).get("followed"))
+    if not generation_ok:
+        return  # a project that never built says nothing about individual features; run_facts holds it
+    checks = []
+    for item in evaluation:
+        name = str(item.get("check", ""))
+        if name == "appearance" or item.get("outcome") not in ("passed", "partial", "failed"):
+            continue
+        index = int(name.rsplit("_", 1)[-1])
+        instructions = task.get("ui_instruct", [])
+        checks.append({"index": index, "outcome": item["outcome"],
+                       "task": str(instructions[index].get("task", "")) if index < len(instructions) else name})
+    with connect_database(database, read_only=True) as connection:
+        categories = known_categories(connection, "bolt")
+    record_checks(database, agent_id="bolt", task_id=str(task["id"]), trajectory_id=trajectory_id,
+                  stack=detect_stack(archive) if archive else "unknown",
+                  rows=build_check_rows(llm, categories, checks, cases or []))
 
 
 def summary(events: list[dict]) -> dict:
@@ -171,8 +301,19 @@ def summary(events: list[dict]) -> dict:
     return {"checks": counts, "total": sum(counts.values())}
 
 
+class FixedGuidanceMemory:
+    """Injects an already reviewed guidance packet; no retrieval or adaptation."""
+
+    def __init__(self, packet: CasePacket):
+        self.packet = packet
+
+    def run(self, task: str, adapter: BoltAgentAdapter, *, task_domain: str | None = None) -> dict:
+        del task_domain
+        return adapter.run(task, self.packet)
+
+
 def run_with_retries(memory: LongMemory, instruction: str, adapter: BoltAgentAdapter,
-                     *, label: str, task_domain: str | None = None) -> dict:
+                     *, label: str, task_domain: str | None = None, tolerate_failure: bool = False) -> dict:
     for attempt in range(3):
         try:
             return memory.run(instruction, adapter, task_domain=task_domain)
@@ -180,11 +321,30 @@ def run_with_retries(memory: LongMemory, instruction: str, adapter: BoltAgentAda
             retryable = (isinstance(error, (TimeoutError, WebDriverException, FileNotFoundError)) or
                          "Generated website failed validation" in str(error))
             if not retryable or attempt == 2:
+                if tolerate_failure and "Generated website failed validation" in str(error):
+                    log_line(f"[continual] {label}: generation failed validation; recorded as a failed run")
+                    return {"generation_failed": True, "error": str(error)}
                 raise
             log_line(f"[continual] retrying {label} after generation/browser failure "
                      f"({attempt + 1}/3)")
             time.sleep(5)
     raise AssertionError("unreachable")
+
+
+def exhausted_generation_failure(destination: Path) -> dict | None:
+    """Return a prior terminal build failure so a resumed run does not pay to regenerate it."""
+    report = destination / "000001.generation.json"
+    if not report.is_file():
+        return None
+    try:
+        payload = json.loads(report.read_text(encoding="utf-8"))
+        attempts = payload.get("attempts", [])
+        maximum = int(payload.get("max_repair_attempts", 0)) + 1
+    except (OSError, ValueError, TypeError):
+        return None
+    if len(attempts) < maximum or not attempts or any(item.get("ok") for item in attempts):
+        return None
+    return {"generation_failed": True, "error": str(attempts[-1].get("error", ""))}
 
 
 def main() -> None:
@@ -211,10 +371,19 @@ def main() -> None:
                         help="abstract = Experience/Skill; case_only = direct structured reflection cases")
     parser.add_argument("--manual-memory-file", type=Path,
                         help="Append a reviewed Golden Source text to the public task prompt")
+    parser.add_argument("--guidance-file", type=Path,
+                        help="stage2.json from memory_stage2_guidance.py; its reviewed guidance is injected "
+                             "as-is and retrieval/adaptation are skipped (single-task runs)")
+    parser.add_argument("--guidance-selfcheck", action="store_true",
+                        help="Long Memory diagnostic: after a build passes, check it against the prompt's guidance "
+                             "lines and request one extra repair round for missing ones (default off)")
     parser.add_argument("--headed", action="store_true")
     parser.add_argument("--memory-config", type=Path,
                         default=ROOT / "config/long_memory.json")
     args = parser.parse_args()
+    guidance: dict | None = None
+    if args.guidance_file:
+        guidance = json.loads(args.guidance_file.resolve().read_text(encoding="utf-8"))
     manual_memory = ""
     if args.manual_memory_file:
         manual_memory = args.manual_memory_file.resolve().read_text(encoding="utf-8").strip()
@@ -251,6 +420,7 @@ def main() -> None:
         rate_limit_max_wait_seconds=settings.memory_llm["rate_limit_max_wait_seconds"],
         rate_limit_long_retry_seconds=settings.memory_llm["rate_limit_long_retry_seconds"],
         rate_limit_long_retries=settings.memory_llm["rate_limit_long_retries"])
+    reflection_llm = memory_llm_from_settings(client, settings.reflection_llm)
     embedder = AzureEmbedder(client, settings.embedding["deployment"],
                              dimensions=settings.embedding["dimensions"])
     max_repair_attempts = int(os.environ.get("WEBGEN_MAX_REPAIR_ATTEMPTS", "1"))
@@ -258,11 +428,19 @@ def main() -> None:
                 "manifest_sha256": file_hash(args.manifest.resolve()), "memory_config_sha256": file_hash(args.memory_config.resolve()),
                 "generator_model": generator_model, "memory_model": settings.memory_llm["deployment"],
                 "embedding_model": settings.embedding["deployment"],
-                "evaluation_model": os.environ.get(
-                    "WEBGEN_EVALUATOR_MODEL", os.environ.get("WEBVOYAGER_API_MODEL", "")),
+                "functional_evaluator_model": os.environ.get(
+                    "WEBGEN_FUNCTIONAL_EVALUATOR_MODEL",
+                    os.environ.get("WEBGEN_EVALUATOR_MODEL", os.environ.get("WEBVOYAGER_API_MODEL", "")),
+                ),
+                "appearance_evaluator_model": os.environ.get(
+                    "WEBGEN_APPEARANCE_EVALUATOR_MODEL",
+                    os.environ.get("WEBGEN_EVALUATOR_MODEL", os.environ.get("WEBVOYAGER_API_MODEL", "")),
+                ),
                 "post_task_reflection": args.post_task_reflection,
                 "memory_representation": args.memory_representation,
-                "modes": list(args.modes)}
+                "modes": list(args.modes),
+                "guidance_selfcheck": args.guidance_selfcheck,
+                "guidance_file_sha256": file_hash(args.guidance_file.resolve()) if args.guidance_file else None}
     metadata_path = output / "run-metadata.json"
     if metadata_path.is_file() and json.loads(metadata_path.read_text(encoding="utf-8")) != metadata:
         raise RuntimeError(f"Output directory belongs to different continual settings: {metadata_path}")
@@ -287,11 +465,39 @@ def main() -> None:
                 continue
             destination = output / "tasks" / task_id / mode
             adapter = BoltAgentAdapter(automatic_web_gen, 1, destination, args.url, generator_model,
-                                       headless=not args.headed, max_repair_attempts=max_repair_attempts)
-            if mode == "disabled":
+                                       headless=not args.headed, max_repair_attempts=max_repair_attempts,
+                                       base_constraints=settings.memory.base_constraints_in_prompt)
+            if mode == "continual" and settings.memory.statistics_memory:
+                adapter.repair_hint = repair_hint_factory(str(database), "bolt", embedder, task_id)
+            if mode == "continual" and args.guidance_selfcheck:
+                def selfcheck_lines(adapter=adapter) -> list[str]:
+                    packet = adapter.last_memory
+                    patterns = [str(c.content.get("implementation_pattern", "")) for c in getattr(packet, "cases", ())]
+                    return [*patterns, *getattr(packet, "common", ())]
+                adapter.compliance_check = (
+                    lambda archive, adapter=adapter, lines=selfcheck_lines:
+                    make_compliance_check(llm, lines(), memory_log)(archive))
+            prior_failure = exhausted_generation_failure(destination)
+            if prior_failure is not None:
+                log_line(f"[resume] {task_id}:{mode}: recording prior terminal generation failure")
+                result = prior_failure
+            elif mode == "disabled":
                 with LongMemory(database, "bolt", memory_mode="disabled") as memory:
                     result = run_with_retries(memory, task["instruction"], adapter,
-                                              label=f"{task_id}:{mode}")
+                                              label=f"{task_id}:{mode}", tolerate_failure=True)
+            elif guidance is not None:
+                if guidance["task_id"] != task_id or guidance["task"] != task["instruction"]:
+                    raise ValueError(f"--guidance-file was built for task {guidance['task_id']}, not {task_id}")
+                packet = CasePacket(tuple(RetrievedCase(item["case_id"], {
+                    "case_type": item["case_type"], "implementation_pattern": item["implementation_pattern"]}, 0.0)
+                    for item in guidance["guidance"]),
+                    common=tuple(guidance.get("common", [])),
+                    common_case_ids=tuple(dict.fromkeys(
+                        cid for item in guidance.get("common_adaptation", {}).get("patterns", [])
+                        for cid in item.get("source_case_ids", []))),
+                    statistics=guidance.get("statistics", ""))
+                result = run_with_retries(FixedGuidanceMemory(packet), task["instruction"], adapter,
+                                          label=f"{task_id}:{mode}", tolerate_failure=True)
             elif args.memory_representation == "case_only":
                 with ReflectionCaseMemory(str(database), "bolt", llm=llm, embedder=embedder,
                                           config=settings.memory, log=memory_log) as memory:
@@ -309,7 +515,7 @@ def main() -> None:
                                   for item in patterns if isinstance(item, dict) and item.get("applicable")
                                   and str(item.get("implementation_pattern", "")).strip()
                                   and not any(term in str(item.get("implementation_pattern", "")).lower() for term in forbidden)]
-                        memory_log.log({
+                        memory_log({
                             "operation": "manual_case_adaptation",
                             "task_id": str(task["id"]),
                             "source_file": str(args.manual_memory_file.resolve()),
@@ -321,34 +527,81 @@ def main() -> None:
                         })
                         if usable:
                             instruction = task["instruction"] + "\n\nCURRENT-TASK IMPLEMENTATION PATTERNS:\n- " + "\n- ".join(usable)
+                    memory.statistics_task_id = task_id
                     result = run_with_retries(memory, instruction, adapter,
                                               label=f"{task_id}:{mode}",
-                                              task_domain=task["application_type"])
+                                              task_domain=task["application_type"], tolerate_failure=True)
             else:
                 with LongMemory(database, "bolt", memory_mode="learn", llm=llm,
                                 embedder=embedder, config=settings.memory, log=memory_log) as memory:
                     result = run_with_retries(memory, task["instruction"], adapter,
                                               label=f"{task_id}:{mode}",
-                                              task_domain=task["application_type"])
+                                              task_domain=task["application_type"], tolerate_failure=True)
             # This is the first point at which hidden benchmark evaluation is accessed.
             # The generated archive has already been written and is never regenerated here.
-            with exclusive_evaluation_lock():
-                run_evaluators(destination, task_file, 1)
-            evaluation = evaluations(destination, 1)
+            generation_failed = isinstance(result, dict) and bool(result.get("generation_failed"))
+            if generation_failed:
+                evaluation = failed_evaluation(task)
+            else:
+                with exclusive_evaluation_lock():
+                    run_evaluators(destination, task_file, 1)
+                evaluation = evaluations(destination, 1)
             event = {"key": key, "status": "complete", "batch": batch_number,
                      "task_id": task_id, "mode": mode, "evaluation": evaluation}
+            if generation_failed:
+                event.update({"generation_failed": True, "error": result.get("error", "")[-500:]})
+            if not generation_failed:
+                event["prompt_delivered"] = prompt_delivered(result)
+                if event["prompt_delivered"] is False:
+                    log_line(f"[continual] WARNING {task_id}:{mode}: Bolt did not receive the whole prompt")
+            if mode == "continual" and generation_failed:
+                # The project never built: keep it as provenance, count every check as failed, and learn from it.
+                evidence = failed_generation_evidence(destination)
+                trajectory_id = insert_failed_trajectory(database, task, destination, generator_model,
+                                                         batch_number, evidence, evaluation)
+                stack = detect_stack(evidence["archive"]) if evidence["archive"] else "unknown"
+                lesson = failure_reflection(reflection_llm, task["instruction"], trajectory_id, stack, evidence)
+                case_ids: list[str] = []
+                if lesson:
+                    append_reflection(reflection_path, lesson)
+                    with ReflectionCaseMemory(str(database), "bolt", llm=llm, embedder=embedder,
+                                              config=settings.memory, log=memory_log) as memory:
+                        case_ids = memory.store(lesson)
+                record_statistics(database, llm, task, trajectory_id, evidence["archive"], evaluation,
+                                  [lesson["implementation_reflection"]["likely_cause_or_limitation"]] if lesson else [],
+                                  destination, generation_ok=False)
+                event.update({"trajectory_id": trajectory_id, "generation_failed": True, "stack": stack,
+                              "case_ids": case_ids, "error": result.get("error", "")[-500:]})
+                append_event(progress_path, event)
+                completed.add(key)
+                reports.append(event)
+                log_line(f"[continual] completed {ordinal}/{len(tasks)} batch {batch_number} "
+                         f"{task_id} {mode} (generation failed; {len(case_ids)} case(s) stored)")
+                continue
             if mode == "continual":
                 trajectory_id = upsert_trajectory(database, task, result, destination,
-                                                  generator_model, evaluation, batch_number)
+                                                  generator_model, evaluation, batch_number,
+                                                  delivered=event.get("prompt_delivered"))
                 evidence_loader = exported_chat_evidence
                 if args.post_task_reflection or args.memory_representation == "case_only":
                     with connect_database(database, read_only=True) as connection:
                         source = connection.execute(
                             "SELECT * FROM trajectories WHERE trajectory_id=?", (trajectory_id,)
                         ).fetchone()
-                    reflection = create_reflection(llm, dict(source), exported_chat_evidence(dict(source)))
+                    reflection = create_reflection(reflection_llm, dict(source),
+                                                 (case_reflection_evidence if args.memory_representation == "case_only"
+                                                  else exported_chat_evidence)(dict(source)),
+                                                 review=settings.memory.post_task_case_review,
+                                                 style=settings.memory.reflection_style,
+                                                 appearance_mode=settings.memory.appearance_reflection,
+                                                 setup_history=(setup_history(earlier_trajectories(connection, dict(source)))
+                                                                if args.memory_representation == "case_only" else None))
                     append_reflection(reflection_path, reflection)
                     event["reflection_id"] = reflection["reflection_id"]
+                    if reflection.get("appearance_all_dropped"):
+                        event["appearance_all_dropped"] = True
+                        log_line(f"[continual] WARNING {task_id}: every appearance case lacked a verified code "
+                                 "citation and was not stored (see appearance_dropped_no_citation in the reflection)")
                     # ``reflection_count`` used to look like an inner retry count.
                     # Keep it only as a backwards-compatible alias for accepted
                     # strict-provenance items; raw archived cases are reported too.
@@ -365,6 +618,17 @@ def main() -> None:
                         event["consolidation_review"] = memory.review_recurring_failures(event["case_ids"])
                         event["experience_candidate_record_id"] = memory.persist_experience_candidate(
                             event["consolidation_review"])
+                    causes = [str(item.get("likely_cause_or_limitation", ""))
+                              for item in [*reflection.get("functional_reflections", []),
+                                           reflection.get("implementation_reflection")]
+                              if isinstance(item, dict) and item.get("outcome") != "success"]
+                    record_statistics(database, llm, task, trajectory_id, result["zip_path"], evaluation,
+                                      causes, destination, generation_ok=True,
+                                      guidance=guidance_run_info(llm, adapter, result["zip_path"],
+                                                                 event.get("prompt_delivered")),
+                                      cases=[item for item in [*reflection.get("functional_reflections", []),
+                                                               reflection.get("implementation_reflection")]
+                                             if isinstance(item, dict) and item.get("outcome") != "success"])
                     refs = []
                 else:
                     evidence_loader = reflective_evidence_loader(exported_chat_evidence, reflection_path)

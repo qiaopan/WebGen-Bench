@@ -15,13 +15,13 @@ class LongMemorySettings:
     memory: MemoryConfig
     memory_llm: dict[str, Any]
     embedding: dict[str, Any]
+    reflection_llm: dict[str, Any]
 
 
 def load_long_memory_settings(path: Path) -> LongMemorySettings:
     raw = json.loads(path.read_text(encoding="utf-8"))
-    if raw.get("schema_version") != 1 or set(raw) != {
-        "schema_version", "memory_llm", "embedding", "runtime"
-    }:
+    base_keys = {"schema_version", "memory_llm", "embedding", "runtime"}
+    if raw.get("schema_version") != 1 or set(raw) not in (base_keys, base_keys | {"reflection_llm"}):
         raise ValueError("Unsupported long-memory configuration schema")
     llm = raw["memory_llm"]
     embedding = raw["embedding"]
@@ -34,4 +34,9 @@ def load_long_memory_settings(path: Path) -> LongMemorySettings:
         embedding["deployment"]
     ).strip():
         raise ValueError("Invalid embedding configuration")
-    return LongMemorySettings(MemoryConfig(**raw["runtime"]), dict(llm), dict(embedding))
+    # Optional stronger model for post-task reflection and case review only; all other
+    # settings (tokens, retries) are inherited from memory_llm.
+    reflection = {**llm, **raw.get("reflection_llm", {})}
+    if set(raw.get("reflection_llm", {})) - {"deployment"} or not str(reflection["deployment"]).strip():
+        raise ValueError("reflection_llm may only override a non-empty deployment")
+    return LongMemorySettings(MemoryConfig(**raw["runtime"]), dict(llm), dict(embedding), reflection)

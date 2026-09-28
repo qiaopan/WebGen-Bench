@@ -26,11 +26,11 @@ def required(name: str) -> str:
     return value
 
 
-def chat_ping(label: str, client: OpenAI, model: str) -> None:
+def chat_ping(label: str, client: OpenAI, model: str, *, azure_style: bool = False) -> None:
     client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": "Reply with OK."}],
-        max_completion_tokens=4,
+        **({"max_completion_tokens": 4} if azure_style else {"max_tokens": 4}),
         temperature=0,
     )
     print(f"PASS  {label}: {model}")
@@ -38,29 +38,44 @@ def chat_ping(label: str, client: OpenAI, model: str) -> None:
 
 def main() -> None:
     load_dotenv(ROOT / ".env")
-    key = required("AZURE_OPENAI_API_KEY")
+    azure_key = required("AZURE_OPENAI_API_KEY")
+    azure_base = required("AZURE_OPENAI_ENDPOINT").rstrip("/") + "/openai/v1"
     generator_base = required("WEBGEN_GENERATOR_BASE_URL")
-    evaluator_base = required("WEBVOYAGER_BASE_URL")
+    generator_key = (os.getenv("WEBGEN_GENERATOR_API_KEY") or azure_key).strip()
+    functional_base = (os.getenv("WEBGEN_FUNCTIONAL_EVALUATOR_BASE_URL")
+                       or os.getenv("WEBGEN_EVALUATOR_BASE_URL")
+                       or required("WEBVOYAGER_BASE_URL")).strip()
+    functional_key = (os.getenv("WEBGEN_FUNCTIONAL_EVALUATOR_API_KEY")
+                      or os.getenv("WEBGEN_EVALUATOR_API_KEY") or azure_key).strip()
+    appearance_base = (os.getenv("WEBGEN_APPEARANCE_EVALUATOR_BASE_URL")
+                       or os.getenv("WEBGEN_EVALUATOR_BASE_URL")
+                       or required("WEBVOYAGER_BASE_URL")).strip()
+    appearance_key = (os.getenv("WEBGEN_APPEARANCE_EVALUATOR_API_KEY")
+                      or os.getenv("WEBGEN_EVALUATOR_API_KEY") or azure_key).strip()
     generator_model = os.getenv("WEBGEN_GENERATOR_API_MODEL", "webgen-generator-gpt41-mini")
-    memory_model = "webgen-memory-gpt41-mini"
+    memory_model = "webgen-memory-gpt4o"
     embedding_model = "webgen-memory-embedding"
-    evaluator_model = os.getenv("WEBVOYAGER_API_MODEL", "webgen-evaluator-gpt54-mini")
+    functional_model = os.getenv("WEBGEN_FUNCTIONAL_EVALUATOR_MODEL", os.getenv("WEBVOYAGER_API_MODEL", ""))
+    appearance_model = os.getenv("WEBGEN_APPEARANCE_EVALUATOR_MODEL", os.getenv("WEBVOYAGER_API_MODEL", ""))
 
-    generator = OpenAI(api_key=key, base_url=generator_base, timeout=30, max_retries=0)
-    evaluator = OpenAI(api_key=key, base_url=evaluator_base, timeout=30, max_retries=0)
+    generator = OpenAI(api_key=generator_key, base_url=generator_base, timeout=30, max_retries=0)
+    memory = OpenAI(api_key=azure_key, base_url=azure_base, timeout=30, max_retries=0)
+    functional = OpenAI(api_key=functional_key, base_url=functional_base, timeout=90, max_retries=0)
+    appearance = OpenAI(api_key=appearance_key, base_url=appearance_base, timeout=30, max_retries=0)
     failures: list[str] = []
-    for label, client, model in (
-        ("generator", generator, generator_model),
-        ("memory/reflection", generator, memory_model),
-        ("evaluator", evaluator, evaluator_model),
+    for label, client, model, azure_style in (
+        ("generator", generator, generator_model, False),
+        ("memory/reflection", memory, memory_model, True),
+        ("functional evaluator", functional, functional_model, "azure.com/openai/v1" in functional_base),
+        ("appearance evaluator", appearance, appearance_model, "azure.com/openai/v1" in appearance_base),
     ):
         try:
-            chat_ping(label, client, model)
+            chat_ping(label, client, model, azure_style=azure_style)
         except Exception as error:  # report deployment identity, never a key
             failures.append(f"FAIL  {label}: {model} ({type(error).__name__}: {error})")
 
     try:
-        response = generator.embeddings.create(model=embedding_model, input=["health check"])
+        response = memory.embeddings.create(model=embedding_model, input=["health check"])
         if not response.data or not response.data[0].embedding:
             raise RuntimeError("empty embedding response")
         print(f"PASS  embedding: {embedding_model}")

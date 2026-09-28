@@ -16,6 +16,60 @@ SCHEMA_VERSION = 3
 APPLICATION_ID = 0x57474D31  # WGM1: WebGen Memory, format 1.
 SCHEMA_PATH = Path(__file__).with_name("long_memory_schema.sql")
 TABLE_NAMES = ("trajectories", "reflection_cases", "experiences", "skills", "memory_sources")
+# Optional side tables are created on first use and are not part of the validated core
+# schema, so databases written before they existed still open. Core tables stay strict.
+OPTIONAL_TABLES_DDL = {
+    "run_facts": """CREATE TABLE IF NOT EXISTS run_facts (
+    fact_id TEXT PRIMARY KEY,
+    agent_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    trajectory_id TEXT,
+    recorded_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    stack TEXT NOT NULL,
+    generation_ok INTEGER NOT NULL CHECK (generation_ok IN (0, 1)),
+    generation_attempts INTEGER,
+    failure_phase TEXT,
+    checks_passed INTEGER NOT NULL DEFAULT 0,
+    checks_partial INTEGER NOT NULL DEFAULT 0,
+    checks_failed INTEGER NOT NULL DEFAULT 0,
+    causes TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(causes) AND json_type(causes) = 'array'),
+    cause_outcomes TEXT NOT NULL DEFAULT '{}'
+        CHECK (json_valid(cause_outcomes) AND json_type(cause_outcomes) = 'object'),
+    prompt_delivered INTEGER CHECK (prompt_delivered IN (0, 1)),
+    guidance_case_ids TEXT NOT NULL DEFAULT '[]'
+        CHECK (json_valid(guidance_case_ids) AND json_type(guidance_case_ids) = 'array'),
+    guidance_total INTEGER,
+    guidance_followed INTEGER,
+    UNIQUE (agent_id, task_id, trajectory_id)
+) STRICT""",
+    "check_facts": """CREATE TABLE IF NOT EXISTS check_facts (
+    fact_id TEXT PRIMARY KEY,
+    agent_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    trajectory_id TEXT NOT NULL,
+    check_index INTEGER NOT NULL,
+    recorded_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    category TEXT NOT NULL,
+    outcome TEXT NOT NULL CHECK (outcome IN ('passed', 'partial', 'failed')),
+    stack TEXT NOT NULL,
+    evidence_source TEXT CHECK (evidence_source IN ('operation', 'code', 'screenshot')),
+    requirement_stated INTEGER CHECK (requirement_stated IN (0, 1)),
+    UNIQUE (agent_id, trajectory_id, check_index)
+) STRICT""",
+    "case_supports": """CREATE TABLE IF NOT EXISTS case_supports (
+    support_id TEXT PRIMARY KEY,
+    agent_id TEXT NOT NULL,
+    supported_case_id TEXT NOT NULL REFERENCES reflection_cases(case_id),
+    supporting_trajectory_id TEXT NOT NULL REFERENCES trajectories(trajectory_id),
+    channel TEXT NOT NULL CHECK (channel = 'appearance'),
+    observed_result TEXT NOT NULL,
+    preventative_action TEXT NOT NULL,
+    evidence_refs TEXT NOT NULL DEFAULT '[]'
+        CHECK (json_valid(evidence_refs) AND json_type(evidence_refs) = 'array'),
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    UNIQUE (agent_id, supported_case_id, supporting_trajectory_id, preventative_action)
+) STRICT""",
+}
 
 
 def _require_sqlite_features() -> None:
@@ -48,6 +102,7 @@ def _schema_signature(connection: sqlite3.Connection) -> tuple[tuple, ...]:
             "SELECT type, name, tbl_name, sql FROM sqlite_schema "
             "WHERE name NOT GLOB 'sqlite_*' ORDER BY type, name"
         )
+        if row[2] not in OPTIONAL_TABLES_DDL
     )
 
 
@@ -69,6 +124,21 @@ def _validate_schema(connection: sqlite3.Connection) -> None:
         )
     if _schema_signature(connection) != _expected_signature():
         raise ValueError("Database schema differs from the current format; use a fresh database")
+
+
+def ensure_optional_tables(connection: sqlite3.Connection) -> None:
+    """Create side tables that a writable connection needs (idempotent, never drops data)."""
+    for ddl in OPTIONAL_TABLES_DDL.values():
+        connection.execute(ddl)
+    # Columns added after a side table first shipped are migrated in place (core tables never change).
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(run_facts)")}
+    for name, definition in (
+            ("cause_outcomes", "TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(cause_outcomes) AND json_type(cause_outcomes) = 'object')"),
+            ("prompt_delivered", "INTEGER CHECK (prompt_delivered IN (0, 1))"),
+            ("guidance_case_ids", "TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(guidance_case_ids) AND json_type(guidance_case_ids) = 'array')"),
+            ("guidance_total", "INTEGER"), ("guidance_followed", "INTEGER")):
+        if name not in columns:
+            connection.execute(f"ALTER TABLE run_facts ADD COLUMN {name} {definition}")
 
 
 def _configure(connection: sqlite3.Connection, *, read_only: bool) -> None:

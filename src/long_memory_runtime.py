@@ -61,8 +61,41 @@ class MemoryConfig:
     # Case-only retrieval first retrieves a small candidate set independently
     # for functional and visual reflections, then asks the LLM to select from it.
     case_retrieval_candidates_per_channel: int = 3
-    case_retrieval_max_functional: int = 3
-    case_retrieval_max_appearance: int = 1
+    # Diagnostic switch: treat the top recalled candidate of every aspect as selected
+    # and skip the LLM relevance gate (adaptation still runs).
+    case_retrieval_skip_relevance_gate: bool = False
+    # Optional second pass that reviews each post-task case (drop/rewrite). Off by default:
+    # it removed real defects at random in trials.
+    post_task_case_review: bool = False
+    # "structured": one rule-based reflection call; "questions": plain questions per failed
+    # check, answers then formatted into the same fields (case-only Long Memory only).
+    reflection_style: str = "structured"
+    # Long Memory only: inject recorded outcome statistics (memory_statistics.py) into the prompt.
+    statistics_memory: bool = False
+    # Long Memory only: task-independent pool of implementation pitfalls (setup, build), always
+    # offered, ranked by evidence and recency, not matched against the task's features.
+    # Priority of a recurring problem = sum over the last `priority_window` runs (0 = all) of
+    #   0.5 ** (age / priority_half_life) * (failed checks * severity_failed + partial checks * severity_partial),
+    # raised to `priority_alpha`. A generation that never built counts every lost check as failed.
+    # Leave-one-task-out: retrieval, common pool, statistics and retrospective use every task's data EXCEPT the
+    # task being run (no ordering by task number). Needs the current task id (statistics_task_id) from the runner.
+    exclude_same_task: bool = True
+    # "grouped": appearance lessons come from the grouped, code-cited path (one case per same-fix group,
+    # needs the site's code as evidence); "single": the original one-case path.
+    appearance_reflection: str = "single"
+    priority_window: int = 0  # 0 = all history
+    priority_half_life: float = 0.0  # 0 = no decay (deferred: revisit once there is enough history)
+    severity_failed: float = 1.0
+    severity_partial: float = 0.5
+    priority_alpha: float = 1.0
+    # The fixed, hand-written reliability paragraph (JSX escaping). Off: memory content is the only difference
+    # between arms and the earlier No Memory baseline had no such paragraph.
+    base_constraints_in_prompt: bool = False
+    common_pool: bool = False
+    common_pool_candidates: int = 6
+    common_pool_size: int = 3
+    common_pool_min_tasks: int = 2  # an implementation lesson is "broad" once this many different tasks state it
+    common_pool_reserve: int = 2  # candidate slots filled by all-time severity, not by recency
     consolidation_candidates: int = 4
     retrieval_min_similarity: float = 0.35
     consolidation_min_similarity: float = 0.55
@@ -93,7 +126,6 @@ class MemoryConfig:
                 raise ValueError(f"{key} must be hard_only, hard_soft, or soft_only")
         for key in ("min_consolidation_evidence", "min_activation_evidence", "max_task_aspects",
                     "retrieval_candidates_per_type", "case_retrieval_candidates_per_channel",
-                    "case_retrieval_max_functional", "case_retrieval_max_appearance",
                     "consolidation_candidates", "evidence_cap",
                     "max_prompt_memory_chars", "max_prompt_workflow_steps",
                     "max_prompt_completion_checks", "max_experiences_per_trajectory",
@@ -114,6 +146,11 @@ class MemoryConfig:
         for key in ("evidence_weight", "domain_match_weight"):
             if not math.isfinite(getattr(self, key)) or getattr(self, key) < 0:
                 raise ValueError(f"{key} must be finite and nonnegative")
+        if self.reflection_style not in ("structured", "questions"):
+            raise ValueError("reflection_style must be 'structured' or 'questions'")
+        for key in ("case_retrieval_skip_relevance_gate", "post_task_case_review"):
+            if type(getattr(self, key)) is not bool:
+                raise ValueError(f"{key} must be a boolean")
         if type(self.include_full_task_in_retrieval) is not bool:
             raise ValueError("include_full_task_in_retrieval must be a boolean")
 
