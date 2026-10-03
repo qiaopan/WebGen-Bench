@@ -28,6 +28,11 @@ def _run(command: list[str], cwd: Path, timeout: int) -> subprocess.CompletedPro
                           timeout=timeout, check=False)
 
 
+def _external_resource_failure(message: str) -> bool:
+    match = re.match(r"(https?://[^\s]+) - Failed to load resource", message)
+    return bool(match) and not re.match(r"https?://(127\.0\.0\.1|localhost|\[::1\])[:/]", match.group(1))
+
+
 def validate_generated_zip(zip_path: str | Path) -> dict:
     """Return a compact validation report without calling an LLM."""
     archive = Path(zip_path)
@@ -99,8 +104,11 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
                 body_size = driver.execute_script(
                     "return document.body?.innerHTML.length || 0"
                 )
+                # A third-party resource that fails to load (e.g. an offline placeholder-image service)
+                # is not a defect of the generated site; only the site's own errors fail validation.
                 severe = [entry["message"] for entry in driver.get_log("browser")
-                          if entry.get("level") == "SEVERE" and "favicon.ico" not in entry["message"]]
+                          if entry.get("level") == "SEVERE" and "favicon.ico" not in entry["message"]
+                          and not _external_resource_failure(entry["message"])]
                 if height <= 0 or body_size <= 0 or severe:
                     return {"ok": False, "phase": "runtime", "error": "\n".join(severe[-8:])
                             or f"page did not render (height={height}, body_size={body_size})"}

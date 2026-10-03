@@ -40,6 +40,8 @@ OPTIONAL_TABLES_DDL = {
         CHECK (json_valid(guidance_case_ids) AND json_type(guidance_case_ids) = 'array'),
     guidance_total INTEGER,
     guidance_followed INTEGER,
+    prompt_stats TEXT NOT NULL DEFAULT '{}'
+        CHECK (json_valid(prompt_stats) AND json_type(prompt_stats) = 'object'),
     UNIQUE (agent_id, task_id, trajectory_id)
 ) STRICT""",
     "check_facts": """CREATE TABLE IF NOT EXISTS check_facts (
@@ -136,7 +138,8 @@ def ensure_optional_tables(connection: sqlite3.Connection) -> None:
             ("cause_outcomes", "TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(cause_outcomes) AND json_type(cause_outcomes) = 'object')"),
             ("prompt_delivered", "INTEGER CHECK (prompt_delivered IN (0, 1))"),
             ("guidance_case_ids", "TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(guidance_case_ids) AND json_type(guidance_case_ids) = 'array')"),
-            ("guidance_total", "INTEGER"), ("guidance_followed", "INTEGER")):
+            ("guidance_total", "INTEGER"), ("guidance_followed", "INTEGER"),
+            ("prompt_stats", "TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(prompt_stats) AND json_type(prompt_stats) = 'object')")):
         if name not in columns:
             connection.execute(f"ALTER TABLE run_facts ADD COLUMN {name} {definition}")
 

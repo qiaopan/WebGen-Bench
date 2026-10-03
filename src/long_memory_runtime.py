@@ -80,6 +80,13 @@ class MemoryConfig:
     # Leave-one-task-out: retrieval, common pool, statistics and retrospective use every task's data EXCEPT the
     # task being run (no ordering by task number). Needs the current task id (statistics_task_id) from the runner.
     exclude_same_task: bool = True
+    # Long Memory only: condense all injected memory (task guidance, common pitfalls, statistics) into
+    # at most `guidance_max_items` one-sentence lines whose total length is at most
+    # `guidance_max_ratio` x the requirement's length. Multiple-instruction compliance falls roughly
+    # geometrically with instruction count ("Curse of Instructions", Harada et al. 2024).
+    guidance_condense: bool = False
+    guidance_max_items: int = 5
+    guidance_max_ratio: float = 1.0
     # "grouped": appearance lessons come from the grouped, code-cited path (one case per same-fix group,
     # needs the site's code as evidence); "single": the original one-case path.
     appearance_reflection: str = "single"
@@ -273,8 +280,9 @@ def _prompt_content(kind: str, content: Mapping[str, Any], max_workflow_steps: i
 def _render_prompt_sections(sections: Sequence[tuple[str, list[dict]]]) -> str:
     selected = dict(sections)
     return "\n\n".join(
-        heading + "\n" + json.dumps(selected.get(heading, []), ensure_ascii=False, sort_keys=True)
+        heading + "\n" + json.dumps(selected[heading], ensure_ascii=False, sort_keys=True)
         for heading in ("Relevant Experiences", "Relevant Skills")
+        if heading in selected
     )
 
 def _normalise_evidence_refs(refs: Any, evidence: list[dict]) -> list[dict]:

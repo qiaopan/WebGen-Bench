@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import base64
 import json
+import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -41,14 +43,20 @@ class AzureMemoryLLM:
             raise ValueError("Memory LLM retry settings must be nonnegative")
 
     def generate(self, operation: str, payload: Mapping[str, Any]) -> dict:
+        # ``_images``: optional PNG paths sent as image parts after the JSON text (multimodal models only).
+        text = json.dumps({"operation": operation, **{key: value for key, value in payload.items()
+                           if key not in ("instructions", "_images")}}, ensure_ascii=False, default=str)
+        images = [path for path in payload.get("_images", []) if Path(path).is_file()]
+        user_content: Any = text if not images else [{"type": "text", "text": text}] + [
+            {"type": "image_url", "image_url": {
+                "url": "data:image/png;base64," + base64.b64encode(Path(path).read_bytes()).decode()}}
+            for path in images]
         arguments = {
             "model": self.model_id,
             "messages": [
                 {"role": "system", "content": str(payload["instructions"]) +
                  " Return one valid JSON object and no surrounding prose."},
-                {"role": "user", "content": json.dumps(
-                    {"operation": operation, **{key: value for key, value in payload.items()
-                     if key != "instructions"}}, ensure_ascii=False, default=str)},
+                {"role": "user", "content": user_content},
             ],
             "response_format": {"type": "json_object"},
             "temperature": 0,
@@ -189,6 +197,42 @@ _CODE_SKIP_DIRS = {"node_modules", "dist", ".git", "shots", "results", "download
 _CODE_SUFFIXES = (".jsx", ".tsx", ".js", ".ts", ".astro", ".vue", ".svelte", ".html", ".css", ".mjs")
 
 
+_GLOBAL_STYLE_FILES = ("src/style.css", "src/index.css", "src/App.css", "src/assets/main.css",
+                       "src/styles.css", "src/global.css", "src/app.css")
+def global_style_findings(project: Path) -> list[str]:
+    """Measured facts, no judgement: for each global stylesheet, which entry files import it and every
+    declaration it makes on :root, html, body or #app (the rules every page inherits)."""
+    src = project / "src"
+    entries = [p for p in src.glob("*") if p.is_file() and p.stem in ("main", "App", "index")
+               and p.suffix in (".ts", ".tsx", ".js", ".jsx", ".vue")] if src.is_dir() else []
+    entry_text = {p.relative_to(project).as_posix(): p.read_text(encoding="utf-8", errors="ignore") for p in entries}
+    findings = []
+    for rel in _GLOBAL_STYLE_FILES:
+        path = project / rel
+        if not path.is_file():
+            continue
+        importers = [name for name, text in entry_text.items() if Path(rel).name in text]
+        selector, media, depth, rules = None, None, 0, []
+        for number, line in enumerate(path.read_text(encoding="utf-8", errors="ignore").splitlines(), start=1):
+            head = re.match(r"\s*([^{}]+?)\s*\{", line)
+            if head and head.group(1).strip().startswith("@media"):
+                media, depth = head.group(1).strip(), 0
+            elif head:
+                selector = head.group(1).strip()
+                depth += 1
+            elif selector and re.fullmatch(r"(:root|html|body|#app)(\s*,\s*(:root|html|body|#app))*", selector) \
+                    and ":" in line and line.strip().endswith(";"):
+                rules.append(f"line {number} " + (f"{media} " if media else "") + f"{selector} {{ {line.strip()} }}")
+            if "}" in line:
+                if selector:
+                    selector, depth = None, depth - 1
+                elif media:
+                    media = None
+        if rules:
+            findings.append(f"{rel} (imported by: {', '.join(importers) or 'no entry file'}): " + "; ".join(rules))
+    return findings
+
+
 def generated_code_evidence(trajectory: dict, *, per_file: int = 16000, budget: int = 60000,
                             project: Path | None = None) -> list[dict]:
     """Compact view of the generated website's own source, for root-cause analysis.
@@ -220,7 +264,8 @@ def generated_code_evidence(trajectory: dict, *, per_file: int = 16000, budget: 
                 or path.suffix not in _CODE_SUFFIXES or path.name.endswith(".d.ts")):
             continue
         files.append(rel.as_posix())
-    evidence = [{"ref": {"kind": "code_manifest"}, "content": {**manifest, "files": files}}]
+    evidence = [{"ref": {"kind": "code_manifest"},
+                 "content": {**manifest, "files": files, "global_style_rules": global_style_findings(project)}}]
     used = 0
     for rel in sorted(files, key=lambda f: (0 if "/pages/" in f or "/components/" in f else 1, f)):
         try:

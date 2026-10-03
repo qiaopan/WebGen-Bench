@@ -19,6 +19,51 @@ from selenium.webdriver.support import expected_conditions as EC
 from generation_validator import repair_prompt, validate_generated_zip
 
 
+VUE_HELPERS = {"ref", "reactive", "computed", "watch", "watchEffect", "nextTick", "onMounted",
+               "onUnmounted", "onBeforeMount", "onBeforeUnmount", "onUpdated", "toRef", "toRefs",
+               "shallowRef", "defineComponent"}
+
+
+def _uses_name(text, name):
+    """True if ``name`` is called, including with a generic argument: ``ref<number>(0)``."""
+    return re.search(rf"(?<![\w.$]){name}\s*(?:<[^()]*>)?\s*\(", text) is not None
+
+
+def _fix_vue_imports(text, missing, unused):
+    """Add helpers the compiler could not find; drop helpers it reports unused and that are not called."""
+    vue_import = re.search(r"import\s*\{([^}]*)\}\s*from\s*(['\"])vue\2;?", text)
+    imported = [n.strip() for n in vue_import.group(1).split(",") if n.strip()] if vue_import else []
+    wanted = [n for n in imported if not (n in unused and not _uses_name(text, n))]
+    wanted += [n for n in sorted(missing) if n not in wanted and _uses_name(text, n)]
+    if wanted == imported:
+        return None
+    line = f"import {{ {', '.join(wanted)} }} from 'vue'" if wanted else ""
+    if vue_import:
+        return text[:vue_import.start()] + line + text[vue_import.end():]
+    if not line or "<script setup" not in text:
+        return None
+    return re.sub(r"(<script\s+setup[^>]*>)", lambda m: m.group(1) + "\n" + line, text, count=1)
+
+
+def _changed_files(original_bytes, zip_path):
+    """Files whose content differs between the archive before and after a deterministic repair."""
+    import io
+    with zipfile.ZipFile(io.BytesIO(original_bytes)) as before, zipfile.ZipFile(zip_path) as after:
+        old = {i.filename: before.read(i.filename) for i in before.infolist()}
+        return sorted(name for name in after.namelist() if old.get(name) != after.read(name))
+
+
+# Errors a deterministic import/dependency edit could itself cause: unused import (TS6133/TS6192),
+# missing export (TS2305/TS2614/TS2724), duplicate identifier (TS2300/TS2451), unresolvable module
+# (TS2307), or any syntax/parse error.
+_PATCH_CAUSED_ERROR = re.compile(
+    r"error TS(6133|6192|2305|2614|2724|2300|2451|2307|1\d{3}):|SyntaxError|Unexpected token|Expected ")
+
+
+def _error_lines(report):
+    return {line.strip() for line in str(report.get("error", "")).splitlines() if "error" in line.lower()}
+
+
 def _repair_common_jsx_syntax(zip_path, report):
     """Apply narrowly scoped syntax repairs to a generated archive."""
     detail = str(report.get("error", ""))
@@ -34,6 +79,15 @@ def _repair_common_jsx_syntax(zip_path, report):
         r"(?<=>)([^<>{]*)(<)(\s*\d[^<>{]*)(?=<)"
     )
     astro_dynamic = "GetStaticPathsRequired" in detail or "getStaticPaths() function is required" in detail
+    vue_router_missing = "Cannot find module 'vue-router'" in detail
+    # Per-file Vue import fixes, limited to the files and helper names that the error names.
+    vue_missing, vue_unused = {}, {}
+    for path, name in re.findall(r"(\S+\.vue)\(\d+,\d+\): error TS2304: Cannot find name '(\w+)'\.", detail):
+        if name in VUE_HELPERS:
+            vue_missing.setdefault(path, set()).add(name)
+    for path, name in re.findall(r"(\S+\.vue)\(\d+,\d+\): error TS6133: '(\w+)' is declared but its value is never read\.", detail):
+        if name in VUE_HELPERS:
+            vue_unused.setdefault(path, set()).add(name)
     changed = False
     with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as stream:
         repaired_path = stream.name
@@ -67,6 +121,18 @@ export default function App() {
                                     if len(frontmatter) == 3 else "---\n" + declaration + "---\n" + text)
                     else:
                         repaired = text
+                elif vue_router_missing and item.filename == "package.json":
+                    package = json.loads(content.decode("utf-8"))
+                    dependencies = package.setdefault("dependencies", {})
+                    if "vue-router" not in dependencies:
+                        dependencies["vue-router"] = "^4.5.0"
+                        repaired = json.dumps(package, ensure_ascii=False, indent=2) + "\n"
+                elif item.filename.endswith(".vue"):
+                    named = lambda table: set().union(*[names for path, names in table.items()
+                                                        if item.filename.endswith(path)])
+                    missing, unused = named(vue_missing), named(vue_unused)
+                    if missing or unused:
+                        repaired = _fix_vue_imports(content.decode("utf-8"), missing, unused)
                 if repaired is not None and repaired != content.decode("utf-8"):
                     content = repaired.encode("utf-8")
                     changed = True
@@ -115,6 +181,31 @@ def _type_message(text_box, text):
             text_box.send_keys(line)
 
 
+def _export_chat(driver, download_dir, new_path):
+    export_chat_button = _visible_element(driver, By.XPATH, "//button[@title='Export Chat']")
+    driver.execute_script("window.__boltExportedChat = null;")
+    driver.execute_script("arguments[0].click()", export_chat_button)
+    deadline = time.time() + 60
+    chat_data = None
+    while time.time() < deadline:
+        chat_data = driver.execute_script("return window.__boltExportedChat || null;")
+        if isinstance(chat_data, dict) and isinstance(chat_data.get("messages"), list):
+            break
+        time.sleep(0.25)
+    if os.path.exists(new_path):
+        raise FileExistsError(new_path)
+    if isinstance(chat_data, dict) and isinstance(chat_data.get("messages"), list):
+        with open(new_path, "w", encoding="utf-8") as stream:
+            json.dump(chat_data, stream, ensure_ascii=False, indent=2)
+        print(f"Saved chat file: {new_path}")
+    else:
+        old_path = _download_new_file(driver, export_chat_button, download_dir,
+                                      expected_suffix=".json")
+        if old_path:
+            os.rename(old_path, new_path)
+            print(f"Renamed chat file to: {new_path}")
+
+
 def _open_code_view(driver):
     for element in driver.find_elements(By.XPATH, "//button[contains(., 'Download Code')]"):
         try:
@@ -128,7 +219,11 @@ def _open_code_view(driver):
     _visible_element(driver, By.XPATH, "//button[./span[normalize-space()='Code']]").click()
 
 
-def _wait_generation_complete(driver, timeout=1200, require_artifact=False):
+def _wait_generation_complete(driver, timeout=None, require_artifact=False):
+    if timeout is None:
+        timeout = int(os.environ.get("WEBGEN_GENERATION_TIMEOUT_SECONDS", "1200"))
+    if timeout < 60:
+        raise ValueError("WEBGEN_GENERATION_TIMEOUT_SECONDS must be at least 60")
     stop_icon = (By.CSS_SELECTOR, "div.i-ph\\:stop-circle-bold")
     if require_artifact:
         WebDriverWait(driver, timeout).until(EC.presence_of_element_located(
@@ -164,10 +259,6 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         "model": desired_model, "provider": provider, "url": url,
         "max_repair_attempts": max_repair_attempts,
     }
-    # Bolt's exported chat may omit the exact text submitted to the textarea.
-    # Keep a local, human-readable snapshot so prompt provenance is auditable.
-    with open(prompt_path, "w", encoding="utf-8") as stream:
-        stream.write(instruction)
     existing = [os.path.exists(path) for path in (chat_path, zip_path)]
     if all(existing):
         if not os.path.isfile(request_path):
@@ -175,12 +266,38 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
         with open(request_path, encoding="utf-8") as stream:
             existing_request = json.load(stream)
         if existing_request != request:
-            raise RuntimeError(f"Existing artifacts belong to a different request: {request_path}")
-        print(f"Files {idx:06d}.json and {idx:06d}.zip already exist. Skipping download.")
-        return {"chat_path": chat_path, "zip_path": zip_path, "request_path": request_path,
-                "skipped": True}
+            # Long Memory can legitimately produce a different prompt when a
+            # previously interrupted task is resumed.  Preserve the complete
+            # earlier attempt (including its prompt/chat/archive) rather than
+            # overwriting it or pretending it belongs to this request.
+            suffix = time.strftime("%Y%m%d-%H%M%S")
+            archive_dir = f"{download_dir}.prior-request-{suffix}"
+            sequence = 1
+            while os.path.exists(archive_dir):
+                archive_dir = f"{download_dir}.prior-request-{suffix}-{sequence}"
+                sequence += 1
+            os.rename(download_dir, archive_dir)
+            os.makedirs(download_dir)
+            print(
+                f"Archived prior request artifacts to {archive_dir}; "
+                "starting a distinct resumed request."
+            )
+            chat_path = os.path.join(download_dir, f"{idx:06d}.json")
+            zip_path = os.path.join(download_dir, f"{idx:06d}.zip")
+            request_path = os.path.join(download_dir, f"{idx:06d}.request.json")
+            prompt_path = os.path.join(download_dir, f"{idx:06d}.prompt.txt")
+            existing = [False, False]
+        else:
+            print(f"Files {idx:06d}.json and {idx:06d}.zip already exist. Skipping download.")
+            return {"chat_path": chat_path, "zip_path": zip_path, "request_path": request_path,
+                    "skipped": True}
     if any(existing):
         raise RuntimeError(f"Partial prior output; use a fresh directory: {download_dir}")
+
+    # Bolt's exported chat may omit the exact text submitted to the textarea.
+    # Keep a local, human-readable snapshot so prompt provenance is auditable.
+    with open(prompt_path, "w", encoding="utf-8") as stream:
+        stream.write(instruction)
 
     # Fail before launching Chrome when the local Bolt service is unavailable.  Previously
     # this surfaced much later as an opaque ChromeDriver stack trace.
@@ -293,10 +410,29 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
                         "Timed out waiting for Bolt Download Code button after reopening code view"
                     ) from error
                 report = validate_generated_zip(downloaded)
+                original_bytes = Path(downloaded).read_bytes()
                 deterministic_repair = _repair_common_jsx_syntax(downloaded, report)
                 if deterministic_repair:
-                    report = validate_generated_zip(downloaded)
-                    report["deterministic_repair"] = deterministic_repair
+                    repaired_report = validate_generated_zip(downloaded)
+                    new_errors = (_error_lines(repaired_report) - _error_lines(report)
+                                  if not repaired_report["ok"] else set())
+                    # Fixing one error often lets the compiler reach errors that were already in the
+                    # model's code (they were hidden behind the first one); those are not ours. Undo only
+                    # for errors an import/manifest edit can cause.
+                    introduced = {line for line in new_errors if _PATCH_CAUSED_ERROR.search(line)}
+                    if introduced:
+                        # Our own patch must never make the model's code worse: undo it.
+                        Path(downloaded).write_bytes(original_bytes)
+                        report["deterministic_repair"] = deterministic_repair
+                        report["deterministic_repair_reverted"] = sorted(introduced)[:10]
+                        print(f"Deterministic repair introduced new errors; reverted: {sorted(introduced)[:3]}")
+                    else:
+                        # Keep what the model produced before our patch, so credit can be attributed later.
+                        pre_repair_error = str(report.get("error", ""))[-3000:]
+                        report = repaired_report
+                        report["deterministic_repair"] = deterministic_repair
+                        report["pre_repair_error"] = pre_repair_error
+                        report["deterministic_repair_files"] = _changed_files(original_bytes, downloaded)
                 settle_checks.append(report)
                 incomplete = (report.get("phase") == "archive" and
                               "neither package.json nor index.html" in report.get("error", ""))
@@ -343,45 +479,36 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
                 print(f"Guidance round failed validation; using earlier validated build: {zip_path}")
                 break
             if attempt == last_attempt:
+                # Keep the repair-round conversation: Bolt only exports chat on success otherwise.
+                try:
+                    _export_chat(driver, download_dir,
+                                 os.path.join(download_dir, f"{idx:06d}.failed-chat.json"))
+                except Exception as error:
+                    print(f"Could not export chat for failed generation: {error}")
                 raise RuntimeError(f"Generated website failed validation after repair: {report}")
 
             text_box = _visible_element(driver, By.CSS_SELECTOR, "textarea")
             extra_hint = repair_hint(report, failed_archive, attempt + 1) if repair_hint else ""
-            _type_message(text_box, repair_prompt(report) + extra_hint)
+            # The local model answers an identical request with an identical (still failing) project, so
+            # say explicitly when the previous repair left errors unchanged. Same rule for both arms.
+            previous = validation_attempts[-2] if len(validation_attempts) >= 2 else None
+            unchanged = sorted(_error_lines(report) & _error_lines(previous)) if previous else []
+            stuck_note = ""
+            if unchanged:
+                stuck_note = (
+                    "Your previous fix did not resolve the errors below; they are exactly the same as before. "
+                    "Do not resubmit the same code. Change the implementation at these locations in a "
+                    "different way, keeping the requested features.\n"
+                    + "\n".join(unchanged[:10]) + "\n\n")
+                report["unchanged_errors_noted"] = len(unchanged)
+            _type_message(text_box, stuck_note + repair_prompt(report) + extra_hint)
             text_box.send_keys(Keys.ENTER)
             _wait_generation_complete(driver)
 
         #
         # --- STEP G: Export Chat -> rename to {idx:06d}.json
         #
-        export_chat_button = _visible_element(driver,
-            By.XPATH,
-            "//button[@title='Export Chat']"
-        )
-        driver.execute_script("arguments[0].click()", export_chat_button)
-        json_name = f"{idx:06d}.json"
-        new_path = os.path.join(download_dir, json_name)
-        deadline = time.time() + 60
-        chat_data = None
-        while time.time() < deadline:
-            chat_data = driver.execute_script("return window.__boltExportedChat || null;")
-            if isinstance(chat_data, dict) and isinstance(chat_data.get("messages"), list):
-                break
-            time.sleep(0.25)
-        if isinstance(chat_data, dict) and isinstance(chat_data.get("messages"), list):
-            if os.path.exists(new_path):
-                raise FileExistsError(new_path)
-            with open(new_path, "w", encoding="utf-8") as stream:
-                json.dump(chat_data, stream, ensure_ascii=False, indent=2)
-            print(f"Saved chat file: {new_path}")
-        else:
-            old_path = _download_new_file(driver, export_chat_button, download_dir,
-                                          expected_suffix=".json")
-            if old_path:
-                if os.path.exists(new_path):
-                    raise FileExistsError(new_path)
-                os.rename(old_path, new_path)
-                print(f"Renamed chat file to: {new_path}")
+        _export_chat(driver, download_dir, os.path.join(download_dir, f"{idx:06d}.json"))
 
         time.sleep(1)
         with open(request_path, "w", encoding="utf-8") as stream:

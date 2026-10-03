@@ -1,5 +1,7 @@
 # 项目背景（Project Context）
 
+> **2026-10-03：WebGen-Bench 这一阶段已封版归档**（总结见根目录 `README.md`，快照见 `archive/phase1-webgen-2026-10/`）。下一阶段可能转向 SWE 类基准；下面描述的是本阶段的架构。
+
 ## 研究目标与范围
 
 本项目研究网站生成 agent 是否能通过长期记忆（Long-Term Memory）在跨任务过程中提升表现。目标场景是 WebGen-Bench 风格的网站生成：生成网站、评估功能行为与外观，然后保留对后续网站任务有用的跨任务经验。
@@ -55,6 +57,8 @@ functional/appearance aspects 与人工选定 cases，过滤不匹配的具体�
 - memory/reflection 与 embedding: Azure `webgen-memory-gpt4o`、`webgen-memory-embedding`（No Memory 条件不调用它们）。
 
 代码通过角色专用 `WEBGEN_GENERATOR_*`、`WEBGEN_FUNCTIONAL_EVALUATOR_*`、`WEBGEN_APPEARANCE_EVALUATOR_*` 环境变量路由；只保留旧通用 evaluator 变量作回退。运行前使用 `scripts/preflight_reflective_models.py` 验证所有角色。local endpoints 由 SSH tunnel 提供，具体连接凭据不进入仓库文档。
+
+2026-09-29 起服务器只剩一台 5090，另有一个**Mac 本地生成器 profile**（独立标注，不与上面的 5090 BF16 profile 混用）：generator 改为 Mac（Apple M5、24GB）上 llama.cpp 运行的 `WebGen-LM-7B` Q8_0（自行从官方权重量化），仍暴露 `http://127.0.0.1:8000/v1`、模型名 `WebGen-LM-7B`；functional evaluator 仍是服务器上的 `qwen2.5-vl-32b-awq`（经 8001 隧道）；其余角色不变。决策与理由见 DECISIONS.md。
 
 薄接口为 `MemoryLLM`、`Embedder` 和 `AgentAdapter`。Memory core 不应依赖 provider/plugin framework，也不应改变 `AgentAdapter` 返回内容的语义。
 

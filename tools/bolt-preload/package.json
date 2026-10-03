@@ -1,0 +1,8 @@
+{
+  "name": "webgen-bolt-preload",
+  "private": true,
+  "description": "Preloaded into Bolt's Node process: raise fetch headers/body timeouts so slow local-model calls are not cut at 300 s.",
+  "dependencies": {
+    "undici": "8.10.2"
+  }
+}

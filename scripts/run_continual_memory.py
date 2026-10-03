@@ -36,7 +36,7 @@ from long_memory import connect_database, initialize_database  # noqa: E402
 from guidance_selfcheck import make_compliance_check
 from generation_failure_memory import (failed_evaluation, failed_generation_evidence, failure_reflection,
                                        repair_hint_factory)
-from memory_statistics import (BUILD_FAILURE_LABEL, setup_label, build_check_rows, detect_stack, known_categories, known_labels, label_causes,
+from memory_statistics import (BUILD_FAILURE_LABEL, prompt_stats, setup_label, build_check_rows, detect_stack, known_categories, known_labels, label_causes,
                                record_checks, record_run)
 from long_memory_integrations import (AzureEmbedder, AzureMemoryLLM, BoltAgentAdapter, memory_llm_from_settings,
                                       exported_chat_evidence, case_reflection_evidence,
@@ -136,10 +136,13 @@ def upsert_trajectory(database: Path, task: dict, result: dict, destination: Pat
     chat = Path(result["chat_path"]).resolve()
     archive = Path(result["zip_path"]).resolve()
     with connect_database(database, read_only=False) as connection:
-        row = connection.execute(
-            "SELECT trajectory_id FROM trajectories WHERE agent_id=? AND task_id=? AND trace_path=?",
+        # A rerun after the old task directory was moved aside writes to the same chat path; it is
+        # still a new run, so only reuse a trajectory whose recorded archive is this exact archive.
+        archive_hash = file_hash(archive)
+        row = next((found for found in connection.execute(
+            "SELECT trajectory_id, artifact_refs FROM trajectories WHERE agent_id=? AND task_id=? AND trace_path=?",
             ("bolt", str(task["id"]), str(chat)),
-        ).fetchone()
+        ) if any(ref.get("sha256") == archive_hash for ref in json.loads(found[1] or "[]"))), None)
         encoded = json.dumps(evaluation, ensure_ascii=False, sort_keys=True)
         if row:
             connection.execute("UPDATE trajectories SET evaluation_results=? WHERE trajectory_id=?",
@@ -163,7 +166,7 @@ def upsert_trajectory(database: Path, task: dict, result: dict, destination: Pat
                          "output_directory": str(destination.resolve()),
                          "generation_prompt": generation_prompt, "prompt_delivered": delivered,
                          "generation_prompt_path": str(prompt_path) if prompt_path.is_file() else ""}, sort_keys=True),
-             str(chat), json.dumps([{"path": str(archive), "sha256": file_hash(archive)}],
+             str(chat), json.dumps([{"path": str(archive), "sha256": archive_hash}],
                                    sort_keys=True), encoded, utc_now()),
         )
     return trajectory_id
@@ -217,7 +220,9 @@ def guidance_run_info(llm, adapter, archive: str, delivered: bool | None) -> dic
     packet = adapter.last_memory
     patterns = [str(c.content.get("implementation_pattern", "")).strip() for c in getattr(packet, "cases", ())]
     lines = [text for text in [*patterns, *getattr(packet, "common", ())] if text]
-    ids = [*(c.case_id for c in getattr(packet, "cases", ())), *getattr(packet, "common_case_ids", ())]
+    ids = [*(cid for c in getattr(packet, "cases", ())
+             for cid in (c.content.get("source_case_ids") or [c.case_id])),
+           *getattr(packet, "common_case_ids", ())]
     info = {"delivered": delivered, "case_ids": list(dict.fromkeys(ids)), "total": len(lines) or None, "followed": None}
     if lines and delivered:
         code = project_code(archive)
@@ -273,7 +278,8 @@ def record_statistics(database: Path, llm, task: dict, trajectory_id: str, archi
                outcomes=statistics_outcomes(evaluation), causes=labels, cause_outcomes=outcomes,
                prompt_delivered=(guidance or {}).get("delivered"),
                guidance_case_ids=(guidance or {}).get("case_ids", ()),
-               guidance_total=(guidance or {}).get("total"), guidance_followed=(guidance or {}).get("followed"))
+               guidance_total=(guidance or {}).get("total"), guidance_followed=(guidance or {}).get("followed"),
+               prompt_stats=run_prompt_stats(task, destination))
     if not generation_ok:
         return  # a project that never built says nothing about individual features; run_facts holds it
     checks = []
@@ -290,6 +296,23 @@ def record_statistics(database: Path, llm, task: dict, trajectory_id: str, archi
     record_checks(database, agent_id="bolt", task_id=str(task["id"]), trajectory_id=trajectory_id,
                   stack=detect_stack(archive) if archive else "unknown",
                   rows=build_check_rows(llm, categories, checks, cases or []))
+
+
+def run_prompt_stats(task: dict, destination: Path) -> dict:
+    """Requirement vs injected-memory size for this run, plus the condense step's own numbers when it ran
+    (taken from this task's latest case_retrieval event; destination is <output>/tasks/<id>/<mode>)."""
+    prompt = destination / "000001.prompt.txt"
+    if not prompt.is_file():
+        return {}
+    events = destination.parents[2] / "memory-events.jsonl"
+    condense = None
+    if events.is_file():
+        for line in events.read_text(encoding="utf-8").splitlines():
+            if '"case_retrieval"' in line:
+                event = json.loads(line)
+                if event.get("operation") == "case_retrieval" and event.get("task") == task["instruction"]:
+                    condense = event.get("guidance_condense")
+    return prompt_stats(prompt.read_text(encoding="utf-8"), task["instruction"], condense)
 
 
 def summary(events: list[dict]) -> dict:
@@ -318,12 +341,23 @@ def run_with_retries(memory: LongMemory, instruction: str, adapter: BoltAgentAda
         try:
             return memory.run(instruction, adapter, task_domain=task_domain)
         except (TimeoutError, RuntimeError, WebDriverException, FileNotFoundError) as error:
-            retryable = (isinstance(error, (TimeoutError, WebDriverException, FileNotFoundError)) or
-                         "Generated website failed validation" in str(error))
+            validation_failed = "Generated website failed validation" in str(error)
+            if tolerate_failure and validation_failed:
+                # Every repair round is already spent inside one generation; regenerating from scratch at
+                # temperature 0 reproduces the same project and overwrites the attempt record (2026-10-02).
+                log_line(f"[continual] {label}: generation failed validation; recorded as a failed run")
+                return {"generation_failed": True, "error": str(error)}
+            retryable = isinstance(error, (TimeoutError, WebDriverException, FileNotFoundError)) or validation_failed
             if not retryable or attempt == 2:
                 if tolerate_failure and "Generated website failed validation" in str(error):
                     log_line(f"[continual] {label}: generation failed validation; recorded as a failed run")
                     return {"generation_failed": True, "error": str(error)}
+                if tolerate_failure and retryable:
+                    # Browser/Bolt crashes are infrastructure faults, not model outcomes: do not
+                    # score or reflect on them; leave the task unrecorded so a resumed run retries it.
+                    log_line(f"[continual] {label}: infrastructure failure after 3 tries; skipped, "
+                             f"not recorded: {type(error).__name__}: {str(error)[-300:]}")
+                    return {"infrastructure_failure": True, "error": str(error)}
                 raise
             log_line(f"[continual] retrying {label} after generation/browser failure "
                      f"({attempt + 1}/3)")
@@ -537,6 +571,8 @@ def main() -> None:
                     result = run_with_retries(memory, task["instruction"], adapter,
                                               label=f"{task_id}:{mode}",
                                               task_domain=task["application_type"], tolerate_failure=True)
+            if isinstance(result, dict) and result.get("infrastructure_failure"):
+                continue
             # This is the first point at which hidden benchmark evaluation is accessed.
             # The generated archive has already been written and is never regenerated here.
             generation_failed = isinstance(result, dict) and bool(result.get("generation_failed"))
