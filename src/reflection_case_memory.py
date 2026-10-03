@@ -121,12 +121,19 @@ kind of setup to use or avoid, what an interactive component must contain, what 
 that choice and its names. Include no website's content, page names or example values. Prefer the
 higher-priority cases; drop a case only if another one already covers it or it is not an
 implementation-level lesson.
+Generalise: a case may mix a site-wide lesson with details of one feature (for example "every
+required section needs its own navigation entry, and the contact form must show its fields above the
+fold"). Keep only the part that holds for any website (the navigation entry for every section) and drop
+the feature-specific part (the contact form): feature lessons reach later tasks by feature match, not
+through this list. Several cases that state the same site-wide lesson become one requirement.
 Conditions: a lesson that holds for every website that has interactive features is written without a
 condition. A lesson that only matters when the website has a certain kind of feature or takes a certain
 approach (for example when data created by one feature must be found again by another) is written as
 "If the website <condition the builder can judge from what it is building>, <requirement>", so that a
 builder whose website does not meet the condition can skip it. Never state a condition in terms of a
-label the builder cannot know in advance. Return JSON only:
+label the builder cannot know in advance. A condition is for how the site is built (setup, data
+flow, rendering), never a way to keep how one feature should behave ("If the website has a news
+section, it must render articles" is a feature lesson: drop it). Return JSON only:
 {"patterns":[{"implementation_pattern":str,"source_case_ids":[str]}]}."""
 
 IMPLEMENTATION_LESSON_GROUP_INSTRUCTIONS = """Group implementation lessons that state the SAME underlying requirement for a
@@ -153,7 +160,15 @@ quality condition that would also make the current aspect work).
 example a phone-number input when the task only needs a tap-to-call link, a
 date-of-birth field or SSN digits the task never mentions).
 2. Keep the transferable lesson and restate it for the matched current aspect, using
-only the current task's own features and wording. Typical transferable lessons:
+only the current task's own features and wording. The case's preventative action names
+the element the earlier site lacked (for example a navigation entry for every section, a
+submit handler, a timer that advances a carousel); that missing element is the core of the
+lesson and must still be named in your pattern. Do not replace it with a weaker visibility
+or quality condition (for example "a section becomes visible when scrolled to" in place of
+"every section has its own navigation entry"). Keep the case's qualifiers: do not turn a limited statement into an
+absolute one (for example "show the form on the first screen, not only behind navigation" must not
+become "no navigation is needed"), and never add a requirement that removes or contradicts something
+the current requirement asks for or that other guidance needs, such as navigation. Typical transferable lessons:
 show a visible confirmation or result after a submit; make a lookup find the data
 that was just created or stored; do not reject valid input and show accepted
 formats and visible errors; show details for the selected item and a way to leave
@@ -199,6 +214,10 @@ Use decision=none unless at least one older case and the new case share a specif
 failure mode. Candidate output is advisory only; it must not alter the current task."""
 
 
+# Target length of one condensed guidance item after its "Part:" prefix (characters).
+ITEM_MAX_CHARS = 90
+
+
 @dataclass(frozen=True)
 class RetrievedCase:
     case_id: str
@@ -220,9 +239,8 @@ class CasePacket:
 
     guidance_header = (
         "\n\nIMPLEMENTATION GUIDANCE FROM PAST TASKS:\n"
-        "The requirement above remains binding. The constraints below were distilled "
-        "from earlier tasks and already adapted to this requirement; implement them "
-        "as part of this website.\n"
+        "The requirement above has priority: build everything it lists. These notes only flag "
+        "parts earlier websites got wrong; they are not the full list.\n"
     )
     common_header = (
         "\n\nCOMMON IMPLEMENTATION PITFALLS FROM EARLIER WEBSITES:\n"
@@ -241,7 +259,9 @@ class CasePacket:
         for item in self.cases:
             pattern = str(item.content.get("implementation_pattern", "")).strip()
             if pattern:
-                lines.append(f"- [{item.content.get('case_type', 'functional')}] {pattern}")
+                # No source tag ([functional]/[common]): it means nothing to the generator; provenance
+                # stays in the run log.
+                lines.append(f"- {pattern}")
         sections = [(self.guidance_header, "\n".join(lines)),
                     (self.common_header, "\n".join(f"- {text}" for text in self.common if text.strip())),
                     (self.statistics_header, self.statistics)]
@@ -252,11 +272,15 @@ class CasePacket:
         sections = self._sections()
         return sections[0][0] if sections else self.guidance_header
 
+    # Repeated at the end: models use the start and the end of a prompt best (Liu et al., Lost in the Middle).
+    guidance_footer = "\n\nReminder: build every page and feature the requirement lists, not only these."
+
     def render(self) -> str:
         sections = self._sections()
         if not sections:
             return ""
-        return sections[0][1] + "".join(header + text for header, text in sections[1:])
+        return (sections[0][1] + "".join(header + text for header, text in sections[1:])
+                + self.guidance_footer)
 
 
 class ReflectionCaseMemory:
@@ -386,6 +410,8 @@ class ReflectionCaseMemory:
                     "verification": content["verification"], "transfer_limits": content["transfer_limits"],
                     "evidence_refs": _json(source_item.get("evidence_refs", [])),
                     "provenance_status": source_item.get("provenance_status", "unresolved"),
+                    # Uncertain causes stay on record for audit but are never retrieved.
+                    "status": "archived" if source_item.get("cause_confidence") == "uncertain" else "active",
                     "embedding": struct.pack(f"<{len(vector)}f", *vector),
                     "embedding_model": self.embedder.model_id, "embedding_dim": len(vector),
                     "embedding_text_hash": hashlib.sha256(text.encode()).hexdigest(),
@@ -443,6 +469,8 @@ class ReflectionCaseMemory:
         # memory_sources requires at least one evidence reference per link; cases without any (for example
         # implementation or build-failure cases) cannot support a candidate, and skipping is harmless.
         sources = [row for row in sources if json.loads(row["evidence_refs"] or "[]")]
+        # Several cases from one run can cite identical evidence; memory_sources keeps one link per pair.
+        sources = list({(row["trajectory_id"], row["evidence_refs"]): row for row in sources}.values())
         if not sources:
             self.log({"operation": "experience_candidate_skipped", "reason": "no source case has evidence references",
                       "source_case_ids": source_case_ids})
@@ -497,12 +525,9 @@ class ReflectionCaseMemory:
                                                         for key in ("feature_object", "user_trigger", "expected_state_change"))]
         appearance = [item for item in raw.get("appearance_aspects", [])
                       if isinstance(item, dict) and str(item.get("visual_requirement", "")).strip()]
-        if functional:
-            # The appearance screenshot shows only the first screen, so the key required
-            # features should be visible there. Built from this task's own features.
-            appearance.append({"visual_requirement": "the landing page / first screen visibly "
-                               "presents the required features and content: " +
-                               ", ".join(str(item["feature_object"]) for item in functional)})
+        # No code-written "first screen presents every feature" aspect any more: it was a hand-written
+        # design assumption that pulled guidance such as "all sections on the landing page, no navigation"
+        # (000017, 000018) against requirements and checks that expect navigation.
         build = []
         if functional and raw.get("interactive") is True and not self.config.common_pool:
             build.append({"implementation_requirement": "the site is built so that its interactive "
@@ -709,7 +734,12 @@ class ReflectionCaseMemory:
                 decisions_by_channel[channel].extend(decisions)
                 allowed = {item["case_id"]: item for item in aspect_candidates}
                 for verdict in ("hard_match", "soft_transfer"):
-                    winner = next((d for d in decisions if d.get("verdict") == verdict), None)
+                    # Prefer a case not already chosen for another aspect: aspects with the same query
+                    # otherwise all take the same top case and push other relevant lessons out.
+                    matching = [d for d in decisions if d.get("verdict") == verdict
+                                and d.get("case_id") in allowed]
+                    winner = next((d for d in matching if d["case_id"] not in selected_by_channel[channel]),
+                                  matching[0] if matching else None)
                     if winner is not None:
                         item = allowed[winner["case_id"]]
                         selected[item["case_id"]] = RetrievedCase(item["case_id"], dict(item["content"]),
@@ -775,13 +805,141 @@ class ReflectionCaseMemory:
                                              for cid in item.get("source_case_ids", [])))
         packet = CasePacket(ordered, common=common, common_case_ids=common_sources,
                             statistics=self.statistics_block())
+        condensed_info: dict = {"applied": False}
+        if self.config.guidance_condense:
+            packet, condensed_info = self.condense_packet(task, packet)
         self.log({"operation": "case_retrieval", "agent_id": self.agent_id, "task": task,
+                  "guidance_condense": condensed_info,
                   "aspects": aspects, "candidates_by_channel": candidates,
                   "decisions_by_channel": decisions_by_channel,
                   "implementation_adaptations": adaptations, "statistics_ordering": ordering, "common_pool": common_info,
                   "selected": [item.case_id for item in ordered], "rendered_memory": packet.render(),
                   "packet_chars": len(packet.render())})
         return packet
+
+    def condense_packet(self, task: str, packet: CasePacket) -> tuple[CasePacket, dict]:
+        """Merge every memory line into at most guidance_max_items short requirements, within a
+        character budget proportional to the requirement. Lines are rewritten, not invented: each kept
+        item names the candidate lines it came from, and items citing nothing are dropped."""
+        candidates = []
+        for item in packet.cases:
+            text = str(item.content.get("implementation_pattern", "")).strip()
+            if text:
+                candidates.append({"id": f"g{len(candidates)}", "text": text, "case_ids": [item.case_id],
+                                   "kind": item.content.get("case_type", "functional")})
+        common_ids = list(packet.common_case_ids)
+        for text in packet.common:
+            if text.strip():
+                candidates.append({"id": f"g{len(candidates)}", "text": text.strip(), "case_ids": common_ids,
+                                   "kind": "common pitfall"})
+        if not candidates:
+            return packet, {"applied": False, "reason": "no memory lines"}
+        budget = int(len(task) * self.config.guidance_max_ratio)
+        limit = self.config.guidance_max_items
+        instructions = (
+                f"You prepare implementation guidance for a small code-generation model that loses "
+                f"instructions when given many. Rewrite the candidate lines into AT MOST {limit} items, "
+                f"each ONE sentence, and at most {budget} characters in total. These are notes on parts of the "
+                "requirement, not a list of what to build: start every item with the part of the requirement "
+                "it refines (for example \"For the booking form: ...\", or \"On every page: ...\" for a "
+                "common pitfall) and say how to implement that part so it does not go wrong; never write an "
+                "item that only names a feature to build. Use at most 2 items for common pitfalls and the "
+                "rest for the requirement's own features. Cover, do not drop: every candidate must be cited "
+                "in some item's \"from\", unless it duplicates another candidate or does not apply to this "
+                "requirement's features or stack - list those in \"dropped\" with \"why\": \"duplicate\" or \"not_applicable\" (space is never a reason: merge instead). When there are "
+                "more candidates than items allowed, merge related candidates into one item (cite them all) "
+                "and shorten wording to fit the character limit; never leave out a note on one of the "
+                "requirement's features to save space, because the code model tends to build only the parts the "
+                "notes mention. Candidates of kind \"common pitfall\" come from problems "
+                "that recurred across earlier websites and apply to every website: keep the first two. "
+                f"Brevity: each item is one short imperative sentence of at most {ITEM_MAX_CHARS} characters "
+                "after its prefix (for example \"Voting: after Vote, show a confirmation at once.\"); write "
+                "only what to build and how, never verification or rationale clauses (verify..., ensuring..., "
+                "so that users..., without relying on...), no filler adverbs (visibly, sufficiently, "
+                "immediately after a successful...), and do not restate values the requirement already gives "
+                "(colours, names) beyond a word or two. "
+                "Put the item most likely to prevent a failure first. Do not add new advice that no candidate supports; recorded statistics may "
+                "only be used to decide what matters most, never quoted. Return JSON "
+                '{"items":[{"text":str,"from":[candidate ids]}],"dropped":[{"id":str,"why":"duplicate|not_applicable","reason":str}]}.')
+        request = {"instructions": instructions, "requirement": task,
+                   "candidates": [{k: c[k] for k in ("id", "text", "kind")} for c in candidates],
+                   "recorded_statistics": packet.statistics}
+        result = self.llm.generate("guidance_condense", request)
+        # Coverage check (code): a feature candidate that no item cites and that the model did not drop as a
+        # duplicate or not-applicable was cut for space -- the failure seen in 018 and 026, where the generator
+        # then built only the noted parts. Ask once more, naming what is missing and the size limits.
+        def _gaps(answer: dict) -> tuple[list[str], int]:
+            items = answer.get("items", []) if isinstance(answer, dict) else []
+            cited = {s for i in items if isinstance(i, dict) for s in (i.get("from") or [])}
+            # Only a duplicate or not-applicable candidate may be dropped; "no room" is not accepted.
+            dropped = {str(d.get("id")) for d in (answer.get("dropped") or [])
+                       if isinstance(d, dict) and d.get("why") in ("duplicate", "not_applicable")} \
+                if isinstance(answer, dict) else set()
+            missing = [c["id"] for c in candidates
+                       if c["kind"] != "common pitfall" and c["id"] not in cited and c["id"] not in dropped]
+            size = sum(len(str(i.get("text", ""))) for i in items[:limit] if isinstance(i, dict))
+            return missing, size
+        missing, size = _gaps(result)
+        retried = None
+        if missing or size > budget:
+            retried = {"missing": missing, "chars": size}
+            result = self.llm.generate("guidance_condense", {
+                **request, "previous_answer": result,
+                "problem": (f"Your previous answer left out candidates {missing} without listing them as dropped, "
+                            f"and/or used {size} of {budget} characters. Rewrite so every non-duplicate, "
+                            f"applicable candidate is cited, within {limit} items and {budget} characters, by "
+                            "merging related candidates and shortening wording.")})
+            retried["after"] = dict(zip(("missing", "chars"), _gaps(result)))
+        long_items = [i for i in (result.get("items", []) if isinstance(result, dict) else [])
+                      if isinstance(i, dict) and len(str(i.get("text", ""))) > ITEM_MAX_CHARS + 30]
+        if long_items:
+            shortened = self.llm.generate("guidance_shorten", {
+                "instructions": (f"Shorten each item to one imperative sentence of at most {ITEM_MAX_CHARS} "
+                                 "characters after its prefix (keep the prefix such as \"Voting:\" or \"Every "
+                                 "page:\"). Keep the concrete thing to build; delete verification or rationale "
+                                 "clauses, filler adverbs and values the requirement already states. Return JSON "
+                                 '{"items":[{"index":int,"text":str}]}.'),
+                "requirement": task, "items": [{"index": n, "text": i.get("text")} for n, i in enumerate(long_items)]})
+            for entry in (shortened.get("items", []) if isinstance(shortened, dict) else []):
+                n = entry.get("index") if isinstance(entry, dict) else None
+                if isinstance(n, int) and 0 <= n < len(long_items) and str(entry.get("text", "")).strip():
+                    long_items[n]["text"] = str(entry["text"]).strip()
+        by_id = {c["id"]: c for c in candidates}
+        kept, used = [], 0
+        for item in (result.get("items", []) if isinstance(result, dict) else [])[:limit]:
+            text = str(item.get("text", "")).strip() if isinstance(item, dict) else ""
+            sources = [by_id[s] for s in item.get("from", []) if s in by_id] if text else []
+            if not sources:
+                continue
+            used += len(text)
+            case_ids = list(dict.fromkeys(cid for s in sources for cid in s["case_ids"]))
+            kept.append(RetrievedCase(case_ids[0] if case_ids else "", {
+                "implementation_pattern": text, "case_type": sources[0]["kind"].split()[0],
+                "source_case_ids": case_ids, "_from": [s["id"] for s in sources]}, 0.0))
+        # Recurring cross-site lessons must survive condensing: the first two common lines are kept (at most
+        # 2 common items, the rest for the requirement's features). A missing one is added.
+        common_candidates = [c for c in candidates if c["kind"] == "common pitfall"]
+        for wanted in common_candidates[:2]:
+            if not kept or sum(k.content.get("case_type") == "common" for k in kept) >= 2:
+                break
+            if any(k.content.get("case_type") == "common" and wanted["id"] in k.content.get("_from", []) for k in kept):
+                continue
+            # Never cut a feature note to make room (the generator then skips that feature); the
+            # item count may exceed the limit by the common lines that had to be restored.
+            kept.append(RetrievedCase(wanted["case_ids"][0] if wanted["case_ids"] else "", {
+                "implementation_pattern": wanted["text"], "case_type": "common",
+                "source_case_ids": list(wanted["case_ids"]), "_from": [wanted["id"]]}, 0.0))
+            used += len(wanted["text"])
+        if not kept:
+            return packet, {"applied": False, "reason": "condensing returned no usable item",
+                            "raw": result}
+        condensed = CasePacket(tuple(kept), common=(), common_case_ids=(), statistics="")
+        cited = {s for k in kept for s in k.content.get("_from", [])}
+        return condensed, {"applied": True, "budget_chars": budget, "used_chars": used,
+                           "candidates": len(candidates), "kept": len(kept), "retried": retried,
+                           "uncovered": [c["id"] for c in candidates if c["id"] not in cited],
+                           "dropped": (result.get("dropped") if isinstance(result, dict) else None),
+                           "items": [c.content["implementation_pattern"] for c in kept]}
 
     def implementation_breadth(self) -> dict:
         """How widely each implementation lesson occurred: the number of DISTINCT tasks whose cases state it.
@@ -852,17 +1010,31 @@ class ReflectionCaseMemory:
         ordered, info = self.order_by_statistics(cases)
         info = {**info, "breadth": breadth["groups"], "min_tasks": breadth["min_tasks"]}
         limit = self.config.common_pool_candidates
-        reserve = min(self.config.common_pool_reserve, limit) if info.get("applied") else 0
+        # Reserved slots also serve the cold start: before statistics can rank anything, they are filled
+        # with the newest implementation lessons (rows are newest first), so a lesson seen in only one
+        # task is still offered instead of leaving the pool empty.
+        reserve = reserved_slots = min(self.config.common_pool_reserve, limit)
         ordered = list(ordered)
         broad = [c for c in ordered if c.case_id in breadth["broad_ids"]]
         picked = broad[:limit - reserve]
         totals = info.get("case_totals", {})
         rest = sorted((c for c in ordered if c not in picked), key=lambda c: -totals.get(c.case_id, 0.0))
-        picked += rest[:reserve]
+        # One reserved slot per lesson: several cases of the same lesson (one task can store it once per
+        # failed check) must not fill every slot and push other lessons out.
+        group_of = {cid: index for index, entry in enumerate(breadth["groups"]) for cid in entry["case_ids"]}
+        taken = {group_of.get(c.case_id, c.case_id) for c in picked}
+        for case in rest:
+            if reserve <= 0:
+                break
+            key = group_of.get(case.case_id, case.case_id)
+            if key not in taken:
+                picked.append(case)
+                taken.add(key)
+                reserve -= 1
         picked += [c for c in broad if c not in picked][:limit - len(picked)]
         info["narrow_left_to_feature_match"] = [c.case_id for c in ordered if c not in picked
                                                 and c.case_id not in breadth["broad_ids"]]
-        return picked, {**info, "available": len(cases), "reserved_slots": reserve}
+        return picked, {**info, "available": len(cases), "reserved_slots": reserved_slots}
 
     def adapt_common_pool(self, candidates: Sequence[RetrievedCase]) -> tuple[tuple[str, ...], dict]:
         """Stage 2 of the common pool: merge/rewrite the candidates into a few general requirements."""

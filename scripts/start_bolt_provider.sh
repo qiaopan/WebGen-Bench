@@ -38,5 +38,23 @@ else
   export OPENAI_LIKE_API_BASE_URL="$WEBGEN_GENERATOR_BASE_URL"
 fi
 
+# Bolt's context-optimization summary is a non-streaming call; the local 7B can take over Node's
+# default 300 s headers timeout, which silently dropped every build-repair reply (2026-10-02).
+# Same setting for both arms. Source: tools/bolt-preload (run `npm install` there once; undici must match
+# `node -p process.versions.undici`). Falls back to the copy outside the repo used during the experiments.
+bolt_preload="${WEBGEN_BOLT_PRELOAD:-}"
+if [[ -z "$bolt_preload" ]]; then
+  if [[ -d "$project_root/tools/bolt-preload/node_modules/undici" ]]; then
+    bolt_preload="$project_root/tools/bolt-preload/long-timeouts.mjs"
+  else
+    bolt_preload="$HOME/webgen-local-generator/bolt-preload/long-timeouts.mjs"
+  fi
+fi
+if [[ -f "$bolt_preload" ]]; then
+  export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--import $bolt_preload"
+else
+  echo "WARNING: $bolt_preload missing; Node's 300 s fetch timeout will cut slow repair calls" >&2
+fi
+
 cd "$project_root/bolt.diy-Fork"
 exec npm run dev -- --host 127.0.0.1 --port "$port"

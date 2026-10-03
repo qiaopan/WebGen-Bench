@@ -1,0 +1,172 @@
+{
+  "prompt_version": "7a77cc219e91",
+  "gold": "/Users/ma/Downloads/792/webgen/config/reflection_regression/gold_v1.json",
+  "tasks": {
+    "000014": [
+      {
+        "check": "task000001_0",
+        "expect": "uncertain",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "guessed cause stated as established"
+        ],
+        "cause": "(unverified against code) The check ended before the final submit action, so the form’s success state was never triggered. This is a tester limitation rather than a website defect."
+      },
+      {
+        "check": "task000001_2",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "cause not named"
+        ],
+        "cause": "The site does not render a dedicated introductory services section in the place the tester searched; the visible content is limited to service listings and a CTA, so the requested introduction was not"
+      }
+    ],
+    "000016": [
+      {
+        "check": "task000001_0",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The product showcase was not reached during the test, so the failure is a reachability/interaction limitation rather than a confirmed defect in the product-detail content itself."
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The homepage does not expose a visible way to reach the news route, so the tester could not access the News and Updates feature from the page they were on."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The contact feature was not reached during the test, so the broken sub-step was that the form never became visible or accessible from the tester's path."
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The site defines the destination routes, but it does not provide a reachable navigation control from the homepage. The tester also exhausted interactions, so the check stopped before any destination p"
+      }
+    ],
+    "000017": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The testimonials are rendered, but the text is not visible in the cards in the screenshot, so the section reads as empty to the user. The cause is established by the screenshot and the rendered compon"
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      },
+      {
+        "check": "task000001_4",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      }
+    ],
+    "000019": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The required sections were not implemented in the shared navigation/router, so the tester could not reach them; the run also ended with interaction-budget exhaustion and a driver error, but the missin"
+      },
+      {
+        "check": "task000001_1",
+        "expect": "uncertain",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not fully exercised: the tester ran out of interactions before completing the extra verification steps, so no concrete search defect is established."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The website does not provide a dedicated customer cases or success stories route or section, so the tester had nowhere on the site to reach that content."
+      },
+      {
+        "check": "task000001_5",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The global light-mode background is set to white, so the page area does not show misty rose even though the Services content renders correctly."
+      }
+    ],
+    "000021": [
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The events and promotions component only renders static RSVP buttons; the broken sub-step is that clicking a valid RSVP control does nothing and never reveals the reservation flow."
+      }
+    ]
+  },
+  "ok": 13,
+  "checks": 18
+}

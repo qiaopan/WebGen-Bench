@@ -1,0 +1,18 @@
+{
+  "protocol": "continual-domain-block-v1",
+  "manifest": "/Users/ma/Downloads/792/webgen/data/experiment_splits/continual_domain_blocks/manifest.json",
+  "manifest_sha256": "1f3f5fac5c932e6dcfc9b589302415388173f4e4e6c1c2a0b78c5d9c48ab3971",
+  "memory_config_sha256": "eeda9c3bdeae7baa8107759ba657be86ceb7518f3ffc3f6ecfe04ab48b5feb67",
+  "generator_model": "WebGen-LM-7B",
+  "memory_model": "webgen-memory-gpt4o",
+  "embedding_model": "webgen-memory-embedding",
+  "functional_evaluator_model": "qwen2.5-vl-32b-awq",
+  "appearance_evaluator_model": "webgen-appearance-evaluator-gpt4o",
+  "post_task_reflection": true,
+  "memory_representation": "case_only",
+  "modes": [
+    "continual"
+  ],
+  "guidance_selfcheck": false,
+  "guidance_file_sha256": null
+}

@@ -4,8 +4,8 @@ set -euo pipefail
 # Eight-task No Memory baseline for the local WebGen-LM-7B setup.
 #
 # Required services (run in separate terminals before invoking this script):
-#   ssh -N -L 8000:127.0.0.1:8000 qma258@130.216.118.84
-#   ssh -N -L 8001:127.0.0.1:8001 qma258@130.216.119.129
+#   ssh -N -L 8000:127.0.0.1:8000 <user>@<generator-server>
+#   ssh -N -L 8001:127.0.0.1:8001 <user>@<evaluator-server>
 #   bash scripts/start_bolt_provider.sh --provider local --port 5186
 #
 # Roles are read from .env:

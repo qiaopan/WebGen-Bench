@@ -1,0 +1,171 @@
+{
+  "_about": "Human-checked expected attribution per failed/partial check, used ONLY to score reflection-prompt versions. Never injected into Long Memory. Chain: longmem_mac_q8_19_21_then_remaining_r1, latest completed attempt of each task. confidence: established | uncertain | any. cause_any: at least one keyword (case-insensitive) should appear in cause/evidence when established. forbid: wrong conclusions that must not be stated as established.",
+  "000014": {
+    "task000001_0": {
+      "note": "form submit not reached: interaction budget ran out",
+      "confidence": "uncertain"
+    },
+    "task000001_2": {
+      "note": "evaluator ran out of interactions; homepage white sections inherit white text from imported style.css",
+      "confidence": "any",
+      "cause_any": [
+        "style.css",
+        "rgba(255, 255, 255",
+        "inherit"
+      ],
+      "forbid": [
+        "first screen",
+        "initial viewport"
+      ]
+    },
+    "task000001_3": {
+      "note": "ServicesView has heading + service cards with descriptions; .service-card white bg, no text colour -> white text from style.css (dark mode)",
+      "confidence": "any",
+      "cause_any": [
+        "style.css",
+        "rgba(255, 255, 255",
+        "inherit"
+      ],
+      "forbid": [
+        "no dedicated introduct",
+        "does not present a dedicated",
+        "only a list of service cards",
+        "first screen",
+        "initial viewport"
+      ]
+    }
+  },
+  "000016": {
+    "_note": "App.vue renders only <RouterView/>; no links to the views from the home page",
+    "task000001_0": {
+      "confidence": "established",
+      "cause_any": [
+        "navigation",
+        "link",
+        "RouterView",
+        "router"
+      ]
+    },
+    "task000001_1": {
+      "confidence": "established",
+      "cause_any": [
+        "navigation",
+        "link",
+        "RouterView",
+        "router"
+      ]
+    },
+    "task000001_2": {
+      "confidence": "established",
+      "cause_any": [
+        "navigation",
+        "link",
+        "RouterView",
+        "router"
+      ]
+    },
+    "task000001_3": {
+      "confidence": "established",
+      "cause_any": [
+        "navigation",
+        "link",
+        "RouterView",
+        "router"
+      ]
+    },
+    "task000001_4": {
+      "confidence": "established",
+      "cause_any": [
+        "navigation",
+        "link",
+        "RouterView",
+        "router"
+      ]
+    }
+  },
+  "000017": {
+    "task000001_0": {
+      "note": "corrected 2026-10-02: the intro exists (default tab activeTab='intro' in App.vue); earlier analysis of an older run said missing. Cause not checked further.",
+      "confidence": "any",
+      "forbid": [
+        "not implemented",
+        "does not exist",
+        "missing introduction",
+        "no introduction section"
+      ]
+    },
+    "task000001_1": {
+      "note": "testimonials rendered but white text from imported style.css",
+      "confidence": "established",
+      "cause_any": [
+        "style.css",
+        "rgba(255, 255, 255",
+        "inherit"
+      ]
+    },
+    "task000001_2": {
+      "note": "company info rendered but white text from imported style.css",
+      "confidence": "established",
+      "cause_any": [
+        "style.css",
+        "rgba(255, 255, 255",
+        "inherit"
+      ]
+    },
+    "task000001_4": {
+      "note": "subjective relevance judgement after a blank screen",
+      "confidence": "any"
+    }
+  },
+  "000019": {
+    "task000001_0": {
+      "confidence": "any"
+    },
+    "task000001_1": {
+      "note": "search worked; sorting/broken links not verified within budget",
+      "confidence": "uncertain"
+    },
+    "task000001_3": {
+      "confidence": "any"
+    },
+    "task000001_4": {
+      "note": "customer stories section does not exist",
+      "confidence": "established",
+      "cause_any": [
+        "missing",
+        "not exist",
+        "absent",
+        "no customer",
+        "not implemented",
+        "lacks",
+        "does not provide",
+        "no dedicated",
+        "not present",
+        "no page or section"
+      ]
+    },
+    "task000001_5": {
+      "note": "misty rose never set anywhere in src",
+      "confidence": "established",
+      "cause_any": [
+        "misty",
+        "background"
+      ]
+    }
+  },
+  "000021": {
+    "task000001_3": {
+      "note": "RSVP buttons have no click handler and there is no reservation form",
+      "confidence": "established",
+      "cause_any": [
+        "handler",
+        "@click",
+        "no reservation form",
+        "missing",
+        "not implemented",
+        "no click",
+        "static"
+      ]
+    }
+  }
+}

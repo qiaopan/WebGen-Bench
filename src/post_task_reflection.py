@@ -492,6 +492,23 @@ check's own steps and answer are too thin to identify a concrete defect (for exa
 from one screenshot with no interaction, or a one-line judgement with no described problem), return null
 for this check instead of writing about anything else.
 
+Check identity: this check's own task and expected result are stated in the first tester message of
+its trajectory. Read them first; feature_object must be the feature THAT task names. The tester often
+passes through other features on the way (for example opening a testimonials tab while looking for
+navigation links); a defect noticed there belongs to that other feature's own check, which may well have
+passed, so do not write it here. If the only defect you can see concerns a different feature than this
+check's task, return null.
+
+Missing feature: the feature this check asks for (named in its own task and expected result) may not
+exist in the website at all, so the tester wandered into some other page and tried whatever controls
+were there. Check the supplied code_manifest and code for that feature (a page, route, navigation item,
+section or component for it). If the code shows it is absent, the absence IS the established cause:
+feature_object is the feature this check asked for, observed_result says the site has no such feature
+and briefly where the tester looked instead, preventative_action requires the site to provide every
+content section or feature the requirement lists with its own reachable entry point, and code_evidence
+quotes the navigation or route list that lacks it. Do not attribute the failure to the unrelated
+control the tester happened to try; a defect in that control belongs to the check about that control.
+
 Infrastructure, provider, port and timeout failures are not website lessons.
 
 Evaluator log: evidence of kind evaluator_log holds the error lines of that check's own test
@@ -530,6 +547,29 @@ of interactions, the requirement is ambiguous, a feature exists but is not visib
 where the tester looked): for those set code_evidence to null and do not stretch to
 find a code cause. A missing code_evidence is always acceptable; a forced one is not.
 
+Screenshots: the last screenshots the tester saw for this check are attached as images
+(listed in attached_screenshots). Compare them with what the code says should be on screen.
+When the code does implement the expected behaviour but the screenshot does not show it,
+the cause is usually visual rather than logical. Trace it like a developer: start from the element
+that should show the content and list the style rules that decide how it is drawn, in order - its
+own component styles, then each parent container, then the global stylesheets the entry files
+import (code_manifest.global_style_rules lists, as measured facts, every declaration those
+stylesheets make on :root, html, body or #app). The rule that finally decides the element's
+colour, size or visibility is the cause; quote it as code_evidence. Do this across all supplied
+files before concluding that the logic is missing.
+
+Cause confidence: set cause_confidence to "established" only when the screenshots, the
+tester's own steps or a verbatim code excerpt show the cause. If you cannot point to such
+evidence, set it to "uncertain" and say in likely_cause_or_limitation that the cause is not
+established; do not present a plausible guess as the cause.
+Two consistency checks before you choose "established": (1) if likely_cause_or_limitation uses
+hedged wording (appears, seems, likely, may, might, probably, possibly), the cause is not
+established - set "uncertain". (2) The quoted evidence must itself show the stated cause, not merely
+be real code from a nearby place: a claim that something is missing needs evidence where it would
+have to appear (the routes, the navigation, the component that should render it); a claim about
+what the user saw needs the code that decides it. If the quote is genuine but does not show the
+cause, set "uncertain".
+
 Do not write stock advice such as "ensure the feature works correctly" or "follow
 best practices" in any field.
 
@@ -558,15 +598,73 @@ lesson as a general convention that most websites follow (for example plain,
 conventional names for main sections) or leave the check out when the expectation is
 only this one task's particular wording.
 
+Lesson scope: decide from where the cause lives. If the cause is in something every page shares (the
+entry file, a global stylesheet, the router or navigation, the root layout or app shell), the same
+cause would affect every page, so set "scope" to "site_wide". If the cause is inside one feature's own
+component or logic, set "feature". Site-wide lessons are offered to every later task; feature lessons only to
+tasks with a similar feature.
+
+Investigation order: before writing the lesson, work through these steps in order and record what
+you found at each one in "investigation" (one or two sentences per step, citing the evidence you used):
+1. task: the check's own task and expected result (first tester message) and the tester's final answer
+   and stated reason.
+2. reached_target: whether the tester actually reached the page, control or content the task is about,
+   or stopped earlier (ran out of interactions, wandered to another feature, the page was still
+   loading, an evaluator or driver error). If it never reached it, say WHY, using step 5: when the
+   page the tester was on offers no entry point to the target (no link, button or menu item leads
+   there), not reaching it is itself a website defect that can be established; only when an entry
+   point existed and the tester did not use it (or ran out of interactions before using it) is
+   nothing about the website established.
+3. screenshots: what the attached screenshots actually show compared with what the task expected
+   (content present, missing, blank, unreadable, wrong colour, wrong page).
+4. errors: any build, console or evaluator error in the evidence; write "none" if there is none.
+5. code_path: follow the chain the feature needs in the source and say where it holds or breaks:
+   route or section exists -> it is linked from navigation or the page the tester was on -> the
+   component is mounted -> its data or handler is present -> it is rendered. A feature claimed absent
+   must be shown absent where it would have to appear.
+6. style_trace: whenever the code has the content (step 5 reaches "rendered") but the screenshot shows
+   that place blank, empty or unreadable - note that text drawn in the same colour as its background
+   looks exactly like an empty area in a screenshot, so a blank area is not proof that nothing is there -
+   list, for the element that should show it, the text colour and background set by (a) the element's
+   own styles, (b) each parent container, (c) the global stylesheets the entry files import
+   (code_manifest.global_style_rules), each with file and rule; then name the rule that decides what
+   is drawn. Otherwise write "not applicable".
+7. candidates: name two or three possible causes (for example absent feature, unreachable feature,
+   unreadable styling, broken handler, tester limitation) and for each say which evidence above
+   supports or rules it out.
+8. conclusion: the one cause that survives step 7 with direct evidence. "established" means a defect
+   in the WEBSITE is established; if the surviving cause is a tester limitation (ran out of
+   interactions, did not use an existing entry point, driver error), that is not a website defect, so
+   cause_confidence is "uncertain" however sure you are about it. If more than one survives, or
+   the only support is the tester's impression, set cause_confidence "uncertain". Do not use hedged
+   wording (appears, seems, likely, may, might, probably) for an established cause.
+9. fix_check: state the concrete change to THIS site's code that preventative_action implies (file and
+   what changes) and whether, given steps 1-8, that change alone would make this check pass. If it
+   would not (the cause lies elsewhere, or the tester never reached the target), rewrite the lesson so
+   it addresses the cause that would, or set cause_confidence "uncertain".
+
 Return null when the evidence gives no usable lesson for this check (only infrastructure failure, or an
 unexercised check). Return JSON only:
-{"functional_reflection":null|{"feature_object":str,"user_trigger":str,
+{"functional_reflection":null|{"investigation":{"task":str,"reached_target":str,"screenshots":str,
+"errors":str,"code_path":str,"style_trace":str,"candidates":str,"conclusion":str,"fix_check":str},
+"feature_object":str,"user_trigger":str,
 "expected_state_change":str,"observed_result":str,
 "outcome":"partial|failure","likely_cause_or_limitation":str,
+"cause_confidence":"established|uncertain","scope":"site_wide|feature",
 "preventative_action":str,"verification":str,"transfer_limits":str,
 "code_evidence":null|{"file":str,"snippet":str},
 "requirement_evidence":null|{"quote":str,"site":str},
 "evidence_refs":[supplied refs]}}."""
+
+
+def _last_screenshots(check: Mapping[str, Any], count: int = 2) -> list[str]:
+    """The last screenshots the tester saw for one check (next to its interact_messages.json)."""
+    path = check.get("evidence") if isinstance(check, Mapping) else None
+    if not isinstance(path, str):
+        return []
+    shots = sorted(Path(path).parent.glob("screenshot*.png"),
+                   key=lambda p: int(re.sub(r"\D", "", p.stem) or 0))
+    return [str(p) for p in shots[-count:]]
 
 
 def _check_own_evidence(evidence: list[dict], index: int) -> list[dict]:
@@ -617,6 +715,10 @@ def _shares_topic(check_text: str, case: Mapping[str, Any], fields: tuple[str, .
     return bool(check_words & case_words)
 
 
+# Why each failed/partial check produced no case in the latest _functional_cases call (diagnostics only).
+LAST_FUNCTIONAL_SKIPS: list[dict] = []
+
+
 def _functional_cases(llm: Any, trajectory: Mapping[str, Any], evidence: list[dict],
                       checks: list | None) -> list[dict]:
     """One model call per failed/partial functional check, each seeing only that check's own evidence.
@@ -625,21 +727,35 @@ def _functional_cases(llm: Any, trajectory: Mapping[str, Any], evidence: list[di
     if not isinstance(checks, list):
         return []
     functional = []
+    skipped = LAST_FUNCTIONAL_SKIPS
+    skipped.clear()
     for index, check in enumerate(checks):
         if not isinstance(check, dict) or check.get("check") == "appearance" or check.get("outcome") == "passed":
             continue
         own_evidence = _check_own_evidence(evidence, index)
+        screenshots = _last_screenshots(check)
         try:
             result = llm.generate("post_task_functional_case", {
                 "instructions": FUNCTIONAL_CASE_INSTRUCTIONS,
                 "public_task_requirement": str(trajectory["task_request"]),
                 "check_index": index, "check_outcome": check.get("outcome"),
-                "evidence": own_evidence})
-        except ValueError:
+                "attached_screenshots": [Path(p).name for p in screenshots],
+                "evidence": own_evidence, "_images": screenshots})
+        except ValueError as error:
+            skipped.append({"check_index": index, "reason": f"model call failed: {str(error)[:200]}"})
             continue
         item = result.get("functional_reflection") if isinstance(result, dict) else None
         if not isinstance(item, dict):
+            skipped.append({"check_index": index, "reason": "model returned null"})
             continue
+        # Format repair: the model sometimes closes "investigation" too late, nesting every case field
+        # inside it. Lift those fields back to the case level (content unchanged).
+        investigation = item.get("investigation")
+        if isinstance(investigation, dict) and "feature_object" not in item and "feature_object" in investigation:
+            steps = ("task", "reached_target", "screenshots", "errors", "code_path", "style_trace",
+                     "candidates", "conclusion", "fix_check")
+            item = {**{k: v for k, v in investigation.items() if k not in steps},
+                    "investigation": {k: investigation[k] for k in steps if k in investigation}}
         # Deterministic topic-drift guard: the instructions ask the model to write about this check's
         # own steps/answer only, or return null when they are too thin -- but a model with no concrete
         # defect to report will sometimes borrow a different, more concrete-looking topic from the
@@ -647,14 +763,120 @@ def _functional_cases(llm: Any, trajectory: Mapping[str, Any], evidence: list[di
         # check's own text; a case that shares none of it is not trusted, whatever the model claims.
         if not _shares_topic(_check_own_text(own_evidence, index), item,
                              ("feature_object", "user_trigger", "observed_result")):
+            skipped.append({"check_index": index, "reason": "topic guard: shares no words with this check",
+                            "feature_object": str(item.get("feature_object"))[:120]})
             continue
         normalised = _normalise_functional(item, own_evidence)
         if normalised is None:
+            skipped.append({"check_index": index, "reason": "normalise rejected the case"})
             continue
+        normalised["check_index"] = index
+        normalised["investigation"] = item.get("investigation")
         normalised["code_evidence"] = item.get("code_evidence")
         normalised["requirement_evidence"] = item.get("requirement_evidence")
+        # "uncertain": kept on record but archived, so a guessed cause never reaches a later prompt.
+        normalised["cause_confidence"] = ("uncertain" if str(item.get("cause_confidence", "")).strip().lower()
+                                          == "uncertain" else "established")
+        # A site-wide lesson is stored as an implementation case so it reaches the common pool, which every
+        # later task sees and which ranks lessons by occurrence x severity rather than feature similarity.
+        normalised["scope"] = "site_wide" if str(item.get("scope", "")).strip().lower() == "site_wide" else "feature"
         functional.append(_ground_requirement_evidence(
             _ground_code_evidence(normalised, own_evidence), str(trajectory["task_request"])))
+    return _choose_site_wide(llm, route_scope(llm, functional, evidence))
+
+
+SITE_WIDE_CHOICE_INSTRUCTIONS = """Several lessons from ONE website were marked site-wide. Group the lessons that
+state the same underlying site-wide requirement (the same cause in the same shared part of the site);
+lessons whose causes differ are different groups. In each group choose the ONE lesson that is most
+purely about the whole site: prefer the lesson that names no single feature over one written for one
+page or feature; when every lesson in the group mentions a feature, choose the one with the least
+feature-specific detail. Every index appears in exactly one group. Return JSON only:
+{"groups":[{"indices":[int],"chosen":int,"reason":str}]}."""
+
+
+SCOPE_ROUTING_INSTRUCTIONS = """You decide where ONE lesson from a website-generation memory is stored.
+"site_wide": the cause lies in something every page of a website shares, so the same cause would
+affect other pages or features of any later website too; such lessons are offered to every later task.
+"feature": the cause lies inside one feature's own component or logic, so the lesson only matters to a
+later website with a similar feature. You get the lesson, its cause, its code evidence, and a measured
+fact: whether the code evidence comes from a file every page shares (entry file, root component,
+router, or a global stylesheet an entry file imports). Judge whether the same cause would reach other
+pages; the fact is evidence, not the answer. A page or feature that is simply missing is a "feature"
+lesson even when the evidence quotes a shared file (for example a route or menu list that lacks it):
+the shared file only shows the absence. "site_wide" is for a rule or setup in a shared file that itself
+breaks or hides content on several pages. Return JSON only: {"scope":"site_wide|feature","reason":str}."""
+
+_SHARED_NAME = re.compile(r"(^|/)(main|index|App)\.(ts|tsx|js|jsx|vue|astro)$|(^|/)router/|^index\.html$")
+
+
+def _shared_file(path: str, evidence: list[dict]) -> bool:
+    """Code fact: is this file shared by every page (entry, root component, router, or a global stylesheet
+    that an entry file imports)?"""
+    path = str(path or "").strip()
+    if not path:
+        return False
+    if _SHARED_NAME.search(path):
+        return True
+    for item in evidence:
+        ref, content = item.get("ref"), item.get("content")
+        if isinstance(ref, dict) and ref.get("kind") == "code_manifest" and isinstance(content, dict):
+            for rule in content.get("global_style_rules") or []:
+                if str(rule).startswith(path + " ") and "imported by: no entry file" not in str(rule):
+                    return True
+    return False
+
+
+def route_scope(llm: Any, functional: list[dict], evidence: list[dict]) -> list[dict]:
+    """Separate, single-purpose routing call per lesson: site-wide (common pool) or feature (feature
+    match). Writing the lesson and judging its reach in one call left global causes marked "feature"."""
+    for case in functional:
+        code = case.get("code_evidence") if isinstance(case.get("code_evidence"), dict) else {}
+        shared = _shared_file(code.get("file", ""), evidence)
+        try:
+            result = llm.generate("case_scope_routing", {
+                "instructions": SCOPE_ROUTING_INSTRUCTIONS,
+                "lesson": {k: case.get(k) for k in ("feature_object", "observed_result",
+                                                     "likely_cause_or_limitation", "preventative_action")},
+                "code_evidence": {"file": code.get("file"), "snippet": code.get("snippet")} if code else None,
+                "code_evidence_from_shared_file": shared})
+        except ValueError:
+            result = {}
+        scope = str(result.get("scope", "")).strip().lower() if isinstance(result, dict) else ""
+        if scope in ("site_wide", "feature"):
+            case["scope"] = scope
+            case["scope_reason"] = str(result.get("reason", ""))[:300]
+        case["code_evidence_from_shared_file"] = shared
+    return functional
+
+
+def _choose_site_wide(llm: Any, functional: list[dict]) -> list[dict]:
+    """Keep one site-wide case per distinct site-wide lesson: it goes to the common pool as an
+    implementation case; the other cases of that lesson stay feature cases, so the feature lessons they
+    also carry remain retrievable by feature match, and the feature pool is not emptied."""
+    marked = [i for i, case in enumerate(functional) if case.get("scope") == "site_wide"]
+    chosen: set[int] = set(marked)
+    if len(marked) > 1:
+        try:
+            result = llm.generate("site_wide_choice", {
+                "instructions": SITE_WIDE_CHOICE_INSTRUCTIONS,
+                "lessons": [{"index": i, "feature_object": functional[i]["feature_object"],
+                             "preventative_action": functional[i]["preventative_action"]} for i in marked]})
+        except ValueError:
+            result = {}
+        groups = [g for g in (result.get("groups") or []) if isinstance(g, dict)] if isinstance(result, dict) else []
+        picked = {g.get("chosen") for g in groups if g.get("chosen") in marked}
+        covered = {i for g in groups for i in (g.get("indices") or []) if i in marked}
+        # Anything the model left out of every group stays site-wide rather than being silently demoted.
+        chosen = picked | (set(marked) - covered) if picked else {marked[0]}
+        for g in groups:
+            if g.get("chosen") in chosen:
+                functional[g["chosen"]]["site_wide_choice_reason"] = str(g.get("reason", ""))[:300]
+    for i, case in enumerate(functional):
+        if i in chosen:
+            if not case["feature_object"].startswith("[implementation]"):
+                case["feature_object"] = "[implementation] " + case["feature_object"]
+        else:
+            case["scope"] = "feature"
     return functional
 
 
@@ -818,7 +1040,8 @@ def create_reflection_by_questions(llm: Any, trajectory: Mapping[str, Any], evid
     reflections = ([appearance] if appearance is not None else []) + functional
     accepted = [item for item in reflections if item["accepted_for_memory"]]
     return {
-        "reflection_id": uuid.uuid4().hex, "trajectory_id": str(trajectory["trajectory_id"]),
+        "reflection_id": uuid.uuid4().hex, "prompt_version": prompt_version(),
+        "trajectory_id": str(trajectory["trajectory_id"]),
         "public_task_requirement": requirement, "task_summary": _task_summary(None),
         "appearance_reflection": appearance, "functional_reflections": functional,
         "implementation_reflection": implementation, "accepted_reflections": accepted,
@@ -897,6 +1120,8 @@ def _create_reflection_structured(llm: Any, trajectory: Mapping[str, Any], evide
     accepted = [item for item in reflections if item["accepted_for_memory"]]
     return {
         "reflection_id": uuid.uuid4().hex,
+        "prompt_version": prompt_version(),
+        "functional_skipped": list(LAST_FUNCTIONAL_SKIPS),
         "trajectory_id": str(trajectory["trajectory_id"]),
         "public_task_requirement": str(trajectory["task_request"]),
         "task_summary": _task_summary(result.get("task_summary")),
@@ -1155,3 +1380,12 @@ def reflective_evidence_loader(base_loader: Callable[[dict], list[dict]],
 
 for _name in ("REFLECTION_INSTRUCTIONS", "IMPLEMENTATION_INSTRUCTIONS", "APPEARANCE_ONLY_INSTRUCTIONS"):
     globals()[_name] = globals()[_name].replace("[[TROUBLESHOOTING]]", TROUBLESHOOTING_STEPS)
+
+
+def prompt_version() -> str:
+    """Short fingerprint of every reflection instruction in this module, so each stored reflection
+    records which prompt version wrote it (prompts change between runs; see the regression set)."""
+    import hashlib
+    texts = [f"{name}={value}" for name, value in sorted(globals().items())
+             if name.endswith("_INSTRUCTIONS") and isinstance(value, str)]
+    return hashlib.sha256("\n".join(texts).encode("utf-8")).hexdigest()[:12]

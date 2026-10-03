@@ -129,22 +129,40 @@ def record_run(database: str | Path, *, agent_id: str, task_id: str, trajectory_
                failure_phase: str | None, outcomes: Mapping[str, int], causes: Sequence[str],
                cause_outcomes: Mapping[str, Mapping[str, int]] | None = None,
                prompt_delivered: bool | None = None, guidance_case_ids: Sequence[str] = (),
-               guidance_total: int | None = None, guidance_followed: int | None = None) -> str:
+               guidance_total: int | None = None, guidance_followed: int | None = None,
+               prompt_stats: Mapping[str, object] | None = None) -> str:
     fact_id = uuid.uuid4().hex
     with connect_database(database, read_only=False) as connection:
         ensure_optional_tables(connection)
         connection.execute(
             "INSERT OR REPLACE INTO run_facts (fact_id,agent_id,task_id,trajectory_id,stack,generation_ok,"
             "generation_attempts,failure_phase,checks_passed,checks_partial,checks_failed,causes,cause_outcomes,"
-            "prompt_delivered,guidance_case_ids,guidance_total,guidance_followed) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "prompt_delivered,guidance_case_ids,guidance_total,guidance_followed,prompt_stats) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (fact_id, agent_id, task_id, trajectory_id, stack, int(generation_ok), generation_attempts,
              failure_phase, int(outcomes.get("passed", 0)), int(outcomes.get("partial", 0)),
              int(outcomes.get("failed", 0)), json.dumps(sorted(set(causes)), ensure_ascii=False),
              json.dumps({k: dict(v) for k, v in (cause_outcomes or {}).items()}, ensure_ascii=False),
              None if prompt_delivered is None else int(prompt_delivered),
-             json.dumps(list(guidance_case_ids)), guidance_total, guidance_followed))
+             json.dumps(list(guidance_case_ids)), guidance_total, guidance_followed,
+             json.dumps(dict(prompt_stats or {}), ensure_ascii=False)))
     return fact_id
+
+
+def prompt_stats(prompt: str, requirement: str, condense: Mapping[str, object] | None = None) -> dict:
+    """Code-measured size of what the generator was sent: the requirement versus the injected memory.
+    Everything after the requirement text is memory; bullet lines count as guidance items."""
+    prompt, requirement = prompt.strip(), requirement.strip()
+    memory = prompt[len(requirement):].strip() if prompt.startswith(requirement) else ""
+    stats: dict[str, object] = {
+        "prompt_chars": len(prompt), "requirement_chars": len(requirement), "memory_chars": len(memory),
+        "memory_ratio": round(len(memory) / len(requirement), 3) if requirement else None,
+        "memory_items": sum(line.lstrip().startswith("- ") for line in memory.splitlines()),
+        "requirement_is_prefix": prompt.startswith(requirement)}
+    if condense:
+        stats["condense"] = {key: condense.get(key) for key in
+                             ("applied", "candidates", "kept", "budget_chars", "used_chars")}
+    return stats
 
 
 def _other_task(task_id: str, current: str) -> bool:

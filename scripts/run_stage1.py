@@ -198,7 +198,7 @@ def evaluations(output_dir: Path, position: int) -> list[dict]:
     if appearance.is_file():
         result = json.loads(appearance.read_text(encoding="utf-8"))
         model_output = result.get("model_output") or ""
-        grade_match = re.search(r"Grade\s*:\s*([1-5])", model_output, re.IGNORECASE)
+        grade_match = re.search(r"Grade\W{0,6}?:\W{0,6}([1-5])", model_output, re.IGNORECASE)
         grade = int(grade_match.group(1)) if grade_match else None
         values.append({"check": "appearance", "outcome": "scored",
                        "model_output": result.get("model_output"),
