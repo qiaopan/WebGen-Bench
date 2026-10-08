@@ -1,0 +1,12 @@
+<section id="stronger" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:104px 128px 150px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">更强的生成模型 · WebGen-LM-32B（FP8）</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:50px;font-weight:700;line-height:1.2">更强的模型还需要代码吗？[待填：一句话结论]</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:26px">
+<tr><th style="width:34%;text-align:left">生成模型（原论文 Bolt.diy 准确率）</th><th style="width:22%;text-align:right">No Memory</th><th style="width:22%;text-align:right">Long Memory</th><th style="width:22%;text-align:right">配对差（95% CI）</th></tr>
+<tr><td>7B（28.4%）</td><td style="text-align:right">28.5%</td><td style="text-align:right">40.0%</td><td style="text-align:right">+11.5 [6.0, 16.9]</td></tr>
+<tr><td>32B FP8（38.2%）</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
+</table>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">不选 14B：原论文里它是 29.4%，和 7B 几乎一样强。32B 用 FP8 是因为每人只有 2 张卡；两组用同一模型，组间比较公平，但不能和原论文 32B 直接比。另看：32B 是否更能执行文字经验。</p>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:48px;font-size:20px;color:#6A7179">在同一个作业里把 7B 换成 32B（不释放资源、不重新排队）；记忆、评测、Bolt 不变；manifest 顺序，两组逐题 ABBA。</p>
+<aside>这一页检验“记忆形式取决于模型能力”。我们换成同一家族、明显更强的 WebGen-LM-32B，其他全部不变。不选 14B，因为原论文里它只比 7B 高 1 个点。如果 32B 上记忆的提升变小，或者文字经验开始被执行，就支持“强模型不那么需要代码”这个结论；如果 32B 上代码片段依然关键，说明这个结论不只限于 7B。要说明两点：第一，32B 用了 FP8 量化，因为每人只能用两张卡，BF16 的 32B 和评测模型放不进；两组用同一个模型，比较是公平的，但不能和原论文的 32B 数字直接比。第二，为了不重新排队，我们在同一个作业里把 7B 换成 32B。顺便一提，我们 7B 加记忆的 40%，已经超过了原论文里不带记忆的 32B。</aside>
+</section>

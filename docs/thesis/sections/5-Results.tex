@@ -100,6 +100,12 @@ If the fixed prefix matches v7, the contribution of the method is better describ
 
 \todo{Fill in: accuracy / appearance / zero-score for No Memory, checklist only, fixed prefix and v7, first 30 and last 71 tasks.}
 
+\section{A Stronger Generator}
+\label{sec:stronger}
+To test whether the advantage of code over text depends on the capability of the generator, we repeat the main comparison with WebGen-LM-32B from the same model family, keeping Bolt.diy, the memory pipeline, the memory model and the evaluators unchanged, with the two arms run as alternating pairs in the manifest order. WebGen-LM-14B is not a useful contrast: with Bolt.diy it reaches 29.4\% against 28.4\% for the 7B model, while the 32B model reaches 38.2\%~\cite{lu2025webgenbench}. Because each user may hold two GPUs and the 32B evaluator already occupies most of one, the 32B generator is served with FP8 weight quantization. Both arms use the same FP8 model, so the comparison between them is fair, but its absolute scores are not directly comparable with the BF16 results of the original paper. Note that the 7B generator with v7 memory (40.0\%) already exceeds the published 32B result without memory.
+
+\todo{Fill in: 32B FP8 No Memory vs Long Memory accuracy, paired difference with CI, zero-score tasks; whether textual lessons are used more by the 32B generator.}
+
 \section{Robustness to Task Order}
 \label{sec:order-design}
 WebGen-Bench is a static benchmark: tasks are solved independently and its main results are single runs without error bars, which the authors attribute to computational cost~\cite{lu2025webgenbench}. With memory, however, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.

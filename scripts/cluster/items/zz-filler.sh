@@ -12,6 +12,12 @@ while true; do
   [[ -n "$others" ]] && { echo "FILLER_YIELD to $(basename "$others")"; requeue; }
   next=$(filler_next) || { echo FILLER_ALL_DONE; exit 0; }
   read -r arm out id cfg <<< "$next"
+  if [[ $arm == HALT ]]; then echo "FILLER_HALT: $out failed three times; fix it, then remove its lines from $WG/queue/filler-failures.txt"; exit 0; fi
+  if [[ $arm == X ]]; then
+    echo "=== FILLER_SWITCH $out"; bash "$out" "$id"
+    [[ -e "$id" ]] || { echo "$out $id" >> "$WG/queue/filler-failures.txt"; echo "FILLER_SWITCH_FAILED $out"; requeue; }
+    continue
+  fi
   memory_config="$default_memory_config"
   [[ -n "${cfg:-}" && "$cfg" != "-" ]] && memory_config="$cfg"
   if [[ $arm == L ]]; then run_longmem_tasks "$out" "$id"; status=$?; else run_nomem_tasks "$out" "$id"; status=$?; fi

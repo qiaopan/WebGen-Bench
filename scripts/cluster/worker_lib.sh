@@ -5,10 +5,14 @@ export WEBGEN_VUE_COMPILER_PROJECT=${WEBGEN_VUE_COMPILER_PROJECT:-/data/qma258/o
 # Helpers for worker queue items (source it at the top of an item). Items run from $WG/webgen with the
 # worker's environment ($py, $memory_config, $WEBGEN_BOLT_URL and the shifted model URLs).
 
+# The generator in use: $WG/queue/generator.env (written by switch_generator.sh) overrides .env.
+load_generator_env() { [[ -f "$WG/queue/generator.env" ]] && { set -a; source "$WG/queue/generator.env"; set +a; }; return 0; }
+
 # run_longmem_tasks OUTPUT TASK_ID...: Long Memory (continual, post-task reflection, case_only) on the
 # given tasks in order, each followed by the health check; a failed task is logged and the next one runs.
 run_longmem_tasks() {
   local out="$1"; shift
+  load_generator_env
   local id start
   for id in "$@"; do
     start=$(date +%s)
@@ -40,6 +44,7 @@ key_file() {
 # run_nomem_tasks OUTPUT TASK_ID...: No Memory (disabled) on the given tasks, each with the health check.
 run_nomem_tasks() {
   local out="$1"; shift
+  load_generator_env
   local id start
   for id in "$@"; do
     start=$(date +%s)
@@ -57,6 +62,8 @@ run_nomem_tasks() {
 # filler_next: the next unfinished "ARM OUTPUT TASK_ID CONFIG" from $WG/queue/filler.conf, done in order,
 # skipping tasks whose runner already failed three times; nothing (exit 1) when all are done. Lines:
 #   "L|N OUTPUT [MEMORY_CONFIG]"  one arm over the manifest order (CONFIG "-" = the worker default);
+#   "X SCRIPT MARKER"  run SCRIPT once, e.g. a generator switch; done when MARKER exists. After three failures
+#     the filler halts (nothing after it runs on the wrong generator);
 #   "P ORDER_FILE LM_OUTPUT NM_OUTPUT [LM_MEMORY_CONFIG]"  both arms over the order in ORDER_FILE
 #     (data/experiment_splits/task_orders/*.json), task by task; which arm runs first alternates by position
 #     (ABBA: position 0 L,N; 1 N,L; 2 L,N; ...). The order file is copied to OUTPUT/task-order.json.
@@ -81,6 +88,12 @@ for line in conf.read_text().splitlines() if conf.is_file() else []:
     if not line.strip() or line.startswith("#"):
         continue
     f = line.split()
+    if f[0] == "X":  # "X SCRIPT MARKER": run SCRIPT once (until MARKER exists); later lines wait for it
+        if Path(f[2]).exists():
+            continue
+        if failed.count(f"{f[1]} {f[2]}") >= 3:
+            print("HALT", f[1], f[2], "-"); sys.exit(0)
+        print("X", f[1], f[2], "-"); sys.exit(0)
     if f[0] == "P":
         order, lm_out, nm_out = f[1], f[2], f[3]
         lm_cfg = f[4] if len(f) > 4 else "-"

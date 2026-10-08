@@ -11,6 +11,11 @@
 
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
+### 2026-10-08：32B（FP8）已排进当前作业（见 DECISIONS 同日条目）
+- 32B 下载作业 23432（`luzimu/WebGen-LM-32B` @7d10337c，约 65 GB，CPU）在等审批；**切换前必须确认下载完成**（`/data/qma258/models/WebGen-LM-32B/config.json`），否则切换脚本会中止并计失败。
+- 队列末尾：`X scripts/cluster/switch_generator.sh /data/qma258/queue/switched-to-32b-fp8`，然后 P manifest 顺序 32B。目标配置 `$WG/queue/generator.env.next`。补位脚本的运行副本已原子替换为新版，并排了 `reload-filler-2`。
+- **约 10-15 切换时要人工检查：** worker 日志里的 `SWITCH_DONE`/`SWITCH_FAILED`、`nvidia-smi` 显存、第一个 32B 任务是否正常。若 `FILLER_HALT`，补位停止，worker 空闲 60 分钟后会退出、释放卡。
+
 ### 2026-10-08：文献检索与定位
 - 整理在 `docs/reports/literature_positioning_2026-10.md`（Metis、Super Library Agent、Memory Transfer Learning、Evo-Memory、AgentCL 已对照全文核对）。定位：强模型上文字/抽象经验更好（Metis、MTL），7B 上代码片段更好 → 记忆形式取决于模型能力；Super Library Agent 同用 WebGen-Bench 但目标是可维护性、24 题、准确率不显著、不研究顺序。注意 Metis 的代码是被执行的工具，与我们的提示内片段不同，不能写成"直接矛盾"。
 - 已同步论文（第 2 章相关工作 4 段、第 6 章讨论、bib 4 条并补全 Metis 题名）、PPT（新增"相关工作与定位"页，修正"关键发现"页原先"与 Metis 一致"的错误说法，参考文献页）、README。

@@ -12,6 +12,9 @@ SERVICE_LOG="${SERVICE_LOG:-$WG/logs/services-${SLURM_JOB_ID:-manual}}"
 mkdir -p "$SERVICE_LOG"
 
 set -a; source "$WEBGEN_ROOT/.env"; set +a
+# Generator switch (scripts/cluster/switch_generator.sh): $WG/queue/generator.env overrides the generator
+# weights, served name, quantization and GPU share, so a service restart keeps the switched generator.
+[[ -f "$WG/queue/generator.env" ]] && { set -a; source "$WG/queue/generator.env"; set +a; }
 IFS=',' read -r -a SERVICE_GPUS <<< "${CUDA_VISIBLE_DEVICES:-0}"
 
 # Two queue jobs may share the node (No Memory and Long Memory): WEBGEN_PORT_OFFSET shifts every local
@@ -60,7 +63,8 @@ CUDA_VISIBLE_DEVICES="${SERVICE_GPUS[0]}" "$VLLM" serve "$WG/models/${WEBGEN_GEN
   --served-model-name "$WEBGEN_GENERATOR_API_MODEL" --host 127.0.0.1 \
   --port "$(url_port "$WEBGEN_GENERATOR_BASE_URL")" \
   --api-key "$WEBGEN_GENERATOR_API_KEY" --dtype bfloat16 --max-model-len 32768 \
-  --gpu-memory-utilization 0.28 --generation-config vllm \
+  --gpu-memory-utilization "${WEBGEN_GENERATOR_GPU_UTIL:-0.28}" --generation-config vllm \
+  ${WEBGEN_GENERATOR_QUANTIZATION:+--quantization "$WEBGEN_GENERATOR_QUANTIZATION"} \
   > "$SERVICE_LOG/vllm-webgen-lm.log" 2>&1 &
 wait_http "http://127.0.0.1:$(url_port "$WEBGEN_GENERATOR_BASE_URL")/health" 900 webgen-lm || return 1
 
