@@ -393,3 +393,12 @@
 ### 2026-10-08：v7 正式冻结
 - v7 101 题结果保持优势（40.0% vs No Memory 28.5%，配对 +11.5，CI [6.0, 16.9]；后 71 题 40.4% vs 29.5%），按"证明更好才换版本"的流程，正式冻结 v7 作为消融和顺序鲁棒性实验的版本。本地片段修复（`_pick_fragment`）不进入这些实验。
 - 外观在两组都有可用网站的任务上无差别（3.25 vs 3.22），论文局限写为"增益在功能，不在外观"。
+
+### 2026-10-08：跨模型与跨 agent 的实验范围（用户决定）
+- **先后顺序：** 先完成 WebGen-LM-7B + Bolt 的四顺序 Long Memory/No Memory 交叉实验；若收益在顺序变化下仍稳定，再做跨生成模型。顺序鲁棒性先于模型泛化，因为前者检验当前 memory algorithm 的核心因果主张，后者不能弥补单一任务顺序的混淆。
+- **跨模型设计：** 只加 **WebGen-LM-14B**，Bolt、prompt、memory pipeline、功能评测和外观评测均保持不变。在 domain-block 和跨-domain 交错两种顺序下，Long Memory/No Memory 两臂逐题 ABBA 交叉执行，共 4 个完整 101-task run；按题配对报告差值与 CI。选 14B 是为了固定 WebGen-LM 同系训练和输出协议，仅改变生成能力尺度；不以通用 Qwen2.5-Coder-32B 作为此主对照，因 WebGen 原论文中该模型裸 Bolt 表现很低，容易让基础协议失败主导差值。
+- **跨 agent 不做全量：** WebGen 原论文的 Bolt/OpenHands/Aider × LLM 矩阵适合 benchmark 比较，但本项目研究对象是跨题 Long Memory。替换 agent 会连带改变文件写入、工具/环境反馈、上下文预算、prompt 注入位置和 repair loop，因此必须视为一个新的 memory integration，不能直接用于当前主结论。仅在 7B 顺序实验和 14B 对照均支持主效应后，先做 20 个任务的分层 integration pilot；pilot 验证 memory 的送达、可执行性与评测稳定性，再决定是否做完整 101 题。
+- **评测稳健性：** 在重新生成前，优先用已有截图做第二视觉模型的 appearance 复评，并从 v7 相对 No Memory 的胜/负/平任务中分层抽样，以第二 GUI/视觉评测器复核功能结论。此项是测量稳健性检查，不能替代新的生成 LLM 对照。
+
+### 2026-10-08：停在 v7，单页缺 import 写为生成器局限（用户决定）
+- 按文件统计，v7 27/592、No Memory 27/586 个组件漏 Vue import（约 4.6%），与 App/子组件、是否用 defineProps 无关，像随机笔误。v8 试验（示例随缺失分布重建、覆盖 ref+computed）4 题只改善 1 题。按官方协议不能生成后补 import，所以不再追修，停在 v7；论文与 PPT 把它写为 7B 生成器的残余错误率。v8 代码保留在 `src/code_memory.py`，开关 `WEBGEN_CODE_POOL_REFRESH` 默认关闭。

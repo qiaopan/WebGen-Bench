@@ -1,0 +1,16 @@
+<section id="abl" data-section="消融与顺序鲁棒性" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">消融实验</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">提升来自需求拆解，还是来自记忆？</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:30px">
+<tr><th style="width:34%;text-align:left">组别</th><th style="width:22%;text-align:right">前 30</th><th style="width:22%;text-align:right">后 71</th><th style="width:22%;text-align:right">全部</th></tr>
+<tr><td>No Memory</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
+<tr><td>只有清单（不注入经验）</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
+<tr><td>v7（清单 + 记忆）</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
+</table>
+<div style="display:flex;gap:32px">
+<p style="flex:1;font-size:28px;line-height:1.5;color:#4A5568">只有清单 − No Memory = 需求拆解的贡献</p>
+<p style="flex:1;font-size:28px;line-height:1.5;color:#4A5568">v7 − 只有清单 = 记忆的贡献</p>
+</div>
+<p style="font-size:26px;color:#6A7179">只有清单 = v7 配置 + 不写、不读任何记忆，同一顺序。[待填：运行中]</p>
+<aside>消融实验正在集群上跑。问题是：提升来自需求拆解，还是来自记忆？“只有清单”组和 v7 配置完全相同，只是不写、也不读任何记忆，任务顺序也相同。“只有清单”减 No Memory 是需求拆解的贡献；v7 减“只有清单”是记忆的贡献。如果“只有清单”在后期也很高，说明提升主要来自 prompt 改写；如果后期只有 v7 高，说明是记忆的积累在起作用。结果出来后填进这张表。</aside>
+</section>

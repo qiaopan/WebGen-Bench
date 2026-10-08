@@ -333,6 +333,20 @@ def compile_file_text(text: str, name: str, compiler_project: Path | None) -> li
 
 
 VUE_API_KEY_LINES = os.environ.get("WEBGEN_VUE_API_KEY_LINES") == "1"  # diagnostic switch: short vs whole script
+# v8: rebuild the vue-api example when the APIs the chain keeps missing change. v7 built it once (task 6, ref only)
+# and never again, while half of its 22 support tasks later missed computed, which the example never showed.
+CODE_POOL_REFRESH = os.environ.get("WEBGEN_CODE_POOL_REFRESH") == "1"
+VUE_API_COVER_MAX = 3
+
+
+def _needed_apis(want: dict[str, int], min_tasks: int = 2) -> list[str]:
+    """The Vue APIs the example must show: missed in >= min_tasks failing tasks, most-missed first (at least one)."""
+    ranked = sorted(want, key=lambda a: (-want[a], a))
+    return [a for a in ranked if want[a] >= min_tasks][:VUE_API_COVER_MAX] or ranked[:1]
+
+
+def _imported_in(code: str) -> set[str]:
+    return {a for line in _VUE_IMPORT.findall(code) for a in re.findall(r"\w+", line)}
 
 
 def _key_lines(script: str) -> str:
@@ -356,7 +370,7 @@ def _key_lines(script: str) -> str:
 
 
 def _fix_from_good_site(key: str, good: list[dict], max_lines: int,
-                        want: dict[str, int] | None = None) -> tuple[str, str] | None:
+                        want: dict[str, int] | None = None, prefer: set[str] | None = None) -> tuple[str, str] | None:
     """``want``: how many failing tasks missed each Vue API (vue-api:any); the example should import the ones
     missed most, otherwise it shows nothing the generator lacked."""
     kind, _, detail = key.partition(":")
@@ -377,7 +391,8 @@ def _fix_from_good_site(key: str, good: list[dict], max_lines: int,
                 imported = {a for line in _VUE_IMPORT.findall(text) for a in re.findall(r"\w+", line)}
                 used = {a for a in _VUE_APIS if re.search(rf"(?<![\w.]){a}\s*[(<]", text)} & imported
                 n = len(text.splitlines())
-                rank = (sum((want or {}).get(a, 0) for a in used), len(used), -n)
+                need = set(_needed_apis(want)) if (CODE_POOL_REFRESH and want) else set()
+                rank = (len(need & used), len((prefer or set()) & used), sum((want or {}).get(a, 0) for a in used), len(used), -n)
                 if used and n <= 40 and (best is None or rank > best[0]):
                     best = (rank, text, s["task_id"])
         if not best:
@@ -498,6 +513,7 @@ def _pick_key_lines(llm, script: str, breakage: str, want: dict[str, int], attem
     Falls back to the rule extraction (_key_lines) when the model's pick fails the checks."""
     source = {l.strip() for l in script.splitlines() if l.strip()}
     top = max(want, key=want.get) if want else None
+    need = [a for a in _needed_apis(want) if re.search(rf"(?<![\w.]){a}\s*[(<]", script)] if (CODE_POOL_REFRESH and want) else []
     log, feedback = [], ""
     for _ in range(attempts):
         try:
@@ -515,6 +531,11 @@ def _pick_key_lines(llm, script: str, breakage: str, want: dict[str, int], attem
         # scaffold untouched (v6 000020/000026). Show the imported function in use as well.
         if top and not any(re.search(rf"(?<![\w.]){top}\s*[(<]", l) and l is not imp for l in lines):
             problems.append(f"must also include a line that calls {top}(...)")
+        for api in need:  # v8: every API the chain keeps missing, imported and used
+            if api != top and not (imp and re.search(rf"\b{api}\b", imp)):
+                problems.append(f"the import line from 'vue' must also include {api}")
+            if api != top and not any(re.search(rf"(?<![\w.]){api}\s*[(<]", l) and l is not imp for l in lines):
+                problems.append(f"must also include a line that calls {api}(...)")
         if not lines or len(lines) > KEY_LINES_MAX:
             problems.append(f"give 1-{KEY_LINES_MAX} lines")
         log.append({"lines": len(lines), "problems": problems})
@@ -523,7 +544,9 @@ def _pick_key_lines(llm, script: str, breakage: str, want: dict[str, int], attem
             return {"code": "\n".join(lines), "log": log}
         feedback = " Previous answer rejected: " + "; ".join(problems[:5]) + "."
     log.append({"fallback": "rule"})
-    return {"code": _key_lines(script), "log": log}
+    # Lines only here as well: a <script> wrapper made the example read as a finished component (v6).
+    return {"code": "\n".join(l for l in _key_lines(script).splitlines() if not re.match(r"\s*</?script\b", l)),
+            "log": log}
 
 
 def _repair_with_model(llm, failing: dict, problem: dict, compiler_project: Path | None,
@@ -547,6 +570,80 @@ def _repair_with_model(llm, failing: dict, problem: dict, compiler_project: Path
         request = {**request, "retry_notice": "Your file still does not compile or the snippet is not in it: "
                    + json.dumps(errors)[:600]}
     return None
+
+
+def _api_snippet(good: list[dict], api: str, max_lines: int = 6) -> tuple[str, str] | None:
+    """Verbatim lines from the shortest good-site component that imports ``api`` from 'vue' and calls it: its
+    vue import line plus the first statement calling it (up to max_lines - 1 lines)."""
+    best = None
+    for s in good:
+        for path in _sources(s["site"]):
+            if path.suffix != ".vue" or path.name in ("App.vue", "HelloWorld.vue"):
+                continue
+            try:
+                m = re.search(r"<script[^>]*>(.*?)</script>", path.read_text(encoding="utf-8"), re.S)
+            except (OSError, UnicodeDecodeError):
+                continue
+            if not m or api not in _imported_in(m.group(1)):
+                continue
+            lines = m.group(1).splitlines()
+            imp = next((l.strip() for l in lines if _VUE_IMPORT.search(l) and re.search(rf"\b{api}\b", l)), None)
+            i = next((i for i, l in enumerate(lines) if re.search(rf"(?<![\w.]){api}\s*[(<]", l) and "import" not in l), None)
+            if imp is None or i is None:
+                continue
+            block, depth, j = [lines[i].rstrip()], 0, i
+            depth = lines[i].count("(") + lines[i].count("{") - lines[i].count(")") - lines[i].count("}")
+            while depth > 0 and j + 1 < len(lines) and len(block) < max_lines - 1:
+                j += 1; block.append(lines[j].rstrip())
+                depth += lines[j].count("(") + lines[j].count("{") - lines[j].count(")") - lines[j].count("}")
+            if depth > 0:
+                continue  # the statement does not close within the limit: not a usable snippet
+            if best is None or len(block) < len(best[0]) - 1:
+                best = ([imp, *block], s["task_id"])
+    return ("\n".join(best[0]), best[1]) if best else None
+
+
+def _vue_api_explanation(what: str, n_tasks: int) -> str:
+    return f"Earlier websites broke here ({what}, {n_tasks} tasks). Code that works:"
+
+
+def _refresh_vue_api(connection, llm, code_id: str, where: list[dict], good: list[dict], max_lines: int,
+                     want: dict[str, int], tasks: list[str], info: dict) -> None:
+    """v8: when the stored example no longer imports every API the chain keeps missing, pick a new one from the
+    current good sites (same checks as at creation). The count in the explanation follows the support. The old
+    code is kept in the run log (the row is updated in place: one row per problem key)."""
+    row = connection.execute("SELECT code, explanation FROM code_memories WHERE code_id=?", (code_id,)).fetchone()
+    need = _needed_apis(want)
+    what = "a component calls " + ", ".join(f"{a}()" for a in need) + " without importing it from 'vue' (that page fails when opened)"
+    explanation = _vue_api_explanation(what, len(tasks))
+    if set(need) <= _imported_in(row[0]):
+        if row[1] != explanation:
+            connection.execute("UPDATE code_memories SET explanation=? WHERE code_id=?", (explanation, code_id))
+        return
+    # Prefer a component that uses the needed APIs the stored example lacks (a ref-only one ties otherwise).
+    fix = _fix_from_good_site("vue-api:any", good, max_lines, want, prefer=set(need) - _imported_in(row[0]))
+    if fix is None:
+        info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "result": "no good site"})
+        return
+    picked = _pick_key_lines(llm, fix[0], what, want)
+    code, source_task = picked["code"], fix[1]
+    if not set(need) <= _imported_in(code):
+        # No single small working component uses all of them: one verbatim snippet per API, each from its own
+        # site (two import lines from 'vue' are valid and each stays exactly as written there).
+        parts = [_api_snippet(good, api) for api in need]
+        if all(parts) and sum(len(p[0].splitlines()) for p in parts) <= KEY_LINES_MAX:
+            code = "\n\n".join(p[0] for p in parts)
+            source_task = ",".join(dict.fromkeys(p[1] for p in parts))
+            picked["log"].append({"composed": [p[1] for p in parts]})
+    covered = set(need) & _imported_in(code)
+    if not covered - _imported_in(row[0]):  # nothing new: keep the old example
+        info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "result": "no better example",
+                                               "log": picked["log"]})
+        return
+    connection.execute("UPDATE code_memories SET code=?, explanation=?, source_task_id=? WHERE code_id=?",
+                       (code, explanation, source_task, code_id))
+    info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "old_code": row[0], "new_code": code,
+                                           "source_task": source_task, "log": picked["log"]})
 
 
 def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_root: Path, *, min_tasks: int = 2,
@@ -574,17 +671,19 @@ def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_roo
         "SELECT problem_key, code_id FROM code_memories WHERE agent_id=?", (agent_id,))}
     for key, where in seen.items():
         tasks = sorted({s["task_id"] for s in where})
-        if key in existing:
-            connection.execute("UPDATE code_memories SET support_tasks=? WHERE code_id=?",
-                               (json.dumps(tasks), existing[key]))
-            info["supported"].append(key)
-            continue
-        if len(tasks) < min_tasks:
-            continue
         want: dict[str, int] = {}
         for s in where:
             for a in s["facts"].get("missing_vue_api") or []:
                 want[a] = want.get(a, 0) + 1
+        if key in existing:
+            connection.execute("UPDATE code_memories SET support_tasks=? WHERE code_id=?",
+                               (json.dumps(tasks), existing[key]))
+            info["supported"].append(key)
+            if CODE_POOL_REFRESH and key == "vue-api:any":
+                _refresh_vue_api(connection, llm, existing[key], where, good, max_lines, want, tasks, info)
+            continue
+        if len(tasks) < min_tasks:
+            continue
         fix = _fix_from_good_site(key, good, max_lines, want)
         source = "good_site"
         if fix is not None and key.startswith("import:"):

@@ -1,0 +1,14 @@
+<section id="setup" data-section="实验与结果" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">实验设置</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700">全部自部署，复现官方基线</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:30px">
+<tr><th style="width:28%;text-align:left">角色</th><th style="width:72%;text-align:left">设置</th></tr>
+<tr><td>生成器</td><td>WebGen-LM-7B（vLLM），Bolt.diy，只生成一次、不修复</td></tr>
+<tr><td>功能 / 外观评测</td><td>Qwen2.5-VL-32B（论文外观用 GPT-4o，这是唯一偏差）</td></tr>
+<tr><td>记忆 / 反思</td><td>Qwen2.5-VL-72B-AWQ + bge-m3</td></tr>
+<tr><td>硬件</td><td>学校集群 2×H200，单个任务约 12 分钟</td></tr>
+<tr><td>指标</td><td>准确率 =（通过 + 0.5×部分通过）/ 检查数；外观 1–5；零分题数</td></tr>
+<tr><td>基线复现</td><td>No Memory 101 题 28.5%（论文 28.4%，Lu et al., 2025）</td></tr>
+</table>
+<aside>实验设置。全部模型都部署在学校集群上，不调用任何商业 API。生成器是 WebGen-LM-7B，用 Bolt.diy，只生成一次、不修复。功能和外观评测都用 Qwen2.5-VL-32B；论文的外观评测用 GPT-4o，这是唯一的偏差，所以外观分只在我们自己的组之间比较。记忆和反思用 72B 模型。单个任务大约 12 分钟。准确率等于通过数加一半的部分通过数，除以检查数。No Memory 复现出 28.5%，和论文的 28.4% 几乎一样，说明评测管线是可信的。</aside>
+</section>

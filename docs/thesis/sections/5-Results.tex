@@ -43,30 +43,49 @@ Per task, v7 beats No Memory on 54 tasks, loses on 24 and ties on 23; the mean p
 \end{figure}
 
 \section{Why v4 Declines and v7 Improves}
-\Cref{tab:prompt} counts what actually reached the generator's prompt. In v4, generic entries (``ensure form fields are correctly labelled'') appeared in about two thirds of tasks throughout, and a separate ``General notes'' block became more frequent over time, while nothing addressed blank pages and missing imports. In v7 the concreteness filter almost removed generic entries, and the code pool supplied fragments in most later tasks.
+\Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. In v4 such lessons appear in most tasks throughout and a separate ``General notes'' block becomes more frequent over time, while nothing addresses blank pages. In v7 these lessons are rarer and the code pool supplies a fragment in almost every task after it activates.
 
 \begin{table}[ht]
 \centering
-\caption{Prompt content by segment (number of tasks or items), tasks 1--30 / 31--67.}
+\caption{Prompt content by segment (tasks 1--30 / 31--60 / 61--101).}
 \label{tab:prompt}
 \begin{tabular}{lcc}
 \toprule
 Prompt content & v4 & v7 \\
 \midrule
-Tasks with generic entries & 22 / 21 & 2 / 2 \\
-Tasks with a ``General notes'' block & 13 / 23 & 3 / 0 \\
-Tasks with a code-pool fragment & 0 / 0 & 25 / 37 \\
-Lessons attached to checklist items & 56 / 64 & 32 / 20 \\
+Tasks with a lesson without a code construct & 23 / 25 / 28 & 12 / 4 / 11 \\
+Tasks with a ``General notes'' block & 13 / 16 / 27 & 3 / 0 / 8 \\
+Tasks with a code-pool fragment & 0 / 0 / 0 & 25 / 30 / 41 \\
+Lessons attached to checklist items & 56 / 53 / 81 & 32 / 16 / 41 \\
+\quad of which without a code construct (all tasks) & 102 of 190 & 31 of 89 \\
 \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Generated sites with code problems (number of tasks; 1--30 / 31--60 / 61--101, total in brackets).}
+\label{tab:codeerr}
+\begin{tabular}{lccc}
+\toprule
+Problem & No Memory & v4 & v7 \\
+\midrule
+Whole-site break\textsuperscript{a} & 11 / 5 / 10 (26) & 2 / 5 / 12 (19) & 4 / 1 / 3 (\textbf{8}) \\
+Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 12 / 4 / 6 (22) \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize \textsuperscript{a} An undeclared package import or a Vue compile error.}
 \end{tabular}
 \end{table}
 
 These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
 
 \section{Error Analysis}
-On tasks 31--67, whole-site blank pages or compile errors occurred in 6 (No Memory), 7 (v4) and 1 (v7) tasks, and pages with a missing Vue import in 9, 11 and 4 tasks. Ten of v7's 13 zero-score tasks are also zero for No Memory, suggesting that most remaining failures are genuinely hard tasks for this generator.
+Whole-site breaks fall from 26 tasks (No Memory) to 8 (v7), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22): the code pool prevents the error that blanks the whole site more reliably than the per-page one, which remains a basic error of the 7B generator. Counted per file, 27 of 592 generated Vue components in v7 (4.6\%) call a Vue function without importing it, against 27 of 586 (4.6\%) for No Memory. The omission occurs in \texttt{App.vue} and in child components alike, and is unrelated to whether a component uses \texttt{defineProps}/\texttt{defineEmits}; in the same file other imports are usually correct. It behaves like a random slip at a roughly constant per-file rate rather than a misconception, so a site with more components is more likely to contain one.
 
-Two v7 tasks returned the unmodified scaffold. A local diagnosis traced both to an example that was a complete \texttt{App.vue} file from another site; removing it, or reducing it to a verified fragment, restored real output on one task. This fix is not part of the frozen v7 run.
+\paragraph{An attempted fix.} We tested a variant (v8) that rebuilds the code-pool example whenever the set of frequently missed functions changes, so that it shows both \texttt{ref} and \texttt{computed} (the v7 example was built at task 6 and only ever showed \texttt{ref}). Replacing only the code-pool section of the original v7 prompts, missing imports disappeared in one of four affected tasks and remained in the other three; two high-scoring regression tasks were unaffected. Because a random slip is not corrected by an example, and repairing generated code after generation is not allowed under the official protocol, we kept v7 as the final version and report this error rate as a limitation of the generator. Ten of v7's 13 zero-score tasks are also zero for No Memory, suggesting that most remaining failures are genuinely hard tasks for this generator.
+
+Two v7 tasks returned the unmodified scaffold. A local diagnosis traced both to an example that was a complete \texttt{App.vue} file from another site; reducing it to a verified fragment restored real output on one task. This fix is not part of the frozen v7 run.
 
 \paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. The improvement is therefore functional; memory makes more sites work but does not make working sites look better.
 

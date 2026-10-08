@@ -12,8 +12,8 @@
 ### 2026-10-08：后续 Long Memory 的顺序鲁棒性计划（尚未启动）
 - 用户确认一次完整 101-task global run 约 24 小时，成本不是主要约束。等 v7 或后继版本的 scaffold/import 问题修好且版本冻结后，做 4 次从空库开始的 Long Memory：当前 manifest/domain-block 顺序、seed=11 分层 shuffle、seed=29 分层 shuffle、跨 domain 轮换交错顺序；每次保存精确顺序、seed、检索/注入和评测原始结果。
 - No Memory 做 3 次完整独立复跑，分别与前三种执行顺序配对，作用是量化生成器/基础设施/UI evaluator 波动；其 shuffle 本身不是 treatment。第四次若追求完全对称可加跑 No Memory。正式统计按 task 配对做 Long Memory−No Memory、bootstrap CI，并分 domain、来源域别及执行位置报告。完整决策和解释见 DECISIONS「2026-10-08：Long Memory 顺序鲁棒性正式实验」。
-- **模型/agent 扩展的优先级（用户确认）：** 不立即做多模型×多 agent 的全矩阵。先完成固定 WebGen-LM-7B + Bolt 的顺序鲁棒性主实验；只有四顺序下的收益稳定，才选**一个**架构或能力层级明显不同的生成模型、仍固定 Bolt，跑当前 domain-block 与跨-domain 交错两种顺序下的 Long Memory/No Memory（4 个完整 run）。这样任务、memory pipeline 与评测不变，才能较干净地检验效果是否只属于 7B。
-- **agent 放后面的原因：** 换 OpenHands/Aider 等 agent 会同时改变文件操作、上下文、prompt 注入接口和 repair loop；主效应未稳定前，不能把差异归因于 memory。若前两阶段成立，先用约 20 个按 domain 和 v7 胜/负/平分层抽样任务做跨 agent integration pilot，接口可用后再决定是否完整 101 题。
+- **模型/agent 扩展的最终优先级（用户确认）：** 不做多模型×多 agent 全矩阵。先完成已冻结 WebGen-LM-7B + Bolt 的顺序鲁棒性主实验；其收益若稳定，再只加入一个生成 LLM、agent 仍固定 Bolt。候选定为 **WebGen-LM-14B**：同一 WebGen-LM 训练家族和输出协议，能最小化实现差异，直接检验长期记忆是否仅对 7B 有效。对它跑 domain-block 与跨-domain 交错两种顺序，且每种顺序 Long Memory/No Memory 都按 ABBA 交叉执行，共 4 个完整 global run。不要改用通用 Qwen2.5-Coder-32B 作这一主对照：WebGen 原论文中它的裸 Bolt 基线很低，容易把协议/生成失败误判为记忆失效。
+- **agent 放后面的原因与边界：** 原 WebGen-Bench 虽做了 Bolt/OpenHands/Aider × 多 LLM 的基准矩阵，但那回答的是生成系统强弱；本项目先回答 memory 的因果效应。换 OpenHands/Aider 会同时改变文件操作、上下文、prompt 注入接口和 repair loop，等同重做 agent-specific memory integration，不能与 Bolt 结果直接归因比较。因此只在 7B 顺序鲁棒性和 14B 对照均成立后，做约 20 题的跨 agent integration pilot（按 domain 和 v7 胜/负/平分层）；接口送达与运行稳定后才决定是否扩至 101 题。
 - **视觉模型的用途：** 不把不同视觉模型当作主生成实验的第一优先级。对已有全量截图用第二个强视觉模型复评 appearance；再从 v7 相对 No Memory 的胜/负/平中分层抽样，用第二个 GUI/视觉评测器复核功能结论，重点是白屏、interaction-budget exhaustion 与疑似误判。这是评测稳健性检查，可复用已有 artifacts，远低于重新生成完整 benchmark 的成本。
 
 ### 2026-10-08：v7 101 题跑完（最终结果，单次运行）
@@ -23,8 +23,14 @@
 - 学习曲线已用 101 题重画（曲线是逐题平均，终点 40.8/31.9/29.3，与按检查数合计的数字略有差别）。论文初稿 `docs/thesis/`（Overleaf 包 `docs/thesis_overleaf.zip`）已更新这些数字；PPT 尚未更新（按 `docs/reports/ppt_todo.md` 阶段 1）。
 - 工人作业 23385 已转入"只有清单（v7）"消融。
 
+### 2026-10-08：v7 单页缺 import 为什么没压住（101 题分析，v8 方向）
+- v7 有 22 题某页缺 Vue import，No Memory 23 题，基本相同；整站白屏则 26→8。按文件分类：`ref` 用了但整个文件没有任何 vue import 16 处；已有 `import { ref } from 'vue'` 却漏了 `computed` 8 处（另 onUnmounted、computed 无 import 各 1）。No Memory 是 ref 无 import 15、漏 computed 12，结构相同。
+- 原因：代码池里的 `vue-api:any` 条目在第 6 题（来源 000018）建好后就再也没更新。代码一直是 `import { ref } from 'vue'` + `const bookingId = ref('')`，说明文字也停在"3 tasks"；但 support 已累积到 22 题，其中一半是漏 computed。示例只教了 ref，对漏 computed 没有帮助（甚至示范了"只 import ref"），对整文件不写 import 的小组件（Contact 等页面）模型也没照做。
+- v8 本地试验（`WEBGEN_CODE_POOL_REFRESH=1`，`src/code_memory.py`：示例随缺失 API 分布重建、覆盖 ref+computed（无单个小组件同时用两者，按 API 各摘一段逐字拼接）、缺包示例只给片段、规则兜底去掉 `<script>` 包装）。做法：v7 原 prompt 只替换代码池段，6 题只生成+编译检查（输出在 scratchpad `v8gen/`）。结果：缺 import 4 题只修好 000032（但文件框 v-model 编译错仍在），000088（App.vue 漏 computed）、000069、000075（子组件漏 ref）与 v7 相同；回归 000010、000072 正常（无缺 import，页面数相同或多 1）。
+- 结论：按文件统计，v7 有 27/592 个 .vue 文件漏 import（约 5%），No Memory 27/586，和是否用 defineProps/defineEmits 无关，App.vue 和子组件都有。这更像随机的"笔误"，不是可被示例纠正的误解；1/4 的改善可能是偶然。按官方协议不能生成后补 import，所以暂不把此项作为 v8 主改动（待用户决定）。
+
 ### 2026-10-08：组会 PPT
-- 幻灯片 https://claude.ai/artifact/4hFFsiPiUgY397YXaZhNqE（31 页，源文件在当时 session 的 scratchpad `deck/project/`；丢失时从 artifact 读回）。按实验阶段要补的内容（v7 跑完、消融跑完、顺序实验跑完、外观核对）记在 `docs/reports/ppt_todo.md`，到对应阶段直接按清单更新。
+- 幻灯片 https://claude.ai/artifact/4hFFsiPiUgY397YXaZhNqE（33 页，源文件在 `docs/reports/group_meeting_deck_2026-10/`）。按实验阶段要补的内容（v7 跑完、消融跑完、顺序实验跑完、外观核对）记在 `docs/reports/ppt_todo.md`，到对应阶段直接按清单更新。
 
 ### 2026-10-08：v7 剩余 2 个脚手架的原因与修复（本地，未同步，候选冻结版）
 - v7 的 000001、000011 交了脚手架（No Memory、v4 在这两题都写了真代码但也是 0 分）。000001 本地对照：去掉缺 import 示例仍是脚手架，去掉页面切换示例（整份别站的 `App.vue`）即生成 StockSearch/ReportDisplay → 原因是"完整文件"形式的示例，与 v6 的问题同源。
