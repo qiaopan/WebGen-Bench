@@ -11,6 +11,10 @@
 
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
+### 2026-10-08：投稿评估与后续计划（用户讨论）
+- 评估：作为硕士论文已扎实；投稿现在够 workshop，主会还差关键实验。主要质疑：只有一个 7B 生成器/基准/框架；代码池可能等于固定前缀；在同一基准上迭代（过拟合）；记忆模型 72B 强于生成器；与 Metis 的区别要写准。
+- 计划：先按时交论文（11-16）；之后补 ①固定前缀消融 ②WebGen-LM-14B ③留出验证（前 30 定版、后 71 报告，无需新跑），短期投 workshop，补完考虑 ACL/EMNLP Findings。会议截稿日期待查当期征稿。已写进 PPT 下一步页、论文 Future Work、README。
+
 ### 2026-10-08：顺序实验已排队（集群）
 - 顺序文件 `data/experiment_splits/task_orders/{blocks_seed11,random_seed29,blocks_seed47,interleave}.json`（`scripts/make_task_orders.py`；同领域相邻对数：manifest 81/100，blocks 81，random 6，interleave 0）。
 - `worker_lib.sh` 的 `filler_next` 新增 `P ORDER LM_OUT NM_OUT [LM_CFG]` 行：按顺序文件逐题，位置偶数 L→N、奇数 N→L；顺序文件复制到各输出目录 `task-order.json`。本地模拟 404 步核对通过。已同步集群，并排了一个空操作 `reload-filler` 让补位脚本重启加载新代码。
