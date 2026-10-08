@@ -121,6 +121,9 @@ class MemoryConfig:
     common_pool_concrete_method: bool = False
     code_pool: bool = False
     code_pool_max: int = 2
+    # Fixed-prefix ablation: a JSON file of code-pool entries ({"entries": [{problem_key, name, explanation, code}]})
+    # injected on every task with the same selection rule, instead of the entries learned in this chain's database.
+    code_pool_fixed: str = ""
     retire_min_uses: int = 0
     retire_max_utility: float = 0.3
     # "grouped": appearance lessons come from the grouped, code-cited path (one case per same-fix group,

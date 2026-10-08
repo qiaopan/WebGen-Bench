@@ -1,0 +1,22 @@
+{
+ "description": "v7 final code-pool entries (learned by cluster_longmem_v7_webgenlm7b_r1 over 101 tasks), injected from task 1 for the fixed-prefix ablation (code_pool_fixed). The v-model compile entry is left out: v7 never injected it. Task counts in the explanations are the final support counts.",
+ "source_run": "outputs/experiment/cluster_longmem_v7_webgenlm7b_r1",
+ "entries": [
+  {
+   "problem_key": "vue-api:any",
+   "name": "Component fails: missing imports",
+   "applies_when": "the requirement involves reactive data or lifecycle hooks in a component",
+   "explanation": "Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 22 tasks). Code that works:",
+   "code": "import { ref } from 'vue'\nconst bookingId = ref('')",
+   "source_task_id": "000018"
+  },
+  {
+   "problem_key": "import:vue-router",
+   "name": "Missing package: imports a package that package.json does not declare",
+   "applies_when": "the requirement includes dynamic content switching based on user interaction",
+   "explanation": "Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:",
+   "code": "<script setup lang=\"ts\">\nimport { ref } from 'vue'\nimport HomeView from './views/HomeView.vue'\nimport ServicesView from './views/ServicesView.vue'\nimport BookingView from './views/BookingView.vue'\nimport StatusView from './views/StatusView.vue'\nimport ContactView from './views/ContactView.vue'\n\nconst currentView = ref('home')\n</script>\n\n<template>\n  <div class=\"app-container\">\n    <nav class=\"navbar\">\n      <button @click=\"currentView = 'home'\" class=\"nav-btn\">Home</button>\n      <button @click=\"currentView = 'services'\" class=\"nav-btn\">Services</button>\n      <button @click=\"currentView = 'booking'\" class=\"nav-btn\">Book Now</button>\n      <button @click=\"currentView = 'status'\" class=\"nav-btn\">Service Status</button>\n      <button @click=\"currentView = 'contact'\" class=\"nav-btn\">Contact Us</button>\n    </nav>\n\n    <main class=\"main-content\">\n      <HomeView v-if=\"currentView === 'home'\" />\n      <ServicesView v-if=\"currentView === 'services'\" />\n      <BookingView v-if=\"currentView === 'booking'\" />\n      <StatusView v-if=\"currentView === 'status'\" />\n      <ContactView v-if=\"currentView === 'contact'\" />\n    </main>\n  </div>\n</template>",
+   "source_task_id": "000018"
+  }
+ ]
+}

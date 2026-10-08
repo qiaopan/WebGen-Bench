@@ -54,7 +54,9 @@ wait_http "http://127.0.0.1:$(url_port "$WEBGEN_FUNCTIONAL_EVALUATOR_BASE_URL")/
 # file-selection step produced no usable answer on every build repair (pipetest 23342: 5 repairs, no
 # reply, code unchanged); the penalty also discourages copying file paths and repeated code tokens.
 # Bolt (AI SDK 4) sends temperature 0, so generation stays greedy as before.
-CUDA_VISIBLE_DEVICES="${SERVICE_GPUS[0]}" "$VLLM" serve "$WG/models/WebGen-LM-7B" \
+# Generator weights: WebGen-LM-7B by default; WEBGEN_GENERATOR_WEIGHTS=WebGen-LM-14B for the second-generator
+# experiment (set it, and WEBGEN_GENERATOR_API_MODEL, before the worker job starts).
+CUDA_VISIBLE_DEVICES="${SERVICE_GPUS[0]}" "$VLLM" serve "$WG/models/${WEBGEN_GENERATOR_WEIGHTS:-WebGen-LM-7B}" \
   --served-model-name "$WEBGEN_GENERATOR_API_MODEL" --host 127.0.0.1 \
   --port "$(url_port "$WEBGEN_GENERATOR_BASE_URL")" \
   --api-key "$WEBGEN_GENERATOR_API_KEY" --dtype bfloat16 --max-model-len 32768 \

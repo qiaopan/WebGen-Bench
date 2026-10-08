@@ -1038,15 +1038,22 @@ class ReflectionCaseMemory:
         try:
             from code_memory import APPLICABILITY_INSTRUCTIONS, code_utility
             from memory_statistics import _other_task
-            rows = [dict(r) for r in self.connection.execute(
-                "SELECT code_id, problem_key, name, applies_when, explanation, code, support_tasks, source_task_id "
-                "FROM code_memories WHERE agent_id=? AND status='active'", (self.agent_id,))] \
-                if self._has_table("code_memories") else []
+            fixed = bool(self.config.code_pool_fixed)
+            if fixed:  # ablation: the same entries on every task, nothing read from or written to the database
+                from pathlib import Path
+                entries = json.loads(Path(self.config.code_pool_fixed).read_text(encoding="utf-8"))["entries"]
+                rows = [{**e, "code_id": "fixed:" + e["problem_key"], "support_tasks": "[]", "source_task_id": None}
+                        for e in entries]
+            else:
+                rows = [dict(r) for r in self.connection.execute(
+                    "SELECT code_id, problem_key, name, applies_when, explanation, code, support_tasks, source_task_id "
+                    "FROM code_memories WHERE agent_id=? AND status='active'", (self.agent_id,))] \
+                    if self._has_table("code_memories") else []
             # Leave-one-task-out: an entry made only from the current task's own site is not used.
             # Leave-one-task-out: support is counted without the current task and must still reach min_tasks;
             # code taken from the current task's own site is not used either.
-            kept_rows = []
-            for r in rows:
+            kept_rows = [] if not fixed else rows
+            for r in ([] if fixed else rows):
                 other = [t for t in json.loads(r["support_tasks"] or "[]") if _other_task(t, self.statistics_task_id)]
                 if len(other) >= self.config.code_memory_min_tasks and \
                         (not r["source_task_id"] or _other_task(r["source_task_id"], self.statistics_task_id)):
@@ -1054,9 +1061,9 @@ class ReflectionCaseMemory:
                     r["explanation"] = re.sub(r", \d+ tasks\)", f", {len(other)} tasks)", r["explanation"])
                     kept_rows.append(r)
             rows = kept_rows
-            utility = code_utility(self.connection, self.agent_id)
-            info: dict = {"applied": False, "entries": len(rows), "retired": []}
-            if self.config.retire_min_uses:
+            utility = {} if fixed else code_utility(self.connection, self.agent_id)
+            info: dict = {"applied": False, "entries": len(rows), "retired": [], "fixed": fixed}
+            if self.config.retire_min_uses and not fixed:
                 kept = []
                 for r in rows:
                     u = utility.get(r["code_id"])
@@ -1106,7 +1113,7 @@ class ReflectionCaseMemory:
                     chosen.append(r)
             chosen = chosen[:self.config.code_pool_max]
             info.update({"applied": bool(chosen), "decisions": decisions, "chosen": [r["code_id"] for r in chosen]})
-            if self.record_code_uses:
+            if self.record_code_uses and not fixed:
                 with self.connection:
                     # A rerun replaces the task's earlier use rows (no stale recurred value).
                     self.connection.execute("DELETE FROM code_memory_uses WHERE agent_id=? AND task_id=?",

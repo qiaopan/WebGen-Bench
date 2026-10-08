@@ -15,7 +15,7 @@ run_longmem_tasks() {
     echo "=== Long Memory $id -> $out"
     "$py" scripts/run_continual_memory.py --modes continual --post-task-reflection \
       --memory-representation case_only --memory-config "$memory_config" \
-      --url "$WEBGEN_BOLT_URL" --generator-model WebGen-LM-7B \
+      --url "$WEBGEN_BOLT_URL" --generator-model "${WEBGEN_GENERATOR_API_MODEL:-WebGen-LM-7B}" \
       --output "$out" --database "$out/memory.db" --task-ids "$id" 2>&1 | tee -a "$out/runner-$id.log"
     echo "Long Memory $id exit ${PIPESTATUS[0]} after $(( $(date +%s) - start ))s"
     "$py" scripts/cluster/check_task_health.py "$out" "$id" continual
@@ -45,7 +45,7 @@ run_nomem_tasks() {
     start=$(date +%s)
     echo "=== No Memory $id -> $out"
     "$py" scripts/run_continual_memory.py --modes disabled --memory-config "$memory_config" \
-      --url "$WEBGEN_BOLT_URL" --generator-model WebGen-LM-7B \
+      --url "$WEBGEN_BOLT_URL" --generator-model "${WEBGEN_GENERATOR_API_MODEL:-WebGen-LM-7B}" \
       --output "$out" --database "$out/memory.db" --task-ids "$id"
     local status=$?
     echo "No Memory $id exit $status after $(( $(date +%s) - start ))s"

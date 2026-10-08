@@ -11,6 +11,10 @@
 
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
+### 2026-10-08：固定前缀消融已排队；14B 待准备
+- 集群 `filler.conf` 末尾加了固定前缀（备份 `filler.conf.bak-before-fixed-prefix`），整体：只有清单（v7）→ 种子 11 → 29 → 47 → 交错 → 固定前缀，预计约 10-15 全部完成。src、配置、`worker_lib.sh`、`start_services.sh` 已同步（v7 行为不变，见 DECISIONS）。
+- 14B 待做：下载权重到 `/data/qma258/models/WebGen-LM-14B`（长任务需放进 Slurm 作业）；当前 worker 退出后，用 `WEBGEN_GENERATOR_WEIGHTS=WebGen-LM-14B`、`WEBGEN_GENERATOR_API_MODEL=WebGen-LM-14B`（注意 `.env` 里也有该变量）另提交 worker；先试启动确认显存，再按 manifest 顺序跑 Long Memory/No Memory 的 P 行。
+
 ### 2026-10-08：投稿评估与后续计划（用户讨论）
 - 评估：作为硕士论文已扎实；投稿现在够 workshop，主会还差关键实验。主要质疑：只有一个 7B 生成器/基准/框架；代码池可能等于固定前缀；在同一基准上迭代（过拟合）；记忆模型 72B 强于生成器；与 Metis 的区别要写准。
 - 计划：先按时交论文（11-16）；之后补 ①固定前缀消融 ②WebGen-LM-14B ③留出验证（前 30 定版、后 71 报告，无需新跑），短期投 workshop，补完考虑 ACL/EMNLP Findings。会议截稿日期待查当期征稿。已写进 PPT 下一步页、论文 Future Work、README。

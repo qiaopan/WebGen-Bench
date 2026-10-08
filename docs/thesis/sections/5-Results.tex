@@ -89,9 +89,16 @@ Two v7 tasks returned the unmodified scaffold. A local diagnosis traced both to 
 
 \paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. The improvement is therefore functional; memory makes more sites work but does not make working sites look better.
 
-\section{Ablation: Checklist Only}
+\section{Ablations: Checklist Only and Fixed Code Prefix}
 \label{sec:ablation}
-To separate the effect of requirement decomposition from that of memory, we run v7 with memory writes disabled, on the same task order. \todo{Fill in: Checklist-only accuracy / appearance / zero-score; contribution of checklist vs memory.}
+Two ablations separate the contributions of the components, both with the v7 configuration and the manifest order:
+\begin{itemize}
+  \item \textbf{Checklist only:} v7 with memory reads and writes disabled; each task sees only the requirement checklist. Checklist only $-$ No Memory estimates the effect of requirement decomposition.
+  \item \textbf{Fixed code prefix:} checklist only, plus the two code-pool entries that v7 had learned by the end of its run (\Cref{sec:codepool}), injected from the first task with the same selection rule, still without memory. The code is not written by hand; it is v7's own learned content. Fixed prefix $-$ checklist only estimates the effect of having this code in the prompt, and v7 $-$ fixed prefix the effect of accumulating experience and selecting it per task.
+\end{itemize}
+If the fixed prefix matches v7, the contribution of the method is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation.
+
+\todo{Fill in: accuracy / appearance / zero-score for No Memory, checklist only, fixed prefix and v7, first 30 and last 71 tasks.}
 
 \section{Robustness to Task Order}
 \label{sec:order-design}

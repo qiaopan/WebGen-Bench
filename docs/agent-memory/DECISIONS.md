@@ -420,3 +420,8 @@
 
 ### 2026-10-08：恢复"两类各 2 次"（用户决定，取代上一条缩减）
 - 讨论后认定"领域打散只跑一次"是限制：一次运行分不清顺序效应与运行波动（No Memory 重复能量出自身波动，Long Memory 在同类顺序下的波动只有重复才知道）。资源已申请到（作业约 11-05 到期），因此把种子 47（领域挨着）与交错（领域打散）加回队列，排在 11、29 之后：11-11 前后先有两类各一次，约 10-13–14 全部完成。两类各有 2 次逐题交替执行的运行，manifest 原顺序作额外参照；No Memory 共 5 次。
+
+### 2026-10-08：加入固定前缀消融；准备 WebGen-LM-14B（用户决定）
+- **固定前缀消融：** `code_pool_fixed`（`src/long_memory_runtime.py`，默认空）读 `config/fixed_code_prefix_v7.json`（v7 跑完 101 题后库里的 vue-api 与 vue-router 两条，解释中的题数为最终支持数；v-model 那条 v7 从未注入，不含），每题按与 v7 相同的选择规则注入，不读写记忆、不记录使用。配置 `config/long_memory_cluster_fixed_prefix_v7.json` = 只有清单（v7）+ 该开关；manifest 顺序，输出 `cluster_fixed_prefix_v7_webgenlm7b_r1`，排在顺序实验之后。对比：固定前缀 − 只有清单 = prompt 里有代码；v7 − 固定前缀 = 记忆积累与按题选择。
+- **集群代码同步的约束：** 同步前把 v8 的两处改动（缺包示例 `_pick_fragment`、key-lines 兜底去 `<script>`）也放到 `WEBGEN_CODE_POOL_REFRESH` 开关后；开关关闭时各分支与集群原 v7 代码等价，因此同步 src 不改变正在跑的 v7 系列运行。
+- **WebGen-LM-14B：** 生成器权重与模型名改为可配置（`start_services.sh` 的 `WEBGEN_GENERATOR_WEIGHTS`，`worker_lib.sh` 用 `WEBGEN_GENERATOR_API_MODEL`；集群 `.env` 现为 WebGen-LM-7B）。权重 `luzimu/WebGen-LM-14B`（revision bb5930f6…）尚未下载；当前 worker 加载的是 7B，14B 需在其退出后另提交作业。显存估算：GPU A 上 32B（0.62）+ 14B（0.28 约 39GB，权重约 30GB）偏紧，开跑前需试启动确认。
