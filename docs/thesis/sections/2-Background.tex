@@ -4,6 +4,8 @@
 \section{Website Generation Benchmarks}
 WebGen-Bench~\cite{lu2025webgenbench} contains 101 website requirements from 20 application domains, each paired with a set of functional test cases (647 in total). A generated project is installed and started, and a \gls{gui} agent based on WebVoyager~\cite{he2024webvoyager} executes each test case and returns \emph{Pass}, \emph{Partial} or \emph{Fail}. A separate \gls{vlm} grades the appearance of the landing page from 1 to 5. The authors also release WebGen-LM, generators fine-tuned on agent trajectories; with the Bolt.diy scaffold, WebGen-LM-7B reaches 28.4\% accuracy and an appearance score of 2.5. Larger general models such as Qwen2.5-Coder-32B score lower (9.5\%), which makes the 7B model a good subject: it is neither at the floor nor at the ceiling of the benchmark.
 
+The benchmark paper reports each configuration as a single run without error bars; its NeurIPS checklist states that error bars were not reported because it would be too computationally expensive~\cite{lu2025webgenbench}. The limitations it lists itself are that generation covers only TypeScript, JavaScript, CSS and HTML, and that only supervised fine-tuning was used to improve open models. Because we compare two arms whose difference may be small relative to run-to-run noise, we repeat runs and report paired confidence intervals (\Cref{sec:order-design}).
+
 WebGen-Bench is a static benchmark. It does not define any interaction between tasks, so neither memory across tasks nor the order of tasks is part of its protocol. Introducing memory makes the order a treatment variable, which we handle explicitly in \Cref{sec:order-design}.
 
 \section{Memory for LLM Agents}

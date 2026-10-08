@@ -402,3 +402,15 @@
 
 ### 2026-10-08：停在 v7，单页缺 import 写为生成器局限（用户决定）
 - 按文件统计，v7 27/592、No Memory 27/586 个组件漏 Vue import（约 4.6%），与 App/子组件、是否用 defineProps 无关，像随机笔误。v8 试验（示例随缺失分布重建、覆盖 ref+computed）4 题只改善 1 题。按官方协议不能生成后补 import，所以不再追修，停在 v7；论文与 PPT 把它写为 7B 生成器的残余错误率。v8 代码保留在 `src/code_memory.py`，开关 `WEBGEN_CODE_POOL_REFRESH` 默认关闭。
+
+### 2026-10-08：顺序鲁棒性实验的最终设计（用户决定，修改 Codex 方案）
+- **改为"领域挨着 vs 领域打散"各 2 次。** Codex 方案里种子 11、29 的"分层 shuffle"仍然让同领域的题挨着，四个顺序 3 个是同一类，打散只有交错 1 次，无法稳定比较。改为：
+  - 已有：manifest 原顺序（领域挨着；v7 与 No Memory r1，不是逐题交替执行，作锚点）。
+  - 优先级 1：种子 11，打乱领域块顺序和块内顺序（领域挨着）。
+  - 优先级 2：种子 29，101 题完全随机（领域打散）。
+  - 优先级 3：种子 47，打乱领域块顺序和块内顺序（领域挨着，新种子）。
+  - 优先级 4：跨领域轮换交错（相邻题都来自不同领域，最不利情况）。
+  按此优先级排队：前两个跑完就有"挨着""打散"各一次，后两个是重复，时间不够时也有可用结论。
+- **每个顺序都跑 No Memory**，与 Long Memory 逐题背靠背、ABBA 轮换谁先跑。作用：时间配对；共 5 次 No Memory 可量化运行噪声。原 manifest 顺序的 No Memory r2 从队列删除。
+- **消融（只有清单）不随顺序重复**：它回答组成部分的贡献，且不读写记忆，与 No Memory 一样理论上不受顺序影响，只跑当前 manifest 顺序这一次。
+- **与原论文的关系（已核对原文）：** WebGen-Bench（arXiv 2505.03733）主结果为单次运行、无误差线；其 NeurIPS checklist 第 7 项回答 No，理由是 "Error bars are not reported because it would be too computationally expensive"。其 Limitations（附录 B）没有提这一点。论文中表述为：我们重复 No Memory 以量化运行噪声，并在多种顺序下重复 Long Memory、按任务配对报告置信区间；但每个顺序内 Long Memory 仍是单次运行。

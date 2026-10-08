@@ -9,7 +9,14 @@
 
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
+### 2026-10-08：顺序实验已排队（集群）
+- 顺序文件 `data/experiment_splits/task_orders/{blocks_seed11,random_seed29,blocks_seed47,interleave}.json`（`scripts/make_task_orders.py`；同领域相邻对数：manifest 81/100，blocks 81，random 6，interleave 0）。
+- `worker_lib.sh` 的 `filler_next` 新增 `P ORDER LM_OUT NM_OUT [LM_CFG]` 行：按顺序文件逐题，位置偶数 L→N、奇数 N→L；顺序文件复制到各输出目录 `task-order.json`。本地模拟 404 步核对通过。已同步集群，并排了一个空操作 `reload-filler` 让补位脚本重启加载新代码。
+- 集群 `filler.conf`（备份 `filler.conf.bak-before-orders`）：只有清单（v7）→ P 种子 11 → P 种子 29 → P 种子 47 → P 交错；No Memory r2（manifest）已删除。输出 `outputs/experiment/cluster_order_<名>_{longmem_v7,nomem}`。每个顺序约 30 小时，预计 10-13 前后全部完成；10-16 组会。
+- **作业上限：** 23385 于 10-06 开始，30 天上限约 11-05，足够。
+
 ### 2026-10-08：后续 Long Memory 的顺序鲁棒性计划（尚未启动）
+- **（10-08 更新）最终设计见 DECISIONS「顺序鲁棒性实验的最终设计」：领域挨着（种子 11、47）vs 领域打散（种子 29 完全随机、交错）各 2 次，按 11 → 29 → 47 → 交错 的优先级排队；每个顺序 Long Memory/No Memory ABBA 成对；消融不随顺序重复。下面是 Codex 的原方案，仅作记录。**
 - 用户确认一次完整 101-task global run 约 24 小时，成本不是主要约束。等 v7 或后继版本的 scaffold/import 问题修好且版本冻结后，做 4 次从空库开始的 Long Memory：当前 manifest/domain-block 顺序、seed=11 分层 shuffle、seed=29 分层 shuffle、跨 domain 轮换交错顺序；每次保存精确顺序、seed、检索/注入和评测原始结果。
 - No Memory 做 3 次完整独立复跑，分别与前三种执行顺序配对，作用是量化生成器/基础设施/UI evaluator 波动；其 shuffle 本身不是 treatment。第四次若追求完全对称可加跑 No Memory。正式统计按 task 配对做 Long Memory−No Memory、bootstrap CI，并分 domain、来源域别及执行位置报告。完整决策和解释见 DECISIONS「2026-10-08：Long Memory 顺序鲁棒性正式实验」。
 - **模型/agent 扩展的最终优先级（用户确认）：** 不做多模型×多 agent 全矩阵。先完成已冻结 WebGen-LM-7B + Bolt 的顺序鲁棒性主实验；其收益若稳定，再只加入一个生成 LLM、agent 仍固定 Bolt。候选定为 **WebGen-LM-14B**：同一 WebGen-LM 训练家族和输出协议，能最小化实现差异，直接检验长期记忆是否仅对 7B 有效。对它跑 domain-block 与跨-domain 交错两种顺序，且每种顺序 Long Memory/No Memory 都按 ABBA 交叉执行，共 4 个完整 global run。不要改用通用 Qwen2.5-Coder-32B 作这一主对照：WebGen 原论文中它的裸 Bolt 基线很低，容易把协议/生成失败误判为记忆失效。
@@ -22,6 +29,7 @@
 - 外观：只看两组都有可用网站且有外观分的 68 题，No Memory 3.25、v7 3.22 → 增益只在功能，不在外观（局限措辞据此确定）。注意外观均值只算有评分的任务，与 67 题中期报告的口径不同。
 - 学习曲线已用 101 题重画（曲线是逐题平均，终点 40.8/31.9/29.3，与按检查数合计的数字略有差别）。论文初稿 `docs/thesis/`（Overleaf 包 `docs/thesis_overleaf.zip`）已更新这些数字；PPT 尚未更新（按 `docs/reports/ppt_todo.md` 阶段 1）。
 - 工人作业 23385 已转入"只有清单（v7）"消融。
+- 10-08 用户决定删掉队列第 5 项（旧版 v4 只有清单，4/101，已被 v7 版消融取代）：`filler.conf` 中注释掉，备份 `filler.conf.bak-drop-old-abl`。剩余队列：只有清单（v7）→ No Memory r2，预计 10-10 上午跑完，空闲 60 分钟后作业退出。
 
 ### 2026-10-08：v7 单页缺 import 为什么没压住（101 题分析，v8 方向）
 - v7 有 22 题某页缺 Vue import，No Memory 23 题，基本相同；整站白屏则 26→8。按文件分类：`ref` 用了但整个文件没有任何 vue import 16 处；已有 `import { ref } from 'vue'` 却漏了 `computed` 8 处（另 onUnmounted、computed 无 import 各 1）。No Memory 是 ref 无 import 15、漏 computed 12，结构相同。

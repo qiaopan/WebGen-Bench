@@ -95,29 +95,33 @@ To separate the effect of requirement decomposition from that of memory, we run 
 
 \section{Robustness to Task Order}
 \label{sec:order-design}
-With memory, the order of tasks determines which experience is available, so a single order is not sufficient evidence. We therefore run Long Memory from an empty memory four times, each over all 101 tasks:
-\begin{enumerate}
-  \item the manifest (domain-block) order;
-  \item a stratified shuffle with seed 11;
-  \item a stratified shuffle with seed 29;
-  \item a cross-domain interleaved order.
-\end{enumerate}
-In each order, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first in an ABBA pattern, so that drift in infrastructure or evaluator load affects both arms equally. Results are reported per order as task-level paired differences with bootstrap \glspl{ci}, and by domain and position.
+WebGen-Bench is a static benchmark: tasks are solved independently and its main results are single runs without error bars, which the authors attribute to computational cost~\cite{lu2025webgenbench}. With memory, however, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
+
+We therefore compare two kinds of order, each run twice, every run starting from an empty memory and covering all 101 tasks:
+\begin{description}
+  \item[Domains adjacent.] The order of the 20 domain blocks and the order of tasks within each block are shuffled, with seed 11 and seed 47. The manifest order, used for the main results, also belongs to this kind.
+  \item[Domains mixed.] A uniformly random order of all 101 tasks (seed 29), and an interleaved order that takes one task from each domain in turn, so that consecutive tasks always come from different domains.
+\end{description}
+The runs are scheduled by priority (seed 11, seed 29, seed 47, interleaved), so that one run of each kind is available first.
+
+In every order, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first (ABBA), so that drift in infrastructure or evaluator load affects both arms equally. No Memory is not expected to depend on order; its five runs (the original and one per order) instead measure run-to-run noise, against which the Long Memory gain can be judged. The checklist-only ablation does not read or write memory and is therefore run only once. Results are reported per order as task-level paired differences with bootstrap \glspl{ci}, and by domain, source of the injected experience (same or other domain) and position.
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments. \todo{Fill in when complete.}}
+\caption{Task-order experiments (single run of each arm per order). \todo{Fill in when complete.}}
 \label{tab:order}
-\begin{tabular}{lcccc}
+\begin{tabular}{llcccc}
 \toprule
-Order & NM acc. & LM acc. & Paired diff. (95\% \gls{ci}) & Zero-score NM / LM \\
+Kind & Order & NM acc. & LM acc. & Paired diff. (95\% \gls{ci}) & Zero NM / LM \\
 \midrule
-Manifest & -- & -- & -- & -- \\
-Shuffle (seed 11) & -- & -- & -- & -- \\
-Shuffle (seed 29) & -- & -- & -- & -- \\
-Interleaved & -- & -- & -- & -- \\
+Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & $+11.5$ [6.0, 16.9] & 30 / 13 \\
+Adjacent & Shuffled blocks (seed 11) & -- & -- & -- & -- \\
+Adjacent & Shuffled blocks (seed 47) & -- & -- & -- & -- \\
+Mixed & Random (seed 29) & -- & -- & -- & -- \\
+Mixed & Interleaved & -- & -- & -- & -- \\
 \bottomrule
+\multicolumn{6}{l}{\footnotesize \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.}
 \end{tabular}
 \end{table}
 
-\todo{Interpretation: stable gain in all orders (general benefit), gain only in domain blocks (curriculum effect), or worse when interleaved (cross-domain retrieval bottleneck).}
+\todo{Interpretation: a gain in both kinds of order indicates a general benefit; a gain only with adjacent domains indicates a curriculum effect; a clearly smaller gain in the interleaved order points to cross-domain retrieval as a bottleneck.}
