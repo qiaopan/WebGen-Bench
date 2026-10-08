@@ -1,6 +1,8 @@
 # 项目背景（Project Context）
 
 > **2026-10-03：WebGen-Bench 这一阶段已封版归档**（总结见根目录 `README.md`，快照见 `archive/phase1-webgen-2026-10/`）。下一阶段可能转向 SWE 类基准；下面描述的是本阶段的架构。
+>
+> **2026-10-05：WebGen 在学校 H200 集群上重启**，全部自部署、不调 Azure、采用官方评测协议（见 DECISIONS「WebGen 第二阶段」）。下文的 Azure 角色只适用于第一阶段。
 
 ## 研究目标与范围
 

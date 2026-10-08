@@ -87,6 +87,42 @@ class MemoryConfig:
     guidance_condense: bool = False
     guidance_max_items: int = 5
     guidance_max_ratio: float = 1.0
+    # Second-phase changes (2026-10-06, off by default so earlier configs behave as before):
+    # only hard_match cases are injected (no soft_transfer); guidance lines the one-shot front-end generator
+    # cannot carry out (installing packages, external APIs, a backend or database) are dropped by code.
+    relevance_hard_only: bool = False
+    guidance_executable_filter: bool = False
+    guidance_hard_cap: bool = False  # never exceed guidance_max_items (no restored common lines)
+    # Source-side dedupe of functional/implementation lessons (same cause and fix -> one more support, not a
+    # new case) and utility-weighted common-pool ranking (lessons that kept recurring after use rank lower).
+    store_dedupe: bool = False
+    utility_ranking: bool = False
+    # v4 (2026-10-07): the requirement is restated as a feature checklist (memory model) and each guidance
+    # line is attached to the checklist item it is about; the requirement stays verbatim above it. Applied
+    # even when there is no guidance, so a smaller guidance list cannot shrink what gets built.
+    requirement_checklist: bool = False
+    # False = nothing from a run is stored (no trajectory, reflection, cases or statistics): a prompt-only ablation.
+    memory_write: bool = True
+    # v5 (2026-10-07): code memory - recurring breakage found by code on earlier sites of this chain (undeclared
+    # imports, template compile errors) is answered with code from an earlier site that worked (src/code_memory.py).
+    code_memory: bool = False
+    code_memory_min_tasks: int = 2
+    # v5: common-pool lines without a concrete construction (ref, v-if, @click, ...) are dropped: the small
+    # generator follows code, and generic lines ("ensure fields are labeled") filled the pool.
+    common_pool_concrete_only: bool = False
+    # v5: the checklist must cover the requirement - at least this share of the requirement's content words appear
+    # in its items (code check); otherwise one retry naming the missing words, then the sentence fallback. 0 = off.
+    checklist_min_coverage: float = 0.0
+    # v6: code pool kept in the database (code_memories), written after each task, each entry with a name and
+    # the requirement condition it applies to; at most code_pool_max entries whose condition holds are injected.
+    # Entries/lessons used >= retire_min_uses times with utility < retire_max_utility are no longer injected.
+    # v6: common-pool rewriting generalises only the condition ("when the site has several pages") and keeps the
+    # method concrete (a construct or code); a lesson with no concrete method is not returned.
+    common_pool_concrete_method: bool = False
+    code_pool: bool = False
+    code_pool_max: int = 2
+    retire_min_uses: int = 0
+    retire_max_utility: float = 0.3
     # "grouped": appearance lessons come from the grouped, code-cited path (one case per same-fix group,
     # needs the site's code as evidence); "single": the original one-case path.
     appearance_reflection: str = "single"

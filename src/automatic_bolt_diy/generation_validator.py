@@ -33,6 +33,14 @@ def _external_resource_failure(message: str) -> bool:
     return bool(match) and not re.match(r"https?://(127\.0\.0\.1|localhost|\[::1\])[:/]", match.group(1))
 
 
+def official_protocol() -> bool:
+    """WEBGEN_OFFICIAL_PROTOCOL=1: gate generation the way the WebGen-Bench evaluation does - the site
+    only has to install and start its dev server. No production build (vue-tsc etc.) and no browser
+    console check: the paper never builds, it starts `npm run dev` under PM2 and lets the UI agent test
+    whatever is served."""
+    return os.environ.get("WEBGEN_OFFICIAL_PROTOCOL") == "1"
+
+
 def validate_generated_zip(zip_path: str | Path) -> dict:
     """Return a compact validation report without calling an LLM."""
     archive = Path(zip_path)
@@ -57,7 +65,7 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
                 return {"ok": False, "phase": "install", "error": detail}
 
             scripts = package.get("scripts", {})
-            if "build" in scripts:
+            if "build" in scripts and not official_protocol():
                 build = _run(["npm", "run", "build"], app_dir, 180)
                 if build.returncode:
                     detail = (build.stderr or build.stdout)[-4000:]
@@ -89,6 +97,8 @@ def validate_generated_zip(zip_path: str | Path) -> dict:
             startup_output = process_log.read()
             if process.poll() is not None:
                 return {"ok": False, "phase": "start", "error": startup_output[-4000:]}
+            if official_protocol():
+                return {"ok": True, "phase": "started", "official_protocol": True}
             match = re.search(r"https?://(?:localhost|127\.0\.0\.1):(\d+)", startup_output)
             browser_port = int(match.group(1)) if match else port
 

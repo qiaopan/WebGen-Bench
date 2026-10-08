@@ -19,6 +19,31 @@ TABLE_NAMES = ("trajectories", "reflection_cases", "experiences", "skills", "mem
 # Optional side tables are created on first use and are not part of the validated core
 # schema, so databases written before they existed still open. Core tables stay strict.
 OPTIONAL_TABLES_DDL = {
+    # v6 code memory (src/code_memory.py): code that fixes a recurring breakage, with a name and the condition
+    # (in terms of the website requirement) under which it applies. Append-only apart from support/status.
+    "code_memories": """CREATE TABLE IF NOT EXISTS code_memories (
+    code_id TEXT PRIMARY KEY,
+    agent_id TEXT NOT NULL,
+    problem_key TEXT NOT NULL,
+    name TEXT NOT NULL,
+    applies_when TEXT NOT NULL,
+    explanation TEXT NOT NULL,
+    code TEXT NOT NULL,
+    source TEXT NOT NULL,
+    source_task_id TEXT,
+    support_tasks TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(support_tasks)),
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'retired')),
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    UNIQUE (agent_id, problem_key)
+) STRICT""",
+    # One row per (task, injected code memory); recurred = the same breakage was still found in that task's site.
+    "code_memory_uses": """CREATE TABLE IF NOT EXISTS code_memory_uses (
+    agent_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    code_id TEXT NOT NULL,
+    recurred INTEGER CHECK (recurred IN (0, 1)),
+    PRIMARY KEY (agent_id, task_id, code_id)
+) STRICT""",
     "run_facts": """CREATE TABLE IF NOT EXISTS run_facts (
     fact_id TEXT PRIMARY KEY,
     agent_id TEXT NOT NULL,
@@ -63,7 +88,7 @@ OPTIONAL_TABLES_DDL = {
     agent_id TEXT NOT NULL,
     supported_case_id TEXT NOT NULL REFERENCES reflection_cases(case_id),
     supporting_trajectory_id TEXT NOT NULL REFERENCES trajectories(trajectory_id),
-    channel TEXT NOT NULL CHECK (channel = 'appearance'),
+    channel TEXT NOT NULL CHECK (channel IN ('appearance', 'functional')),
     observed_result TEXT NOT NULL,
     preventative_action TEXT NOT NULL,
     evidence_refs TEXT NOT NULL DEFAULT '[]'

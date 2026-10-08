@@ -66,6 +66,25 @@ def append_event(path: Path, event: dict) -> None:
                                 sort_keys=True) + "\n")
 
 
+def with_unreached_checks(evaluation: list[dict], task: dict) -> list[dict]:
+    """A check with no evaluator transcript means the UI agent never reached the site (the official
+    evaluation skips apps whose dev server did not come up). The official accuracy keeps those checks
+    in the denominator with score 0, so record them as failed instead of dropping them."""
+    present = {item.get("check") for item in evaluation}
+    missing = [{"check": f"task000001_{index}", "outcome": "failed", "answer": "",
+                "failure_stage": "start", "failure_type": "start_failed",
+                "failure_reason": "No evaluator transcript: the site was not reachable under PM2",
+                "reached_target_action": False, "logic_failure_observed": False}
+               for index in range(len(task.get("ui_instruct", [])))
+               if f"task000001_{index}" not in present]
+    functional = [item for item in evaluation if item.get("check") != "appearance"]
+    appearance = [item for item in evaluation if item.get("check") == "appearance"]
+    if not appearance:
+        appearance = [{"check": "appearance", "outcome": "scored", "score": None,
+                       "failure_stage": "start", "failure_type": "start_failed"}]
+    return sorted(functional + missing, key=lambda item: int(item["check"].rsplit("_", 1)[-1])) + appearance
+
+
 @contextlib.contextmanager
 def exclusive_evaluation_lock() -> None:
     """Serialize evaluators that use the host-global PM2 service namespace.
@@ -438,15 +457,20 @@ def main() -> None:
     memory_log = JsonlRunLog(output / "memory-events.jsonl")
     completed = completed_keys(progress_path)
     settings = load_long_memory_settings(args.memory_config.resolve())
-    # Generator routing lives inside the selected Bolt service.  Memory LLM and
-    # embedding calls stay on Azure regardless of whether Bolt uses GPT or Qwen.
-    azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/")
-    memory_base_url = (args.memory_base_url or os.environ.get("WEBGEN_MEMORY_BASE_URL")
-                       or f"{azure_endpoint}/openai/v1")
-    memory_api_key = os.environ["AZURE_OPENAI_API_KEY"]
+    # Generator routing lives inside the selected Bolt service.  Memory/reflection LLM and embedding
+    # default to Azure; WEBGEN_MEMORY_* / WEBGEN_EMBEDDING_* point them at self-hosted servers
+    # (cluster profile), where the embedding model is served separately from the memory LLM.
+    memory_base_url = args.memory_base_url or os.environ.get("WEBGEN_MEMORY_BASE_URL")
+    if not memory_base_url:
+        memory_base_url = os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/") + "/openai/v1"
+    memory_api_key = os.environ.get("WEBGEN_MEMORY_API_KEY") or os.environ["AZURE_OPENAI_API_KEY"]
     generator_model = args.generator_model or os.environ["WEBGEN_GENERATOR_API_MODEL"]
     client = OpenAI(api_key=memory_api_key, base_url=memory_base_url,
-                    timeout=120, max_retries=2)
+                    timeout=600, max_retries=2)
+    embedding_base_url = os.environ.get("WEBGEN_EMBEDDING_BASE_URL")
+    embedding_client = client if not embedding_base_url else OpenAI(
+        api_key=os.environ.get("WEBGEN_EMBEDDING_API_KEY") or memory_api_key,
+        base_url=embedding_base_url, timeout=120, max_retries=2)
     llm = AzureMemoryLLM(client, settings.memory_llm["deployment"],
         max_tokens=settings.memory_llm["max_completion_tokens"],
         rate_limit_retries=settings.memory_llm["rate_limit_retries"],
@@ -455,9 +479,12 @@ def main() -> None:
         rate_limit_long_retry_seconds=settings.memory_llm["rate_limit_long_retry_seconds"],
         rate_limit_long_retries=settings.memory_llm["rate_limit_long_retries"])
     reflection_llm = memory_llm_from_settings(client, settings.reflection_llm)
-    embedder = AzureEmbedder(client, settings.embedding["deployment"],
+    embedder = AzureEmbedder(embedding_client, settings.embedding["deployment"],
                              dimensions=settings.embedding["dimensions"])
     max_repair_attempts = int(os.environ.get("WEBGEN_MAX_REPAIR_ATTEMPTS", "1"))
+    official = os.environ.get("WEBGEN_OFFICIAL_PROTOCOL") == "1"
+    if official:
+        max_repair_attempts = 0  # the WebGen-Bench protocol generates once and evaluates it as is
     metadata = {"protocol": "continual-domain-block-v1", "manifest": str(args.manifest.resolve()),
                 "manifest_sha256": file_hash(args.manifest.resolve()), "memory_config_sha256": file_hash(args.memory_config.resolve()),
                 "generator_model": generator_model, "memory_model": settings.memory_llm["deployment"],
@@ -473,6 +500,7 @@ def main() -> None:
                 "post_task_reflection": args.post_task_reflection,
                 "memory_representation": args.memory_representation,
                 "modes": list(args.modes),
+                "official_protocol": official, "max_repair_attempts": max_repair_attempts,
                 "guidance_selfcheck": args.guidance_selfcheck,
                 "guidance_file_sha256": file_hash(args.guidance_file.resolve()) if args.guidance_file else None}
     metadata_path = output / "run-metadata.json"
@@ -562,6 +590,7 @@ def main() -> None:
                         if usable:
                             instruction = task["instruction"] + "\n\nCURRENT-TASK IMPLEMENTATION PATTERNS:\n- " + "\n- ".join(usable)
                     memory.statistics_task_id = task_id
+                    memory.record_code_uses = bool(settings.memory.memory_write)
                     result = run_with_retries(memory, instruction, adapter,
                                               label=f"{task_id}:{mode}",
                                               task_domain=task["application_type"], tolerate_failure=True)
@@ -581,7 +610,11 @@ def main() -> None:
             else:
                 with exclusive_evaluation_lock():
                     run_evaluators(destination, task_file, 1)
-                evaluation = evaluations(destination, 1)
+                try:
+                    evaluation = evaluations(destination, 1)
+                except RuntimeError:  # no transcript and no screenshot: the site never came up under PM2
+                    evaluation = []
+                evaluation = with_unreached_checks(evaluation, task)
             event = {"key": key, "status": "complete", "batch": batch_number,
                      "task_id": task_id, "mode": mode, "evaluation": evaluation}
             if generation_failed:
@@ -590,6 +623,15 @@ def main() -> None:
                 event["prompt_delivered"] = prompt_delivered(result)
                 if event["prompt_delivered"] is False:
                     log_line(f"[continual] WARNING {task_id}:{mode}: Bolt did not receive the whole prompt")
+            if mode == "continual" and not settings.memory.memory_write:
+                # Prompt-only ablation (e.g. checklist without memory): the prompt pipeline ran, but nothing from
+                # this run is stored, so every later task starts from the same empty memory.
+                append_event(progress_path, event)
+                completed.add(key)
+                reports.append(event)
+                log_line(f"[continual] completed {ordinal}/{len(tasks)} batch {batch_number} "
+                         f"{task_id} {mode} (memory_write off: nothing stored)")
+                continue
             if mode == "continual" and generation_failed:
                 # The project never built: keep it as provenance, count every check as failed, and learn from it.
                 evidence = failed_generation_evidence(destination)
@@ -606,6 +648,10 @@ def main() -> None:
                 record_statistics(database, llm, task, trajectory_id, evidence["archive"], evaluation,
                                   [lesson["implementation_reflection"]["likely_cause_or_limitation"]] if lesson else [],
                                   destination, generation_ok=False)
+                if settings.memory.code_pool:  # failed task: its injected code memories count as not preventing it
+                    with ReflectionCaseMemory(str(database), "bolt", llm=llm, embedder=embedder,
+                                              config=settings.memory, log=memory_log) as memory:
+                        event["code_pool"] = memory.update_code_pool(task_id)
                 event.update({"trajectory_id": trajectory_id, "generation_failed": True, "stack": stack,
                               "case_ids": case_ids, "error": result.get("error", "")[-500:]})
                 append_event(progress_path, event)
@@ -644,6 +690,8 @@ def main() -> None:
                     event["accepted_reflection_count"] = reflection["accepted_reflection_count"]
                     event["raw_reflection_count"] = reflection["raw_reflection_count"]
                     event["reflection_count"] = reflection["accepted_reflection_count"]
+                    if getattr(reflection_llm, "context_trims", None):
+                        event["reflection_context_trims"] = reflection_llm.context_trims
                 if args.memory_representation == "case_only":
                     with ReflectionCaseMemory(str(database), "bolt", llm=llm, embedder=embedder,
                                               config=settings.memory, log=memory_log) as memory:
@@ -665,6 +713,10 @@ def main() -> None:
                                       cases=[item for item in [*reflection.get("functional_reflections", []),
                                                                reflection.get("implementation_reflection")]
                                              if isinstance(item, dict) and item.get("outcome") != "success"])
+                    if settings.memory.code_pool:
+                        with ReflectionCaseMemory(str(database), "bolt", llm=llm, embedder=embedder,
+                                                  config=settings.memory, log=memory_log) as memory:
+                            event["code_pool"] = memory.update_code_pool(task_id)
                     refs = []
                 else:
                     evidence_loader = reflective_evidence_loader(exported_chat_evidence, reflection_path)

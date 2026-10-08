@@ -20,9 +20,13 @@ done
 }
 [[ "$port" == <-> ]] || { print -u2 "--port must be an integer"; exit 2; }
 
+# A generator URL already in the environment wins over .env: the cluster queue shifts ports per job
+# (scripts/cluster/start_services.sh) so two jobs on one node each reach their own generator.
+preset_generator_url="${WEBGEN_GENERATOR_BASE_URL:-}"
 set -a
 source "$project_root/.env"
 set +a
+if [[ -n "$preset_generator_url" ]]; then WEBGEN_GENERATOR_BASE_URL="$preset_generator_url"; fi
 
 if [[ "$provider" == "azure" ]]; then
   : "${AZURE_OPENAI_API_KEY:?AZURE_OPENAI_API_KEY is required}"

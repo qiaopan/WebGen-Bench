@@ -15,7 +15,7 @@ import re
 import sqlite3
 import struct
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Sequence
 
 from long_memory import connect_database, ensure_optional_tables
@@ -112,6 +112,21 @@ Return JSON only, in exactly this shape:
 with exactly one entry per candidate and 1-3 current-task implementation_checks
 for selected candidates."""
 
+REQUIREMENT_CHECKLIST_INSTRUCTIONS = (
+    "Split the website requirement into a checklist of every page and feature it asks for, one short line each, "
+    "in the requirement's own words: add nothing that the requirement does not ask for and leave nothing out "
+    "(the colours count as one item). Then attach each guidance note to the ONE checklist item it is about, "
+    "copying the note verbatim; leave a note that is about no single item unattached. Return JSON "
+    '{"items":[{"feature":str,"notes":[str]}]}.')
+
+# v6 addition (common_pool_concrete_method): ExpeL-style "insight + example" / Metis "plan + tool" - the condition
+# may be general, the method must stay concrete.
+COMMON_POOL_CONCRETE_METHOD = (
+    "\nGeneralise only WHEN a pattern applies (e.g. \"when the site has several pages\"); keep HOW concrete: name the "
+    "construct or code that does it (e.g. a ref holding the current page and v-if on each page). A pattern whose "
+    "source lessons give no concrete method is not returned. Write each pattern as \"When <condition>: <concrete "
+    "method>.\"")
+
 COMMON_POOL_ADAPTATION_INSTRUCTIONS = """You maintain a short list of implementation pitfalls that apply to ANY
 website, whatever its features. You get historical implementation cases (how earlier websites were
 built and what went wrong), ordered by priority, most important first. Merge and rewrite them into at
@@ -135,6 +150,13 @@ label the builder cannot know in advance. A condition is for how the site is bui
 flow, rendering), never a way to keep how one feature should behave ("If the website has a news
 section, it must render articles" is a feature lesson: drop it). Return JSON only:
 {"patterns":[{"implementation_pattern":str,"source_case_ids":[str]}]}."""
+
+CASE_SAME_LESSON_INSTRUCTIONS = """Decide whether a NEW lesson from a website-generation memory is the SAME
+lesson as one of the EXISTING ones. It is the same lesson only when BOTH hold: the cause is the same kind of defect
+(for example a handler that never switches the view, a feature with no entry point, a package imported but not
+declared) and the preventative action asks for the same change. The site, its features, page names and wording
+may differ. A different cause, or the same cause with a different fix, is a different lesson. Return JSON only:
+{"same_as": <case_id of the matching existing lesson, or null>, "reason": str}."""
 
 IMPLEMENTATION_LESSON_GROUP_INSTRUCTIONS = """Group implementation lessons that state the SAME underlying requirement for a
 website's build (for example "validate forms inline, never with a blocking browser alert" is one lesson
@@ -188,6 +210,16 @@ must show. Name the concrete element or state that must exist and when it appear
 sentence about one behaviour, rather than describing qualities such as clear or persistent. Do NOT narrate a user session ("when a user does X, then ..."), and do
 not use tester or runtime verbs (run, test, verify, check that, fix, click, select,
 open, observe, navigate); feature names such as "service status check" are fine.
+Concrete construction is mandatory when the cause is a client-side interaction or
+view-state defect: name the Vue construction that the generated code must contain,
+not merely the desired outcome. For example, a page switch must say to keep the
+active view in `ref` state and render the views with `v-if`; a form result must say
+to update a result/message state in the submit handler and render it with `v-if`;
+a generated list must say to keep the items in a local array and render them with
+`v-for`. These are examples of *form*, not extra features: use only a construction
+that the supplied case and current aspect support. Do not replace such a construction
+with "ensure", "make sure", "correctly", "reliably", "consistent", or a bare
+feature name. Preserve any supported Vue/code token from the historical lesson.
 It must not mention any field, control or feature that the current requirement
 lacks, and must not copy old wording, colours, or layout. Historical trigger and
 verification text is evidence only; convert it into what must be built. When the case
@@ -216,6 +248,32 @@ failure mode. Candidate output is advisory only; it must not alter the current t
 
 # Target length of one condensed guidance item after its "Part:" prefix (characters).
 ITEM_MAX_CHARS = 90
+_UNEXECUTABLE = re.compile(
+    r"\b(install(ed|ing)?|npm|package\.json|dependenc(y|ies)|backend|back-end|server[- ]side|database|"
+    r"external (api|data|data source|service)|rest api|api endpoint|endpoint|router|routing library|"
+    r"numerical labels?|numeric labels?)\b", re.I)
+
+# A small model follows concrete Vue constructions much more reliably than prose such
+# as "ensure the pages are connected".  These are not hand-written lessons: they are
+# tokens already present in a reflected/adapted lesson.  During condensation we only
+# protect them from being paraphrased away.
+_CODE_SHAPE = re.compile(r"\b(?:ref|reactive|computed|watch|v-if|v-else|v-for|@click|@submit|"
+                         r"@input|@change|emit|localStorage|sessionStorage)\b")
+
+
+# Words too generic to show that a checklist item comes from this requirement (v4 checklist gate).
+_GENERIC_WORDS = frozenset("""page pages website websites site section sections feature features function
+functions functionality functionalities user users should able have with that this they their them from into
+also allow allows allowing provide provides component components display show view views list item items
+information system platform implement build create include includes using used other each every""".split())
+
+
+def _content_words(text: str) -> set[str]:
+    return {w.rstrip("s") for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _GENERIC_WORDS}
+
+
+def _code_shapes(text: str) -> set[str]:
+    return {match.group(0).lower() for match in _CODE_SHAPE.finditer(text)}
 
 
 @dataclass(frozen=True)
@@ -236,6 +294,19 @@ class CasePacket:
     common_case_ids: tuple[str, ...] = ()  # source cases of the common lines (for run records)
     # Statistical memory: recorded facts about earlier runs (see memory_statistics.py).
     statistics: str = ""
+    # v4: the requirement restated item by item, each with the guidance lines attached to it (verbatim), plus
+    # guidance about no single item. When set, it replaces the guidance/common sections in the prompt.
+    checklist: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    checklist_general: tuple[str, ...] = ()
+    # v5 code memory: (explanation, code) pairs taken from earlier sites that worked.
+    code_examples: tuple[tuple[str, str], ...] = ()
+    code_examples_header = "\n\nCODE FROM EARLIER WEBSITES THAT WORKED:\n"
+
+    checklist_header = (
+        "\n\nFEATURE CHECKLIST (the requirement above, item by item; build every item):\n"
+    )
+    checklist_general_header = "\n\nGeneral notes from earlier websites:\n"
+    checklist_footer = "\n\nBuild every checklist item; the notes only warn about mistakes earlier websites made."
 
     guidance_header = (
         "\n\nIMPLEMENTATION GUIDANCE FROM PAST TASKS:\n"
@@ -255,6 +326,16 @@ class CasePacket:
     )
 
     def _sections(self) -> list[tuple[str, str]]:
+        if self.checklist:
+            lines = []
+            for index, (feature, notes) in enumerate(self.checklist, 1):
+                lines.append(f"{index}. {feature}")
+                lines.extend(f"   Note from earlier websites: {note}" for note in notes)
+            sections = [(self.checklist_header, "\n".join(lines)),
+                        (self.checklist_general_header, "\n".join(f"- {t}" for t in self.checklist_general)),
+                        (self.code_examples_header, self._code_text()),
+                        (self.statistics_header, self.statistics)]
+            return [(header, text) for header, text in sections if text]
         lines = []
         for item in self.cases:
             pattern = str(item.content.get("implementation_pattern", "")).strip()
@@ -264,8 +345,12 @@ class CasePacket:
                 lines.append(f"- {pattern}")
         sections = [(self.guidance_header, "\n".join(lines)),
                     (self.common_header, "\n".join(f"- {text}" for text in self.common if text.strip())),
+                    (self.code_examples_header, self._code_text()),
                     (self.statistics_header, self.statistics)]
         return [(header, text) for header, text in sections if text]
+
+    def _code_text(self) -> str:
+        return "\n\n".join(f"{text}\n```vue\n{code}\n```" for text, code in self.code_examples)
 
     @property
     def injection_header(self) -> str:
@@ -280,7 +365,7 @@ class CasePacket:
         if not sections:
             return ""
         return (sections[0][1] + "".join(header + text for header, text in sections[1:])
-                + self.guidance_footer)
+                + (self.checklist_footer if self.checklist else self.guidance_footer))
 
 
 class ReflectionCaseMemory:
@@ -330,6 +415,90 @@ class ReflectionCaseMemory:
             "preventative_action": item["preventative_action"], "verification": item["verification"],
             "transfer_limits": item["transfer_limits"], "outcome": item["outcome"],
         }
+
+    def _drop_duplicate_functional(self, cases: list, reflection: Mapping[str, Any]) -> list:
+        """Source-side deduplication (ExpeL-style upvote): a new functional or implementation case that the
+        memory model judges to be the same lesson as an existing active one (same cause and same fix) is not
+        stored; it is recorded as one more support of that case (case_supports keeps the trajectory, so the
+        provenance is not lost). Similarity only proposes the candidates (top 5 of the same kind)."""
+        kept = []
+        for content, item in cases:
+            if content["case_type"] == "appearance" or item.get("cause_confidence") == "uncertain":
+                kept.append((content, item))
+                continue
+            implementation = str(content["feature_object"]).startswith(IMPLEMENTATION_MARKER)
+            rows = [dict(row) for row in self.connection.execute(
+                "SELECT case_id, preventative_action, root_cause_or_hypothesis, feature_object, embedding, "
+                "embedding_dim FROM reflection_cases WHERE agent_id=? AND status='active' AND channel='functional' "
+                "AND embedding IS NOT NULL", (self.agent_id,))]
+            rows = [r for r in rows if str(r["feature_object"]).startswith(IMPLEMENTATION_MARKER) == implementation]
+            same_as = None
+            if rows:
+                query = _vector(self._embed([_json(content)])[0])
+                scored = sorted(((sum(a * b for a, b in zip(query, _vector(struct.unpack(
+                    f"<{r['embedding_dim']}f", r["embedding"])))), r) for r in rows), key=lambda x: -x[0])[:5]
+                result = self.llm.generate("case_same_lesson", {
+                    "instructions": CASE_SAME_LESSON_INSTRUCTIONS,
+                    "new_lesson": {"cause": content["root_cause_or_hypothesis"],
+                                   "preventative_action": content["preventative_action"]},
+                    "existing_lessons": [{"case_id": r["case_id"], "cause": r["root_cause_or_hypothesis"],
+                                          "preventative_action": r["preventative_action"]} for _, r in scored]})
+                candidate = result.get("same_as") if isinstance(result, dict) else None
+                if candidate in {r["case_id"] for _, r in scored}:
+                    same_as = candidate
+            if same_as is None:
+                kept.append((content, item))
+                continue
+            support_id = uuid.uuid4().hex
+            try:
+                with self.connection:
+                    self.connection.execute(
+                        "INSERT INTO case_supports (support_id,agent_id,supported_case_id,supporting_trajectory_id,"
+                        "channel,observed_result,preventative_action,evidence_refs) VALUES (?,?,?,?,?,?,?,?) "
+                        "ON CONFLICT(agent_id,supported_case_id,supporting_trajectory_id,preventative_action) DO NOTHING",
+                        (support_id, self.agent_id, same_as, reflection["trajectory_id"], "functional",
+                         content["observed_result"], content["preventative_action"],
+                         _json(item.get("evidence_refs", []))))
+            except sqlite3.IntegrityError:
+                # Databases created before functional supports existed only allow appearance rows.
+                kept.append((content, item))
+                continue
+            self.log({"operation": "case_supported", "agent_id": self.agent_id, "channel": "functional",
+                      "trajectory_id": reflection["trajectory_id"], "supports_case_id": same_as,
+                      "support_id": support_id, "new_preventative_action": content["preventative_action"]})
+        return kept
+
+    def case_utility(self, groups: Sequence[Sequence[str]] = ()) -> dict[str, dict]:
+        """Positive vs negative use of each lesson (ExpeL up/down votes; Memento learns case utility).
+        A run that was given a lesson (run_facts.guidance_case_ids) counts against it when the same lesson came
+        back in that run's own reflection: a support of it, or a new case in its group. Utility =
+        (uses - recurrences + 1) / (uses + 2); a lesson never used is 0.5. Code only, no model call."""
+        group_of = {cid: index for index, ids in enumerate(groups) for cid in ids}
+        members = {index: set(ids) for index, ids in enumerate(groups)}
+        returned: dict[str, set[str]] = {}  # trajectory -> lessons that came back in it
+        for case_id, trajectory in self.connection.execute(
+                "SELECT case_id, trajectory_id FROM reflection_cases WHERE agent_id=?", (self.agent_id,)):
+            returned.setdefault(trajectory, set()).update(members.get(group_of.get(case_id), {case_id}))
+        if self._has_table("case_supports"):
+            for case_id, trajectory in self.connection.execute(
+                    "SELECT supported_case_id, supporting_trajectory_id FROM case_supports WHERE agent_id=?",
+                    (self.agent_id,)):
+                returned.setdefault(trajectory, set()).update(members.get(group_of.get(case_id), {case_id}))
+        stats: dict[str, dict] = {}
+        if self._has_table("run_facts"):
+            for trajectory, injected in self.connection.execute(
+                    "SELECT trajectory_id, guidance_case_ids FROM run_facts WHERE agent_id=?", (self.agent_id,)):
+                for case_id in set(json.loads(injected or "[]")):
+                    entry = stats.setdefault(case_id, {"uses": 0, "recurred": 0})
+                    entry["uses"] += 1
+                    entry["recurred"] += case_id in returned.get(trajectory, set())
+        for entry in stats.values():
+            entry["utility"] = (entry["uses"] - entry["recurred"] + 1) / (entry["uses"] + 2)
+        return stats
+
+    def _has_table(self, name: str) -> bool:
+        return self.connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+                                       (name,)).fetchone() is not None
 
     def _drop_duplicate_appearance(self, cases: list, reflection: Mapping[str, Any]) -> list:
         """Appearance advice repeats across tasks. A new appearance case that states the same
@@ -389,6 +558,8 @@ class ReflectionCaseMemory:
         cases = [(self._content(task, item, appearance=appearance), item)
                  for item, appearance in source]
         cases = self._drop_duplicate_appearance(cases, reflection)
+        if self.config.store_dedupe:
+            cases = self._drop_duplicate_functional(cases, reflection)
         if not cases:
             return []
         texts = [_json(content) for content, _ in cases]
@@ -733,7 +904,8 @@ class ReflectionCaseMemory:
                                                aspect_index, aspect_candidates)
                 decisions_by_channel[channel].extend(decisions)
                 allowed = {item["case_id"]: item for item in aspect_candidates}
-                for verdict in ("hard_match", "soft_transfer"):
+                for verdict in (("hard_match",) if self.config.relevance_hard_only
+                                else ("hard_match", "soft_transfer")):
                     # Prefer a case not already chosen for another aspect: aspects with the same query
                     # otherwise all take the same top case and push other relevant lessons out.
                     matching = [d for d in decisions if d.get("verdict") == verdict
@@ -805,17 +977,267 @@ class ReflectionCaseMemory:
                                              for cid in item.get("source_case_ids", [])))
         packet = CasePacket(ordered, common=common, common_case_ids=common_sources,
                             statistics=self.statistics_block())
+        packet, unexecutable = self.drop_unexecutable(packet)
         condensed_info: dict = {"applied": False}
         if self.config.guidance_condense:
             packet, condensed_info = self.condense_packet(task, packet)
+            # Condensing can reintroduce such wording (e.g. "switch views using Vue's router"): filter again.
+            packet, after = self.drop_unexecutable(packet)
+            unexecutable = unexecutable + after
+        if unexecutable:
+            condensed_info = {**condensed_info, "dropped_unexecutable": unexecutable}
+        checklist_info: dict = {"applied": False}
+        if self.config.requirement_checklist:
+            packet, checklist_info = self.build_checklist(task, packet)
+        code_info: dict = {"applied": False}
+        if self.config.code_pool:
+            packet, code_info = self.add_code_pool(task, packet)
+        elif self.config.code_memory:
+            packet, code_info = self.add_code_examples(packet)
         self.log({"operation": "case_retrieval", "agent_id": self.agent_id, "task": task,
-                  "guidance_condense": condensed_info,
+                  "guidance_condense": condensed_info, "requirement_checklist": checklist_info,
+                  "code_memory": code_info,
                   "aspects": aspects, "candidates_by_channel": candidates,
                   "decisions_by_channel": decisions_by_channel,
                   "implementation_adaptations": adaptations, "statistics_ordering": ordering, "common_pool": common_info,
                   "selected": [item.case_id for item in ordered], "rendered_memory": packet.render(),
                   "packet_chars": len(packet.render())})
         return packet
+
+    record_code_uses = False  # the runner sets it; previews must not count as uses
+
+    def _chain(self) -> list[dict]:
+        chain = []
+        if self._has_table("run_facts"):
+            for task_id, trace, passed, partial, failed in self.connection.execute(
+                    "SELECT t.task_id, t.trace_path, f.checks_passed, f.checks_partial, f.checks_failed "
+                    "FROM trajectories t JOIN run_facts f ON f.trajectory_id = t.trajectory_id WHERE t.agent_id=?",
+                    (self.agent_id,)):
+                passed, partial, failed = passed or 0, partial or 0, failed or 0
+                chain.append({"task_id": task_id, "trace_path": trace,
+                              "score": (passed + 0.5 * partial) / max(1, passed + partial + failed)})
+        return chain
+
+    def update_code_pool(self, task_id: str) -> dict:
+        """v6, after a task (its run_facts written): add/extend code memories from this chain's sites. Never raises."""
+        from pathlib import Path
+        from code_memory import update_code_pool
+        try:
+            return update_code_pool(self.connection, self.agent_id, self.llm, self._chain(),
+                                    Path(__file__).resolve().parents[1], min_tasks=self.config.code_memory_min_tasks,
+                                    current_task=task_id)
+        except Exception as error:
+            self.connection.rollback()  # no half-updated pool
+            return {"error": f"{type(error).__name__}: {str(error)[:300]}"}
+
+    def add_code_pool(self, task: str, packet: CasePacket) -> tuple[CasePacket, dict]:
+        """v6 retrieval: the memory model decides from the requirement which entries' conditions hold; at most
+        code_pool_max of those, by utility then support, are injected. Never raises."""
+        if not self.statistics_task_id:
+            return packet, {"applied": False, "reason": "no current task id"}
+        try:
+            from code_memory import APPLICABILITY_INSTRUCTIONS, code_utility
+            from memory_statistics import _other_task
+            rows = [dict(r) for r in self.connection.execute(
+                "SELECT code_id, problem_key, name, applies_when, explanation, code, support_tasks, source_task_id "
+                "FROM code_memories WHERE agent_id=? AND status='active'", (self.agent_id,))] \
+                if self._has_table("code_memories") else []
+            # Leave-one-task-out: an entry made only from the current task's own site is not used.
+            # Leave-one-task-out: support is counted without the current task and must still reach min_tasks;
+            # code taken from the current task's own site is not used either.
+            kept_rows = []
+            for r in rows:
+                other = [t for t in json.loads(r["support_tasks"] or "[]") if _other_task(t, self.statistics_task_id)]
+                if len(other) >= self.config.code_memory_min_tasks and \
+                        (not r["source_task_id"] or _other_task(r["source_task_id"], self.statistics_task_id)):
+                    r["support_tasks"] = json.dumps(other)
+                    r["explanation"] = re.sub(r", \d+ tasks\)", f", {len(other)} tasks)", r["explanation"])
+                    kept_rows.append(r)
+            rows = kept_rows
+            utility = code_utility(self.connection, self.agent_id)
+            info: dict = {"applied": False, "entries": len(rows), "retired": []}
+            if self.config.retire_min_uses:
+                kept = []
+                for r in rows:
+                    u = utility.get(r["code_id"])
+                    if u and u["uses"] >= self.config.retire_min_uses and u["utility"] < self.config.retire_max_utility:
+                        info["retired"].append(r["code_id"])
+                    else:
+                        kept.append(r)
+                rows = kept
+            if not rows:
+                return packet, info
+            # Applicability by code where it can be decided by code (the model judged vague conditions
+            # inconsistently): a missing Vue import can happen in any Vue site; a whole-site page-structure
+            # entry applies when the checklist has >= 3 items. The model judges only the remaining entries.
+            applies, decisions = set(), []
+            multi = len(packet.checklist) >= 3
+            ask = []
+            for r in rows:
+                key = r["problem_key"]
+                if key.startswith("vue-api:"):
+                    applies.add(r["code_id"]); decisions.append({"code_id": r["code_id"], "applies": True, "by": "code: universal"})
+                elif key.startswith("import:") and multi:
+                    applies.add(r["code_id"]); decisions.append({"code_id": r["code_id"], "applies": True, "by": "code: checklist >= 3"})
+                else:
+                    ask.append(r)
+            if ask:
+                result = self.llm.generate("code_memory_applicability", {
+                    "instructions": APPLICABILITY_INSTRUCTIONS, "requirement": task,
+                    "entries": [{"code_id": r["code_id"], "name": r["name"], "applies_when": r["applies_when"]}
+                                for r in ask]})
+                for d in (result.get("decisions", []) if isinstance(result, dict) else []):
+                    if isinstance(d, dict):
+                        decisions.append({**d, "by": "model"})
+                        if d.get("applies") is True:
+                            applies.add(d.get("code_id"))
+            # One slot per severity level first (whole-site breakage, then a failing page), then by utility.
+            from code_memory import severity
+            ranked = sorted((r for r in rows if r["code_id"] in applies),
+                            key=lambda r: (-severity(r["problem_key"]),
+                                           -utility.get(r["code_id"], {}).get("utility", 0.5),
+                                           -len(json.loads(r["support_tasks"] or "[]"))))
+            chosen, levels = [], set()
+            for r in ranked:
+                if severity(r["problem_key"]) not in levels:
+                    chosen.append(r); levels.add(severity(r["problem_key"]))
+            for r in ranked:
+                if r not in chosen:
+                    chosen.append(r)
+            chosen = chosen[:self.config.code_pool_max]
+            info.update({"applied": bool(chosen), "decisions": decisions, "chosen": [r["code_id"] for r in chosen]})
+            if self.record_code_uses:
+                with self.connection:
+                    # A rerun replaces the task's earlier use rows (no stale recurred value).
+                    self.connection.execute("DELETE FROM code_memory_uses WHERE agent_id=? AND task_id=?",
+                                            (self.agent_id, self.statistics_task_id))
+                    for r in chosen:
+                        self.connection.execute(
+                            "INSERT OR IGNORE INTO code_memory_uses (agent_id, task_id, code_id) VALUES (?,?,?)",
+                            (self.agent_id, self.statistics_task_id, r["code_id"]))
+            return replace(packet, code_examples=tuple((f"{r['name']}. {r['explanation']}", r["code"])
+                                                       for r in chosen)), info
+        except Exception as error:  # code memory must never stop a task
+            return packet, {"applied": False, "error": f"{type(error).__name__}: {str(error)[:300]}"}
+
+    def add_code_examples(self, packet: CasePacket) -> tuple[CasePacket, dict]:
+        """v5 code memory (see src/code_memory.py): only other tasks' sites are read (leave-one-task-out)."""
+        if not self.statistics_task_id:  # without the current task id, leave-one-task-out cannot be enforced
+            return packet, {"applied": False, "reason": "no current task id"}
+        try:
+            return self._add_code_examples(packet)
+        except Exception as error:  # code memory must never stop a task
+            return packet, {"applied": False, "error": f"{type(error).__name__}: {str(error)[:300]}"}
+
+    def _add_code_examples(self, packet: CasePacket) -> tuple[CasePacket, dict]:
+        from pathlib import Path
+        from code_memory import build_code_examples
+        from memory_statistics import _other_task
+        earlier = []
+        if self._has_table("run_facts"):
+            for task_id, trace, passed, partial, failed in self.connection.execute(
+                    "SELECT t.task_id, t.trace_path, f.checks_passed, f.checks_partial, f.checks_failed "
+                    "FROM trajectories t JOIN run_facts f ON f.trajectory_id = t.trajectory_id WHERE t.agent_id=?",
+                    (self.agent_id,)):
+                if not _other_task(task_id, self.statistics_task_id):
+                    continue
+                passed, partial, failed = passed or 0, partial or 0, failed or 0
+                earlier.append({"task_id": task_id, "trace_path": trace,
+                                "score": (passed + 0.5 * partial) / max(1, passed + partial + failed)})
+        examples, info = build_code_examples(earlier, Path(__file__).resolve().parents[1],
+                                             min_tasks=self.config.code_memory_min_tasks)
+        info["applied"] = bool(examples)
+        return replace(packet, code_examples=tuple((e["text"], e["code"]) for e in examples)), info
+
+    def build_checklist(self, task: str, packet: CasePacket) -> tuple[CasePacket, dict]:
+        """v4: restate the requirement as a checklist and attach each guidance line to the item it is about.
+        Code checks (no model judgement): notes must be guidance lines copied verbatim; a guidance line the model
+        did not place goes to the general notes; a checklist item that shares no content word with the
+        requirement is dropped (it came from a lesson, not from this requirement - cf. the "disagreement gate"
+        of Agent KB). On a malformed answer it retries once, then uses the requirement's sentences as the checklist."""
+        guidance = [str(c.content.get("implementation_pattern", "")).strip() for c in packet.cases]
+        guidance = [g for g in guidance if g] + [t.strip() for t in packet.common if t.strip()]
+        request = {"instructions": REQUIREMENT_CHECKLIST_INSTRUCTIONS, "requirement": task,
+                   "guidance_notes": guidance}
+        words = _content_words(task)
+        info: dict = {"applied": False, "guidance": guidance}
+        for attempt in (1, 2):
+            try:
+                result = self.llm.generate("requirement_checklist", request)
+            except Exception as error:  # e.g. a reply cut off by the token limit
+                info[f"attempt_{attempt}"] = f"error: {type(error).__name__}: {str(error)[:300]}"
+                continue
+            raw = result.get("items") if isinstance(result, dict) else None
+            if not isinstance(raw, list) or not raw:
+                info[f"attempt_{attempt}"] = "malformed"
+                continue
+            items, placed, off_requirement, unknown_notes = [], set(), [], []
+            for entry in raw:
+                if not isinstance(entry, dict) or not str(entry.get("feature", "")).strip():
+                    continue
+                feature = str(entry["feature"]).strip()
+                # Colour items name the colours ("Colours", "Background colour"), not the requirement's words.
+                if not words & _content_words(feature) and not re.search(r"colou?r|background", feature, re.I):
+                    off_requirement.append(feature)
+                    continue
+                notes = []
+                for note in entry.get("notes") or []:
+                    note = str(note).strip()
+                    if note in guidance and note not in placed:
+                        notes.append(note); placed.add(note)
+                    elif note:
+                        unknown_notes.append(note)
+                items.append((feature, tuple(notes)))
+            if not items:
+                info[f"attempt_{attempt}"] = "no items"
+                continue
+            if self.config.checklist_min_coverage:
+                covered = set().union(*(_content_words(feature) for feature, _ in items))
+                missing = sorted(words - covered)
+                coverage = 1 - len(missing) / max(1, len(words))
+                info[f"coverage_{attempt}"] = round(coverage, 2)
+                if coverage < self.config.checklist_min_coverage or len(items) < 2:
+                    info[f"attempt_{attempt}"] = f"low coverage {coverage:.2f}"
+                    request = {**request, "retry_notice": (
+                        "Your checklist left out parts of the requirement. Every page and feature the requirement "
+                        "names must be its own item; these words of the requirement appear in no item: "
+                        + ", ".join(missing[:40]))}
+                    continue
+            general = [g for g in guidance if g not in placed]
+            info.update({"applied": True, "items": [f for f, _ in items], "general": general,
+                         "dropped_off_requirement": off_requirement, "unknown_notes": unknown_notes,
+                         "attempts": attempt})
+            return replace(packet, checklist=tuple(items), checklist_general=tuple(general)), info
+        # The model's checklist failed twice: keep the v4 form (not the plain guidance form, which would mix two
+        # prompt versions in one chain) with a code-made checklist - the requirement's sentences - and every
+        # guidance line as a general note. Recorded as "fallback" so such runs can be counted.
+        sentences = [x.strip() for x in re.split(r"(?<=[.!?])\s+", task.strip()) if x.strip()]
+        info.update({"applied": True, "fallback": "requirement sentences", "items": sentences,
+                     "general": guidance})
+        return replace(packet, checklist=tuple((x, ()) for x in sentences),
+                       checklist_general=tuple(guidance)), info
+
+    def drop_unexecutable(self, packet: CasePacket) -> tuple[CasePacket, list[str]]:
+        """Drop guidance a one-shot front-end generator cannot carry out (install a package, call an external
+        API, build a backend or database): it never edits package.json and the site has no server, and such
+        lines led it astray (2026-10-06 analysis). Code rule on the wording; dropped lines are returned."""
+        if not (self.config.guidance_executable_filter or self.config.common_pool_concrete_only):
+            return packet, []
+        dropped: list[str] = []
+        cases = []
+        for item in packet.cases:
+            text = str(item.content.get("implementation_pattern", ""))
+            if _UNEXECUTABLE.search(text):
+                dropped.append(text)
+            else:
+                cases.append(item)
+        common = []
+        for text in packet.common:
+            if _UNEXECUTABLE.search(text) or (self.config.common_pool_concrete_only and not _code_shapes(text)):
+                dropped.append(text)
+            else:
+                common.append(text)
+        return replace(packet, cases=tuple(cases), common=tuple(common)), dropped
 
     def condense_packet(self, task: str, packet: CasePacket) -> tuple[CasePacket, dict]:
         """Merge every memory line into at most guidance_max_items short requirements, within a
@@ -833,7 +1255,8 @@ class ReflectionCaseMemory:
                 candidates.append({"id": f"g{len(candidates)}", "text": text.strip(), "case_ids": common_ids,
                                    "kind": "common pitfall"})
         if not candidates:
-            return packet, {"applied": False, "reason": "no memory lines"}
+            # Statistics only rank candidates (2026-10-01); they are never injected, condensed or not.
+            return replace(packet, statistics=""), {"applied": False, "reason": "no memory lines"}
         budget = int(len(task) * self.config.guidance_max_ratio)
         limit = self.config.guidance_max_items
         instructions = (
@@ -858,6 +1281,12 @@ class ReflectionCaseMemory:
                 "so that users..., without relying on...), no filler adverbs (visibly, sufficiently, "
                 "immediately after a successful...), and do not restate values the requirement already gives "
                 "(colours, names) beyond a word or two. "
+                "Keep names: when a candidate names a concrete file, package, setting or component that the fix "
+                "is about, its item keeps that name; shortening never removes it. Merge only candidates about the "
+                "same problem; never join two different problems into one sentence. "
+                "When a candidate contains a Vue/code construction token (for example ref, v-if, v-for, "
+                "@click or @submit), retain at least one of that candidate's tokens verbatim in the item; "
+                "do not turn a concrete construction into a generic warning. "
                 "Put the item most likely to prevent a failure first. Do not add new advice that no candidate supports; recorded statistics may "
                 "only be used to decide what matters most, never quoted. Return JSON "
                 '{"items":[{"text":str,"from":[candidate ids]}],"dropped":[{"id":str,"why":"duplicate|not_applicable","reason":str}]}.')
@@ -868,7 +1297,7 @@ class ReflectionCaseMemory:
         # Coverage check (code): a feature candidate that no item cites and that the model did not drop as a
         # duplicate or not-applicable was cut for space -- the failure seen in 018 and 026, where the generator
         # then built only the noted parts. Ask once more, naming what is missing and the size limits.
-        def _gaps(answer: dict) -> tuple[list[str], int]:
+        def _gaps(answer: dict) -> tuple[list[str], int, dict[str, list[str]]]:
             items = answer.get("items", []) if isinstance(answer, dict) else []
             cited = {s for i in items if isinstance(i, dict) for s in (i.get("from") or [])}
             # Only a duplicate or not-applicable candidate may be dropped; "no room" is not accepted.
@@ -878,25 +1307,40 @@ class ReflectionCaseMemory:
             missing = [c["id"] for c in candidates
                        if c["kind"] != "common pitfall" and c["id"] not in cited and c["id"] not in dropped]
             size = sum(len(str(i.get("text", ""))) for i in items[:limit] if isinstance(i, dict))
-            return missing, size
-        missing, size = _gaps(result)
+            lost_shapes: dict[str, list[str]] = {}
+            for candidate in candidates:
+                shapes = _code_shapes(candidate["text"])
+                if not shapes:
+                    continue
+                rendered = " ".join(str(i.get("text", "")) for i in items
+                                     if isinstance(i, dict) and candidate["id"] in (i.get("from") or []))
+                lost = sorted(shapes - _code_shapes(rendered))
+                if lost:
+                    lost_shapes[candidate["id"]] = lost
+            return missing, size, lost_shapes
+        missing, size, lost_shapes = _gaps(result)
         retried = None
-        if missing or size > budget:
-            retried = {"missing": missing, "chars": size}
+        if missing or size > budget or lost_shapes:
+            retried = {"missing": missing, "chars": size, "lost_code_shapes": lost_shapes}
             result = self.llm.generate("guidance_condense", {
                 **request, "previous_answer": result,
                 "problem": (f"Your previous answer left out candidates {missing} without listing them as dropped, "
-                            f"and/or used {size} of {budget} characters. Rewrite so every non-duplicate, "
+                            f"lost concrete code constructions {lost_shapes}, and/or used {size} of {budget} characters. "
+                            "Rewrite so every non-duplicate, "
                             f"applicable candidate is cited, within {limit} items and {budget} characters, by "
-                            "merging related candidates and shortening wording.")})
-            retried["after"] = dict(zip(("missing", "chars"), _gaps(result)))
+                            "merging related candidates and shortening wording while retaining the listed code "
+                            "constructions in the item that cites their source.")})
+            after_missing, after_size, after_shapes = _gaps(result)
+            retried["after"] = {"missing": after_missing, "chars": after_size,
+                                  "lost_code_shapes": after_shapes}
         long_items = [i for i in (result.get("items", []) if isinstance(result, dict) else [])
                       if isinstance(i, dict) and len(str(i.get("text", ""))) > ITEM_MAX_CHARS + 30]
         if long_items:
             shortened = self.llm.generate("guidance_shorten", {
                 "instructions": (f"Shorten each item to one imperative sentence of at most {ITEM_MAX_CHARS} "
                                  "characters after its prefix (keep the prefix such as \"Voting:\" or \"Every "
-                                 "page:\"). Keep the concrete thing to build; delete verification or rationale "
+                                 "page:\"). Keep the concrete thing to build and every file, package or setting name it "
+                                 "names; delete verification or rationale "
                                  "clauses, filler adverbs and values the requirement already states. Return JSON "
                                  '{"items":[{"index":int,"text":str}]}.'),
                 "requirement": task, "items": [{"index": n, "text": i.get("text")} for n, i in enumerate(long_items)]})
@@ -919,7 +1363,7 @@ class ReflectionCaseMemory:
         # Recurring cross-site lessons must survive condensing: the first two common lines are kept (at most
         # 2 common items, the rest for the requirement's features). A missing one is added.
         common_candidates = [c for c in candidates if c["kind"] == "common pitfall"]
-        for wanted in common_candidates[:2]:
+        for wanted in ([] if self.config.guidance_hard_cap else common_candidates[:2]):
             if not kept or sum(k.content.get("case_type") == "common" for k in kept) >= 2:
                 break
             if any(k.content.get("case_type") == "common" and wanted["id"] in k.content.get("_from", []) for k in kept):
@@ -930,8 +1374,11 @@ class ReflectionCaseMemory:
                 "implementation_pattern": wanted["text"], "case_type": "common",
                 "source_case_ids": list(wanted["case_ids"]), "_from": [wanted["id"]]}, 0.0))
             used += len(wanted["text"])
+        if self.config.guidance_hard_cap and len(kept) > limit:  # the limit is a limit (first = most important)
+            kept = kept[:limit]
+            used = sum(len(k.content["implementation_pattern"]) for k in kept)
         if not kept:
-            return packet, {"applied": False, "reason": "condensing returned no usable item",
+            return replace(packet, statistics=""), {"applied": False, "reason": "condensing returned no usable item",
                             "raw": result}
         condensed = CasePacket(tuple(kept), common=(), common_case_ids=(), statistics="")
         cited = {s for k in kept for s in k.content.get("_from", [])}
@@ -1017,7 +1464,22 @@ class ReflectionCaseMemory:
         ordered = list(ordered)
         broad = [c for c in ordered if c.case_id in breadth["broad_ids"]]
         picked = broad[:limit - reserve]
-        totals = info.get("case_totals", {})
+        totals = dict(info.get("case_totals", {}))
+        if self.config.utility_ranking:
+            utility = self.case_utility([entry["case_ids"] for entry in breadth["groups"]])
+            for case in ordered:
+                totals[case.case_id] = totals.get(case.case_id, 0.0) * utility.get(case.case_id, {}).get("utility", 0.5)
+            if self.config.retire_min_uses:  # v6: lessons that kept failing after use are no longer injected
+                def retired(c):
+                    u = utility.get(c.case_id)
+                    return bool(u) and u["uses"] >= self.config.retire_min_uses and \
+                        u["utility"] < self.config.retire_max_utility
+                info["retired"] = [c.case_id for c in ordered if retired(c)]
+                ordered = [c for c in ordered if not retired(c)]
+                broad = [c for c in broad if not retired(c)]
+            broad = sorted(broad, key=lambda c: -totals.get(c.case_id, 0.0))
+            picked = broad[:limit - reserve]
+            info["utility"] = {c.case_id: utility.get(c.case_id) for c in ordered if c.case_id in utility}
         rest = sorted((c for c in ordered if c not in picked), key=lambda c: -totals.get(c.case_id, 0.0))
         # One reserved slot per lesson: several cases of the same lesson (one task can store it once per
         # failed check) must not fill every slot and push other lessons out.
@@ -1042,7 +1504,9 @@ class ReflectionCaseMemory:
             return (), {"patterns": []}
         size = self.config.common_pool_size
         result = self.llm.generate("common_pool_adaptation", {
-            "instructions": COMMON_POOL_ADAPTATION_INSTRUCTIONS, "max_patterns": size,
+            "instructions": COMMON_POOL_ADAPTATION_INSTRUCTIONS + (COMMON_POOL_CONCRETE_METHOD
+                                                                   if self.config.common_pool_concrete_method else ""),
+            "max_patterns": size,
             "cases": [{"case_id": c.case_id, "priority_rank": index + 1,
                        "content": {k: v for k, v in c.content.items() if k != "matched_aspects"}}
                       for index, c in enumerate(candidates)]})

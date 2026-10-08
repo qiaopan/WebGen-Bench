@@ -587,16 +587,21 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_file", type=str, default="data/test.json")
     parser.add_argument("--max_iter", type=int, default=5)
+    # Same key order as src/ui_test_bolt/ui_eval_with_answer.py, which picks the functional evaluator's
+    # key but does not pass it on the command line (it would show in `ps` on a shared node). A local
+    # evaluator server that checks keys returned 401 when this fell through to the Azure key.
     parser.add_argument(
         "--api_key",
         default=(
-            os.environ.get("AZURE_OPENAI_API_KEY", "")
+            os.environ.get("WEBGEN_FUNCTIONAL_EVALUATOR_API_KEY", "")
+            or os.environ.get("WEBGEN_EVALUATOR_API_KEY", "")
+            or os.environ.get("AZURE_OPENAI_API_KEY", "")
             or os.environ.get("DASHSCOPE_API_KEY", "")
         ),
         type=str,
         help=(
-            "API key; defaults to AZURE_OPENAI_API_KEY, then "
-            "DASHSCOPE_API_KEY"
+            "API key; defaults to WEBGEN_FUNCTIONAL_EVALUATOR_API_KEY, WEBGEN_EVALUATOR_API_KEY, "
+            "AZURE_OPENAI_API_KEY, then DASHSCOPE_API_KEY"
         ),
     )
     parser.add_argument(

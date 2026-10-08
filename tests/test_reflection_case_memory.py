@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from long_memory import initialize_database
 from long_memory_runtime import MemoryConfig
-from reflection_case_memory import ReflectionCaseMemory
+from reflection_case_memory import ReflectionCaseMemory, _code_shapes
 
 
 class Embedder:
@@ -37,6 +37,11 @@ class LLM:
 
 
 class ReflectionCaseMemoryTests(unittest.TestCase):
+    def test_concrete_vue_shapes_are_detected_for_condense_preservation(self):
+        self.assertEqual(_code_shapes("Keep active = ref('home') and show it with v-if"),
+                         {"ref", "v-if"})
+        self.assertEqual(_code_shapes("Update local state in the submit handler"), set())
+
     def test_case_only_stores_direct_case_and_retrieves_it_without_abstraction(self):
         with tempfile.TemporaryDirectory() as directory:
             database = str(Path(directory) / "memory.db")

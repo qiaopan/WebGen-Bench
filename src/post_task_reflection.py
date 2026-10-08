@@ -374,6 +374,12 @@ when no failed check needed it); the guidance may only be mentioned when it expl
 came to be built the way it is. If the failures are about a hidden section or view (content only
 reachable after a click while the check looked at the landing view), name that structure as the
 cause.
+Fix within reach: the generator writes only the files listed in code_manifest.generator_written_files;
+every other project file (for example configuration it left as the starting template made it) stays as it
+is unless a lesson names the change. When the cause is established, preventative_action must be a change
+the generator can make by writing its own files: name the file and what it must contain, or an
+implementation that works with what the project already declares (code_manifest dependencies). Wording
+such as "ensure X is correctly installed, configured or imported" names no change and is not a lesson.
 The preventative_action must name the concrete code-level execution fix. It may name a
 framework or rendering choice only when the cited code proves that choice is necessary;
 otherwise state a framework-neutral requirement such as mounting the existing handler or
@@ -532,6 +538,9 @@ ground truth. Name as cause only a defect that is actually visible in the trajec
 returning "not found", missing element). If the trajectory shows no concrete defect
 (the agent simply ran out of interactions), say so and label any cause a hypothesis.
 Do not treat a label alone as proof that the website is wrong or right.
+The numbered boxes and labels in the tester's screenshots are drawn by the test tool to name elements;
+they are not part of the website. A cause about those labels, or about the tester failing to find or
+identify an element that the code does render, is a tester limitation, not a website defect.
 
 Code attribution (optional): the supplied code_manifest and code_file evidence is the
 website's own source. Use it only when the code really explains the observed
@@ -573,11 +582,27 @@ cause, set "uncertain".
 Do not write stock advice such as "ensure the feature works correctly" or "follow
 best practices" in any field.
 
+Fix within reach: the generator writes only the files listed in code_manifest.generator_written_files;
+every other project file (for example configuration it left as the starting template made it) stays as it
+is unless a lesson names the change. When the cause is established, preventative_action must be a change
+the generator can make by writing its own files: name the file and what it must contain, or an
+implementation that works with what the project already declares (code_manifest dependencies). Wording
+such as "ensure X is correctly installed, configured or imported" names no change and is not a lesson.
+
 Actionability check: before writing preventative_action, ask whether a developer who
 reads only that sentence would change the code. A sentence that only says something
 must work "reliably", "correctly" or "as specified" restates the requirement and is
 not a lesson; rewrite it as the concrete design change (what to keep, add, show or
 pre-fill).
+
+Concrete UI implementation: when the established cause is a client-side interaction
+or a missing view transition, preventative_action must name the smallest supported
+Vue code construction, not only the desired behaviour. For a view switch, name
+`ref` state plus `v-if`; for a form result, name a submit handler that updates state
+plus a `v-if` result/message; for a rendered collection, name a local array plus
+`v-for`. Use these only where the supplied code and this check support them. Do not
+write a vague substitute such as "ensure the interaction is configured correctly".
+The later memory path preserves these construction names during compression.
 
 Lookup failures: when a lookup or search returns "not found" or nothing, look at what
 the tester typed and where that value could have come from (placeholder text, sample
@@ -617,7 +642,9 @@ you found at each one in "investigation" (one or two sentences per step, citing 
    nothing about the website established.
 3. screenshots: what the attached screenshots actually show compared with what the task expected
    (content present, missing, blank, unreadable, wrong colour, wrong page).
-4. errors: any build, console or evaluator error in the evidence; write "none" if there is none.
+4. errors: any build, console or evaluator error in the evidence, and the measured facts in
+   code_manifest.imports_not_in_package_json (packages the source imports that package.json does not
+   declare); write "none" if there is none.
 5. code_path: follow the chain the feature needs in the source and say where it holds or breaks:
    route or section exists -> it is linked from navigation or the page the tester was on -> the
    component is mounted -> its data or handler is present -> it is rendered. A feature claimed absent

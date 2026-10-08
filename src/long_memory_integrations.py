@@ -5,12 +5,46 @@ from __future__ import annotations
 import base64
 import json
 import re
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from long_memory_runtime import MemoryPacket
+
+# (share of the site's code kept, share of each GUI trajectory kept), step by step, when a request exceeds
+# the model's context window (the cluster's 72B memory model has 32K tokens; Phase 1's GPT-4o had 128K).
+# The code goes first; only then the middle of long tester trajectories (their start and end stay).
+_CONTEXT_TRIM_STEPS = ((0.5, 1.0), (0.25, 1.0), (0.1, 1.0), (0.1, 0.5), (0.1, 0.25))
+
+
+def _is_context_overflow(error: Exception) -> bool:
+    return getattr(error, "status_code", None) == 400 and "maximum context length" in str(error)
+
+
+def _trim_code(value: Any, keep: float, gui_keep: float = 1.0) -> Any:
+    """Copy of a payload with the site's code cut to ``keep`` of its length (code files and the generator's
+    own chat replies) and, when ``gui_keep`` < 1, the middle of each GUI trajectory cut so that share of it
+    remains (its first and last steps stay). Evaluator results and the requirement stay whole."""
+    if isinstance(value, list):
+        return [_trim_code(item, keep, gui_keep) for item in value]
+    if not isinstance(value, dict):
+        return value
+    ref, content = value.get("ref"), value.get("content")
+    if isinstance(ref, dict) and isinstance(content, str):
+        if ref.get("kind") == "code_file" or (ref.get("kind") == "chat_message" and ref.get("role") == "assistant"):
+            limit = max(1500, int(len(content) * keep))
+            if len(content) > limit:
+                return {**value, "content": content[:limit] + "\n...[cut: did not fit in the reflection model's context]"}
+            return value
+        if ref.get("kind") == "gui_trajectory" and gui_keep < 1:
+            half = max(1000, int(len(content) * gui_keep / 2))
+            if len(content) > 2 * half:
+                return {**value, "content": content[:half] + "\n...[middle steps cut: did not fit in the "
+                        "reflection model's context]...\n" + content[-half:]}
+            return value
+    return {key: _trim_code(item, keep, gui_keep) for key, item in value.items()}
 
 
 class AzureMemoryLLM:
@@ -28,6 +62,7 @@ class AzureMemoryLLM:
         self.model_id = model_id
         self.max_tokens = max_tokens
         self.rate_limit_retries = 6 if rate_limit_retries is None else rate_limit_retries
+        self.transient_retries: list[dict] = []
         self.rate_limit_base_seconds = (10 if rate_limit_base_seconds is None
                                         else rate_limit_base_seconds)
         self.rate_limit_max_wait_seconds = (300 if rate_limit_max_wait_seconds is None
@@ -41,8 +76,41 @@ class AzureMemoryLLM:
                 or self.rate_limit_long_retry_seconds < 0
                 or self.rate_limit_long_retries < 0):
             raise ValueError("Memory LLM retry settings must be nonnegative")
+        self.context_trims: list[dict] = []  # requests that only fit after cutting the site's code
+
+    # Transient failures (invalid or empty JSON, dropped connection, timeout, server error) are retried before the
+    # task is given up: an unretried bad reply crashed whole Long Memory tasks before generation (v4, 2026-10-07).
+    transient_attempts = 3
 
     def generate(self, operation: str, payload: Mapping[str, Any]) -> dict:
+        for attempt in range(1, self.transient_attempts + 1):
+            try:
+                return self._generate(operation, payload)
+            except Exception as error:
+                if _is_context_overflow(error):
+                    overflow = error
+                    break
+                # Rate limiting (429) has its own policy in _generate; not retried again here.
+                if attempt == self.transient_attempts or getattr(error, "status_code", None) == 429:
+                    raise
+                self.transient_retries.append({"operation": operation, "attempt": attempt,
+                                               "error": f"{type(error).__name__}: {str(error)[:200]}"})
+                print(f"[memory-llm] {operation}: attempt {attempt} failed ({type(error).__name__}); retrying",
+                      file=sys.stderr, flush=True)
+                time.sleep(10 * attempt)
+        for keep, gui_keep in _CONTEXT_TRIM_STEPS:
+            self.context_trims.append({"operation": operation, "code_kept": keep, "gui_kept": gui_keep})
+            print(f"[memory-llm] {operation}: request exceeds the model's context; retrying with the "
+                  f"site's code cut to {keep:.0%} and tester steps to {gui_keep:.0%}", file=sys.stderr, flush=True)
+            try:
+                return self._generate(operation, _trim_code(payload, keep, gui_keep))
+            except Exception as error:
+                if not _is_context_overflow(error):
+                    raise
+                overflow = error
+        raise overflow
+
+    def _generate(self, operation: str, payload: Mapping[str, Any]) -> dict:
         # ``_images``: optional PNG paths sent as image parts after the JSON text (multimodal models only).
         text = json.dumps({"operation": operation, **{key: value for key, value in payload.items()
                            if key not in ("instructions", "_images")}}, ensure_ascii=False, default=str)
@@ -233,6 +301,57 @@ def global_style_findings(project: Path) -> list[str]:
     return findings
 
 
+_IMPORT_PATTERNS = (re.compile(r"""\bfrom\s+['"]([^'"]+)['"]"""), re.compile(r"""\bimport\s+['"]([^'"]+)['"]"""),
+                    re.compile(r"""\bimport\(\s*['"]([^'"]+)['"]\s*\)"""), re.compile(r"""\brequire\(\s*['"]([^'"]+)['"]\s*\)"""))
+_NODE_BUILTINS = {"assert", "buffer", "child_process", "crypto", "dns", "events", "fs", "http", "https", "module",
+                  "net", "os", "path", "perf_hooks", "process", "querystring", "readline", "stream", "tls", "url",
+                  "util", "worker_threads", "zlib"}
+
+
+def undeclared_imports(project: Path, files: list[str], declared: set[str]) -> list[dict]:
+    """Packages the source imports by bare name that package.json does not declare (measured fact)."""
+    found: dict[str, list[str]] = {}
+    for rel in files:
+        if rel.endswith((".css", ".html")):
+            continue
+        try:
+            text = (project / rel).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for pattern in _IMPORT_PATTERNS:
+            for spec in pattern.findall(text):
+                if spec.startswith((".", "/", "@/", "~", "#")) or ":" in spec:
+                    continue
+                parts = spec.split("/")
+                name = "/".join(parts[:2]) if spec.startswith("@") else parts[0]
+                if name and name not in declared and name not in _NODE_BUILTINS:
+                    found.setdefault(name, [])
+                    if rel not in found[name]:
+                        found[name].append(rel)
+    return [{"package": name, "imported_in": paths[:3]} for name, paths in sorted(found.items())]
+
+
+def generator_written_files(trajectory: dict) -> list[str] | None:
+    """Files written by the generator's own reply in the exported chat; a template import that Bolt
+    performs before the request is answered is not counted. None when the chat cannot be read."""
+    try:
+        data = json.loads(Path(trajectory["trace_path"]).read_text(encoding="utf-8"))
+    except (KeyError, TypeError, OSError, ValueError):
+        return None
+    messages = data.get("messages", []) if isinstance(data, dict) else data
+    start = 0
+    for index, message in enumerate(messages):
+        if message.get("role") == "user" and "Template is imported" in str(message.get("content", "")):
+            start = index + 1
+    written: list[str] = []
+    for message in messages[start:]:
+        if message.get("role") == "assistant" and isinstance(message.get("content"), str):
+            for path in re.findall(r'<boltAction type="file" filePath="([^"]+)"', message["content"]):
+                if path not in written:
+                    written.append(path)
+    return written
+
+
 def generated_code_evidence(trajectory: dict, *, per_file: int = 16000, budget: int = 60000,
                             project: Path | None = None) -> list[dict]:
     """Compact view of the generated website's own source, for root-cause analysis.
@@ -264,8 +383,14 @@ def generated_code_evidence(trajectory: dict, *, per_file: int = 16000, budget: 
                 or path.suffix not in _CODE_SUFFIXES or path.name.endswith(".d.ts")):
             continue
         files.append(rel.as_posix())
+    declared = set(manifest.get("dependencies", {})) | set(manifest.get("devDependencies", {}))
+    facts: dict[str, Any] = {"imports_not_in_package_json": undeclared_imports(project, files, declared)}
+    written = generator_written_files(trajectory)
+    if written is not None:
+        facts["generator_written_files"] = written
     evidence = [{"ref": {"kind": "code_manifest"},
-                 "content": {**manifest, "files": files, "global_style_rules": global_style_findings(project)}}]
+                 "content": {**manifest, "files": files, "global_style_rules": global_style_findings(project),
+                             **facts}}]
     used = 0
     for rel in sorted(files, key=lambda f: (0 if "/pages/" in f or "/components/" in f else 1, f)):
         try:

@@ -16,7 +16,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from generation_validator import repair_prompt, validate_generated_zip
+from generation_validator import official_protocol, repair_prompt, validate_generated_zip
 
 
 VUE_HELPERS = {"ref", "reactive", "computed", "watch", "watchEffect", "nextTick", "onMounted",
@@ -411,7 +411,9 @@ def automatic_web_gen(idx, instruction, download_dir="downloads", url="http://lo
                     ) from error
                 report = validate_generated_zip(downloaded)
                 original_bytes = Path(downloaded).read_bytes()
-                deterministic_repair = _repair_common_jsx_syntax(downloaded, report)
+                # The official protocol evaluates the model's code as generated: no patching by us.
+                deterministic_repair = (None if official_protocol()
+                                        else _repair_common_jsx_syntax(downloaded, report))
                 if deterministic_repair:
                     repaired_report = validate_generated_zip(downloaded)
                     new_errors = (_error_lines(repaired_report) - _error_lines(report)
