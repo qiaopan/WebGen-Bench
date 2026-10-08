@@ -544,7 +544,9 @@ def _pick_key_lines(llm, script: str, breakage: str, want: dict[str, int], attem
             return {"code": "\n".join(lines), "log": log}
         feedback = " Previous answer rejected: " + "; ".join(problems[:5]) + "."
     log.append({"fallback": "rule"})
-    # Lines only here as well: a <script> wrapper made the example read as a finished component (v6).
+    if not CODE_POOL_REFRESH:  # v7 behaviour, unchanged
+        return {"code": _key_lines(script), "log": log}
+    # v8: lines only here as well: a <script> wrapper made the example read as a finished component (v6).
     return {"code": "\n".join(l for l in _key_lines(script).splitlines() if not re.match(r"\s*</?script\b", l)),
             "log": log}
 
@@ -686,7 +688,7 @@ def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_roo
             continue
         fix = _fix_from_good_site(key, good, max_lines, want)
         source = "good_site"
-        if fix is not None and key.startswith("import:"):
+        if fix is not None and key.startswith("import:") and CODE_POOL_REFRESH:  # v8 only; v7 kept the whole file
             picked = _pick_fragment(llm, fix[0], "earlier websites imported a package that package.json does not "
                                     "declare, so the whole site showed a blank page; the working file below does the "
                                     "same job using only what is installed")
