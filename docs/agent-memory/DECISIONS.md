@@ -425,3 +425,7 @@
 - **固定前缀消融：** `code_pool_fixed`（`src/long_memory_runtime.py`，默认空）读 `config/fixed_code_prefix_v7.json`（v7 跑完 101 题后库里的 vue-api 与 vue-router 两条，解释中的题数为最终支持数；v-model 那条 v7 从未注入，不含），每题按与 v7 相同的选择规则注入，不读写记忆、不记录使用。配置 `config/long_memory_cluster_fixed_prefix_v7.json` = 只有清单（v7）+ 该开关；manifest 顺序，输出 `cluster_fixed_prefix_v7_webgenlm7b_r1`，排在顺序实验之后。对比：固定前缀 − 只有清单 = prompt 里有代码；v7 − 固定前缀 = 记忆积累与按题选择。
 - **集群代码同步的约束：** 同步前把 v8 的两处改动（缺包示例 `_pick_fragment`、key-lines 兜底去 `<script>`）也放到 `WEBGEN_CODE_POOL_REFRESH` 开关后；开关关闭时各分支与集群原 v7 代码等价，因此同步 src 不改变正在跑的 v7 系列运行。
 - **WebGen-LM-14B：** 生成器权重与模型名改为可配置（`start_services.sh` 的 `WEBGEN_GENERATOR_WEIGHTS`，`worker_lib.sh` 用 `WEBGEN_GENERATOR_API_MODEL`；集群 `.env` 现为 WebGen-LM-7B）。权重 `luzimu/WebGen-LM-14B`（revision bb5930f6…）尚未下载；当前 worker 加载的是 7B，14B 需在其退出后另提交作业。显存估算：GPU A 上 32B（0.62）+ 14B（0.28 约 39GB，权重约 30GB）偏紧，开跑前需试启动确认。
+
+### 2026-10-08：不做 14B；更强生成模型改为 32B，作为未来工作（用户决定）
+- WebGen-Bench 原表（Bolt.diy）：WebGen-LM-7B 28.4%、14B 29.4%、32B 38.2%。14B 与 7B 几乎一样强，做出来无法检验"记忆形式取决于模型能力"，硕士论文也不需要。改为把 WebGen-LM-32B 写成未来工作（投稿时再做）；注意 7B + v7 记忆（40.0%）已超过不带记忆的 32B。32B 生成与 32B 评测放不进同一张卡，届时需重新分配显存或申请第 3 张卡。
+- 14B 下载作业 23430 已取消（未开始，未占资源）。生成器可配置的代码与 `download_model.sbatch` 保留，供 32B 使用。
