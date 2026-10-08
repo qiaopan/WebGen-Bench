@@ -1,0 +1,21 @@
+Please implement a forum webpage with multiple features. The forum webpage should have functionalities for posting, replying, searching, and browsing by category. Users should be able to browse and search for posts, create new posts, reply to others' posts, and browse posts by category. The forum should also have a user center where users can view their own posts, reply records, and personal information. Choose ghost white for global background and slate gray for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. forum webpage with multiple features
+   Note from earlier websites: For the forum: use ghost white background and slate gray components.
+2. posting
+   Note from earlier websites: Ensure all form fields are correctly labeled and identifiable.
+3. replying
+4. searching
+5. browsing by category
+6. browse and search for posts
+7. create new posts
+8. reply to others' posts
+9. browse posts by category
+10. user center where users can view their own posts, reply records, and personal information
+11. ghost white for global background and slate gray for all components
+
+General notes from earlier websites:
+- On every page: add @click event handler for navigation buttons.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

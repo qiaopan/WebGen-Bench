@@ -1,0 +1,12 @@
+Please implement a website that displays Canadian nutrition facts labels to help users understand food nutrition information. The website should have a product search function, where users can input food names or keywords (such as apple) to search for related nutrition information. The website should also have a nutrition analysis function, where users can input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value. Additionally, the website should provide a packaging design function, where users can design their own food packaging according to Canadian regulations. Define background as linen; define components with maroon.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. displays Canadian nutrition facts labels
+2. product search function
+   Note from earlier websites: For the product search: label all form fields correctly and use @click for navigation buttons.
+3. nutrition analysis function
+4. packaging design function
+5. define background as linen; define components with maroon
+   Note from earlier websites: On every page: use a consistent color scheme with linen background and maroon components.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

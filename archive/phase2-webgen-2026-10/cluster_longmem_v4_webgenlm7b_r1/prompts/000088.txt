@@ -1,0 +1,14 @@
+Please implement a species biological information database website for displaying and managing biological information data. The website should have functionalities for browsing, searching, and filtering. Users should be able to browse biological information data for different species, search for specific data, and filter data based on different criteria. Specify linen as the base color and maroon for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a species biological information database website for displaying and managing biological information data.
+2. The website should have functionalities for browsing, searching, and filtering.
+   Note from earlier websites: For browsing and searching: implement guest mode for public content access.
+3. Users should be able to browse biological information data for different species
+4. search for specific data
+5. and filter data based on different criteria.
+   Note from earlier websites: For the Filters component: use @submit to trigger filter logic on criteria updates.
+6. Specify linen as the base color and maroon for all components.
+   Note from earlier websites: On every page: add event handlers to navigation buttons to set the state correctly.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

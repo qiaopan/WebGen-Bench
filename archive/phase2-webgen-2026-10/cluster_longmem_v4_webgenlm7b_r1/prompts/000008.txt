@@ -1,0 +1,20 @@
+Please implement an online trivia contest app for hosting knowledge competitions. The app should have functionalities for contest enrollment, question display, answer submission, scoring, and leaderboard. Users should be able to browse and enroll in contests, answer contest questions, submit answers, view their scores and rankings, and compare their performance with others on the leaderboard. Specify beige as the base color and saddle brown for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. contest enrollment
+   Note from earlier websites: For contest enrollment: add a `@click` event handler to update `activeTab` state correctly.
+2. question display
+3. answer submission
+4. scoring
+5. leaderboard
+   Note from earlier websites: For the leaderboard: apply beige and saddle brown colors consistently.
+6. beige as the base color and saddle brown for all components
+7. browse contests
+   Note from earlier websites: On every page: ensure all form fields are correctly labeled and identifiable.
+8. enroll in contests
+9. answer contest questions
+10. submit answers
+11. view their scores and rankings
+12. compare their performance with others on the leaderboard
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

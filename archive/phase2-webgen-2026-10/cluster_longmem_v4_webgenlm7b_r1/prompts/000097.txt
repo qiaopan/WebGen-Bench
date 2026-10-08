@@ -1,0 +1,14 @@
+Please implement a travel and camping website and web app for Europe, showcasing tourist attractions and campsites across the continent. The website should have functionalities for searching, booking, and reviewing. Users should be able to browse tourist attractions and campsites in different countries and cities, book attractions and campsites of interest, and review the attractions and campsites they have visited. Establish light pink as the main background and medium violet red for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a travel and camping website and web app for Europe, showcasing tourist attractions and campsites across the continent.
+2. The website should have functionalities for searching, booking, and reviewing.
+3. Users should be able to browse tourist attractions and campsites in different countries and cities, book attractions and campsites of interest, and review the attractions and campsites they have visited.
+4. Establish light pink as the main background and medium violet red for the controls.
+
+General notes from earlier websites:
+- For the booking form: ensure every detail field has a visible label using v-if.
+- On every page: check components' rendering logic for correct mounting.
+- For navigation: add @click to update `activeTab` state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

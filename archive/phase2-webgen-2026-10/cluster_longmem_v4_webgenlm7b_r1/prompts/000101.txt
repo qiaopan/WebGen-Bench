@@ -1,0 +1,17 @@
+Please implement a travel reimbursement and payment system for employee travel expenses. The system should have functionalities for booking tickets, hotels, and trains, generating settlements, submitting reimbursement applications, and more. Users should be able to book tickets, hotels, and trains, generate settlements report, submit reimbursement applications, and view reimbursement status. Use white for container backgrounds and navy for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. booking tickets
+   Note from earlier websites: On every page: ensure all components are correctly mounted and interactive, using v-if for visibility.
+2. booking hotels
+   Note from earlier websites: For hotel booking: implement a client-side handler for 'View Details' with ref for state.
+3. booking trains
+4. generating settlements
+5. submitting reimbursement applications
+6. viewing reimbursement status
+7. white for container backgrounds and navy for component visuals
+
+General notes from earlier websites:
+- For navigation: update the `activeTab` state correctly on button clicks, using @click.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

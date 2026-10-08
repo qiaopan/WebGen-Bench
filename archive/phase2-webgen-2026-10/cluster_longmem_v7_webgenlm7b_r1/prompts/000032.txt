@@ -1,0 +1,23 @@
+Please implement a whistleblower secrets/awareness website to expose truths about business and society. The website should have an anonymous reporting feature, where users can submit their insights and evidence. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions. The website should have a search function, where users can search for specific topics and keywords. The website should also have a news and blog section, where the latest news and articles are published. Use a azure background and apply midnight blue to the UI components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a whistleblower secrets/awareness website to expose truths about business and society.
+2. The website should have an anonymous reporting feature, where users can submit their insights and evidence.
+   Note from earlier websites: For the anonymous reporting: use v-if to show a confirmation after successful submission.
+3. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions.
+4. The website should have a search function, where users can search for specific topics and keywords.
+   Note from earlier websites: For the search function: implement a search bar in the navigation to display results.
+5. The website should also have a news and blog section, where the latest news and articles are published.
+6. Use a azure background and apply midnight blue to the UI components.
+
+General notes from earlier websites:
+- On every page: ensure all required fields are checked before form submission.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

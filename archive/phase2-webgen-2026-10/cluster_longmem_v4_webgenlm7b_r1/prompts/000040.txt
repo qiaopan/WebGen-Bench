@@ -1,0 +1,21 @@
+Please implement a consulting business website that provides leadership and business training services. The website should have an e-commerce component, allowing customers to purchase services directly from the site. The website should include features such as workshops, online classes, podcasts, and blogs. Users should be able to browse and purchase services, and interact with the website. Set all pages to have a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. consulting business website
+2. provides leadership and business training services
+3. e-commerce component
+4. customers to purchase services directly from the site
+5. workshops
+   Note from earlier websites: For the workshops and services: implement v-if for 'View Details' to update state and show details.
+6. online classes
+7. podcasts
+8. blogs
+9. browse and purchase services
+10. interact with the website
+11. light cyan background and cadet blue components
+   Note from earlier websites: For the color scheme: set all pages to light cyan background and cadet blue components.
+
+General notes from earlier websites:
+- On every page: ensure all form fields are labeled and navigation updates `activeTab` state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

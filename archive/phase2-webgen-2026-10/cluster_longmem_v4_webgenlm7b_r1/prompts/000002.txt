@@ -1,0 +1,14 @@
+Please implement a web-based neighborhood mapping application for comparing data across different areas. The application should allow users to compare demographic, economic, and crime data across different areas. The application should also include data dashboards with interactive charts and customizable layouts. Use ivory for the background and forest green for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web-based neighborhood mapping application for comparing data across different areas
+2. compare demographic, economic, and crime data across different areas
+3. data dashboards with interactive charts and customizable layouts
+4. ivory for the background and forest green for components
+   Note from earlier websites: Use ivory background and forest green for components consistently.
+
+General notes from earlier websites:
+- Ensure all form fields are correctly labeled and identifiable.
+- Ensure `@click` updates `activeTab` state correctly for navigation.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

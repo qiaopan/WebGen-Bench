@@ -1,0 +1,21 @@
+Please implement a golf travel package booking website that sells golf travel packages. The website should have functionalities for customer request handling, booking confirmation, online quotes, customer relationship management, and supplier management. Users can initiate requests through the website homepage form submission, and the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions. Customers can confirm bookings online, and the system will generate digital vouchers and invoices. Assign whitesmoke to body backgrounds and dark cyan to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. golf travel package booking website that sells golf travel packages
+2. functionalities for customer request handling
+   Note from earlier websites: For the booking form: update confirmation state in handler and render message with `v-if` from g0.
+3. booking confirmation
+4. online quotes
+   Note from earlier websites: For QuoteForm: handle form submission and show confirmation message from g1.
+5. customer relationship management
+6. supplier management
+7. Users can initiate requests through the website homepage form submission
+8. the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions
+9. Customers can confirm bookings online
+10. the system will generate digital vouchers and invoices
+11. Assign whitesmoke to body backgrounds and dark cyan to main components
+
+General notes from earlier websites:
+- On every page: ensure components are correctly mounted and displayed, allowing proper interaction from g2.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,17 @@
+Please implement a time attendance system to record employee attendance. The system should have functionalities for employee clocking in and out, and viewing attendance records. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time. Administrators should be able to view all employees' attendance records, perform statistics, and analysis. Specify papaya whip as the base color and dark orange for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a time attendance system to record employee attendance.
+2. The system should have functionalities for employee clocking in and out
+   Note from earlier websites: For employee clocking: use v-if to show clock in/out buttons based on attendance status.
+3. and viewing attendance records.
+   Note from earlier websites: For attendance records: allow employees to view their own records and admins all records.
+4. Employees should be able to clock in and out
+5. and view their own attendance records, including attendance time and absence time.
+6. Administrators should be able to view all employees' attendance records, perform statistics, and analysis.
+7. Specify papaya whip as the base color and dark orange for all components.
+
+General notes from earlier websites:
+- On every page: ensure navigation elements update state and redirect correctly when clicked.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

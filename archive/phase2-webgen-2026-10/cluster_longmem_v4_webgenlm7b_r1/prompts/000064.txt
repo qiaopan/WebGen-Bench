@@ -1,0 +1,15 @@
+Please implement a news blog website for the shipping industry to publish news and company information. The website should have sections for news, company profiles, and events. Users should be able to browse news, company information, and events, and subscribe to newsletters. The website should have a backend management system that allows administrators to manage ad spaces. Implement styling with old lace for the background and rosy brown for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. sections for news, company profiles, and events
+   Note from earlier websites: For the news, company profiles, and events: implement v-if for 'View Details' to update state and display details.
+2. Users should be able to browse news, company information, and events
+3. subscribe to newsletters
+4. backend management system that allows administrators to manage ad spaces
+   Note from earlier websites: For the ad space management: implement a client-side handler for the 'Ad Space Management' button.
+5. styling with old lace for the background and rosy brown for components
+
+General notes from earlier websites:
+- On every page: ensure all form fields are correctly labeled and identifiable.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,17 @@
+Please implement an environmental warning system website to display real-time weather and air quality data. The website should have a real-time update function, displaying the air quality index (AQI) for the past two weeks, and allowing users to compare pollution and air quality changes. Users should be able to browse current weather and air quality data, including temperature, humidity, and gas sensor data. Set primary background to azure mist and elements to dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. real-time weather and air quality data
+2. real-time update function
+   Note from earlier websites: For the real-time update: display AQI for past two weeks, allowing pollution and air quality comparison.
+3. air quality index (AQI) for the past two weeks
+4. compare pollution and air quality changes
+5. browse current weather and air quality data
+6. temperature, humidity, and gas sensor data
+7. primary background to azure mist and elements to dark slate blue
+   Note from earlier websites: For the primary background: set color to azure mist with whitespace between sections for clarity.
+
+General notes from earlier websites:
+- On every page: add a `@click` event handler for navigation and ensure components are correctly mounted.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

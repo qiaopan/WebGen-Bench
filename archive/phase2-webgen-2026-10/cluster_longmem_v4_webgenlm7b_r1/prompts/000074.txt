@@ -1,0 +1,7 @@
+Please create a biography website to display a person's life and achievements. The website should have functionalities to display basic information, life experiences, achievements, and honors. Users should be able to browse biographies, view detailed information, and search for related content. The website should have a search function, allowing users to quickly find relevant information. Assign snow as the background color and apply dim gray to all elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display basic information
+   Note from earlier websites: On every page: ensure all components are mounted, interactive, and add @click for navigation.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

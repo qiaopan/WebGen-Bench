@@ -1,0 +1,21 @@
+Please implement an online learning platform for data science that provides Python data science courses. The platform should have functionalities for browsing courses, learning courses, submitting assignments, and querying grades. Users should be able to browse and select Python data science courses of interest, learn course content, submit assignments, and query their own learning grades. Use honeydew in the background layer and dark olive green for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online learning platform for data science
+2. Python data science courses
+3. browsing courses
+   Note from earlier websites: For the course list: implement a handler for the 'View Details' button.
+4. learning courses
+5. submitting assignments
+6. querying grades
+7. browse and select Python data science courses of interest
+8. learn course content
+9. submit assignments
+10. query their own learning grades
+11. honeydew in the background layer and dark olive green for the component layer
+
+General notes from earlier websites:
+- On every page: ensure all form fields are correctly labeled and identifiable.
+- For the navigation: add a @click event handler that sets the activeTab state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

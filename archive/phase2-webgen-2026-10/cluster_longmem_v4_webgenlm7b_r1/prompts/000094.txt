@@ -1,0 +1,19 @@
+Please implement an animal spotter website that recognizes wild animals and sends SMS alerts. The website should have the functionality to identify different types of wild animals, and assign different color codes to each animal. Users should be able to set alert conditions, and when a specific animal is detected, the system will automatically send an SMS alert. Users should be able to browse detection records, view animal information, and set personalized alerts. Set misty rose as the body background and use firebrick for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. recognizes wild animals and sends SMS alerts
+2. identify different types of wild animals
+3. assign different color codes to each animal
+4. set alert conditions
+5. send an SMS alert
+6. browse detection records
+7. view animal information
+   Note from earlier websites: For the animal spotter: implement @click for 'View Animal Information' and personalized alerts form.
+8. set personalized alerts
+9. misty rose as the body background and use firebrick for the UI
+   Note from earlier websites: For the body and UI: set background as 'misty rose' and UI elements as 'firebrick'.
+
+General notes from earlier websites:
+- On every page: ensure components are mounted, interactive, and navigation updates `activeTab` state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

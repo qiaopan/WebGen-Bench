@@ -1,0 +1,22 @@
+Please implement a community website for sharing promotions and discounts. The website should have functionalities for browsing promotions, sharing promotions, and searching promotions. Users should be able to browse and share promotions, and search for promotions of interest. The website should also have a management backend for managing users, promotions, and website settings. Use ivory for the outer layout and forest green for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. browsing promotions
+2. sharing promotions
+3. searching promotions
+   Note from earlier websites: For the promotion search: implement a search bar with v-if to show results based on entered terms.
+4. search for promotions of interest
+5. management backend
+6. managing users
+7. managing promotions
+8. managing website settings
+9. ivory for the outer layout and forest green for UI blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

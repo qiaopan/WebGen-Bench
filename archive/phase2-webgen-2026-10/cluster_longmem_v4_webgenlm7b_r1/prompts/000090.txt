@@ -1,0 +1,11 @@
+Please implement a social website for user registration, making friends, and sharing. The website should have a registration function, allowing users to create an account and log in. Users should be able to invite friends to join the website and vote on content. Users should be able to upload pictures and earn points. The website should have a personal homepage that displays user information and updates. Use light cyan as the default background and cadet blue for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a social website for user registration, making friends, and sharing.
+2. The website should have a registration function, allowing users to create an account and log in.
+   Note from earlier websites: For the registration function: use v-if to show forms based on user state.
+
+General notes from earlier websites:
+- On every page: implement guest mode for public content access.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

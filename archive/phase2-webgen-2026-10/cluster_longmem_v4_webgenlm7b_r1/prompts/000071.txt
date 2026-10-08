@@ -1,0 +1,15 @@
+Please implement a personal portfolio website to showcase design works. The website should have functionalities for showcasing works about the designer, and contact information. Users should be able to browse the designer's portfolio, learn about the designer's background and experience, and get in touch with the designer through contact information. Configure your theme with peach puff as background and indian red as component color.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a personal portfolio website to showcase design works.
+2. The website should have functionalities for showcasing works about the designer,
+3. and contact information.
+4. Users should be able to browse the designer's portfolio,
+5. learn about the designer's background and experience,
+6. and get in touch with the designer through contact information.
+   Note from earlier websites: For the contact form: implement a client-side submit handler to display a confirmation message.
+
+General notes from earlier websites:
+- On every page: add a `@click` event handler for navigation buttons to set the state correctly.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

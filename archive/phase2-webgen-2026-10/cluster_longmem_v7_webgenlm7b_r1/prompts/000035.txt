@@ -1,0 +1,25 @@
+Please implement a cryptocurrency escrow system for secure cryptocurrency transactions. Buyers should be able to browse and select sellers' cryptocurrency products, conduct transactions, and deposit cryptocurrencies into an escrow account. Sellers should be able to view and manage their products and transaction records. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities. Initialize the background color with light gray and component color with dark red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a cryptocurrency escrow system for secure cryptocurrency transactions.
+2. Buyers should be able to browse and select sellers' cryptocurrency products
+   Note from earlier websites: For the product view: use `ref` and `v-if` to conditionally render selected product details.
+3. conduct transactions
+   Note from earlier websites: For the transaction form: check all fields and show a confirmation message.
+4. deposit cryptocurrencies into an escrow account
+5. Sellers should be able to view and manage their products
+   Note from earlier websites: For the product management: use `ref` and `v-if` to display selected product details.
+6. transaction records
+7. The system should also have transaction confirmation
+8. cryptocurrency release
+9. dispute resolution functionalities
+10. Initialize the background color with light gray and component color with dark red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

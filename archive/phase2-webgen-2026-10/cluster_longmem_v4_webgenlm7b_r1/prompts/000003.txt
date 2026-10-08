@@ -1,0 +1,16 @@
+Please implement a multi-company dashboard for managing and displaying financial data from multiple companies. The dashboard should be able to collect and display financial information from each company, provide consolidated reports, and support cross-company comparisons and reporting. Users should be able to browse financial data from each company, view consolidated reports, and perform financial management and reporting. Apply mint cream as the background; style all components with teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. multi-company dashboard for managing and displaying financial data from multiple companies
+   Note from earlier websites: For the dashboard: apply mint cream background, style components with teal, and use @click for navigation.
+2. collect and display financial information from each company
+   Note from earlier websites: For the company selection: implement a client-side handler that updates state and triggers data display.
+3. provide consolidated reports
+4. support cross-company comparisons and reporting
+5. browse financial data from each company
+   Note from earlier websites: On every page: ensure all form fields are labeled and identifiable.
+6. view consolidated reports
+7. perform financial management and reporting
+8. mint cream as the background; style all components with teal
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

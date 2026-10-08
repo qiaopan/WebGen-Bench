@@ -1,0 +1,15 @@
+Please implement a house cleaning service website that provides cleaning services. The website should have functionalities for booking services, service inquiry, and contact us. Users should be able to browse the website, understand the details of the cleaning services, book cleaning services, check service status, and contact customer service staff by phone number and email address. Set the background to azure mist, and apply dark slate blue to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. booking services
+   Note from earlier websites: For the BookingForm: implement a submit handler with @submit to show a confirmation message.
+2. service inquiry
+3. contact us
+   Note from earlier websites: For the ContactForm: implement a submit handler with @submit to show a confirmation message.
+4. browse the website
+5. understand the details of the cleaning services
+6. check service status
+7. contact customer service staff by phone number and email address
+8. set the background to azure mist, and apply dark slate blue to components
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,21 @@
+Please create a software solutions website to provide information to prospective customers. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information. Configure all backgrounds with misty rose and all components with firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. content that introduces software solutions and staffing business
+2. product and service descriptions
+   Note from earlier websites: For the ProductDescriptionsView.vue: pass product data and reference properties in the template.
+3. industry news and trends
+4. customer cases and success stories
+5. attract the attention of small to medium-sized businesses
+6. content should be easy to understand and engaging
+7. browse the website
+8. search for relevant information or product descriptions
+9. read articles and news
+10. contact the website owner for more information
+   Note from earlier websites: For the ContactForm: implement a submit handler with @submit to show a confirmation.
+11. configure all backgrounds with misty rose and all components with firebrick
+
+General notes from earlier websites:
+- On every page: ensure all form fields are labeled and identifiable.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

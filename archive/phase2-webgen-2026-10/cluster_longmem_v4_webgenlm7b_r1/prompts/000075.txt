@@ -1,0 +1,8 @@
+Please implement a webpage to showcase team projects and skills, including team introduction, project showcase, skill showcase, and contact information. Users should be able to browse team information, view project cases, understand team skills, and contact the team through the contact information. Initialize the background color with whitesmoke and component color with dark cyan.
+
+IMPLEMENTATION GUIDANCE FROM PAST TASKS:
+The requirement above has priority: build everything it lists. These notes only flag parts earlier websites got wrong; they are not the full list.
+- On every page: ensure components mount correctly, and navigation updates `activeTab` state with @click.
+- For the project showcase: implement a client-side handler for 'View Details' using @click.
+
+Reminder: build every page and feature the requirement lists, not only these.

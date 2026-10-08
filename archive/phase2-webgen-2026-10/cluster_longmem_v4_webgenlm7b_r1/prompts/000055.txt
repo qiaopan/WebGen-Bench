@@ -1,0 +1,17 @@
+Please implement a website for the Global Institute of Information Security to display courses and provide online enrollment functionality. The website should have functionalities such as course catalog, chatbot integration, contact form, and certification pathways. Users should be able to browse courses, view course details, enroll online, and contact the institute. Style all pages with a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. course catalog
+   Note from earlier websites: For the course selection: implement a client-side handler using `@click` to update state and display details.
+2. chatbot integration
+3. contact form
+   Note from earlier websites: For the contact form: implement a submit handler to display a confirmation message.
+4. certification pathways
+5. browse courses
+6. view course details
+7. enroll online
+8. contact the institute
+9. lavender background and indigo components
+   Note from earlier websites: On every page: ensure all form fields are correctly labeled and identifiable.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

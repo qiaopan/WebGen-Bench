@@ -1,0 +1,20 @@
+Please implement a web application for one-to-one coaching sessions to match coaches and users. The application should have functionalities such as personality assessment, user profiles, coaching and mentorship matching, scheduling and session management, and goal setting and progress tracking. Users should be able to complete a personality assessment, create and manage their profiles, search for and select suitable coaches, schedule coaching sessions, and set and track goals. Set the background to beige, and apply saddle brown to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. one-to-one coaching sessions
+2. personality assessment
+   Note from earlier websites: For the PersonalityAssessment: Implement a submit handler to display results and update state.
+3. user profiles
+4. coaching and mentorship matching
+5. scheduling and session management
+   Note from earlier websites: For the session scheduling: Implement a submit handler with `v-if` to update and render session details.
+6. goal setting and progress tracking
+7. complete a personality assessment
+8. create and manage their profiles
+9. search for and select suitable coaches
+10. schedule coaching sessions
+11. set and track goals
+12. set the background to beige, and apply saddle brown to components
+   Note from earlier websites: On every page: Ensure all form fields are labeled and add `@click` for navigation buttons.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

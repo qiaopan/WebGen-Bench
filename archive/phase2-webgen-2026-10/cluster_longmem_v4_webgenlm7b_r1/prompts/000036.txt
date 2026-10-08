@@ -1,0 +1,14 @@
+Please implement a website to automatically search and compare product prices across different states. The website should allow users to select specific product categories and parameters. The website should be able to automatically search and compare product prices across different states, including finding the lowest-priced products, and provide detailed product information, including price, quantity, and supplier information. Apply seashell to the canvas background and crimson to all visible components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website to automatically search and compare product prices across different states.
+2. The website should allow users to select specific product categories and parameters.
+   Note from earlier websites: For the category selection: Implement a client-side handler to update state and display selected products.
+   Note from earlier websites: For the product parameter selection: Implement a submit handler and v-if logic to display matching products.
+3. The website should be able to automatically search and compare product prices across different states, including finding the lowest-priced products, and provide detailed product information, including price, quantity, and supplier information.
+4. Apply seashell to the canvas background and crimson to all visible components.
+
+General notes from earlier websites:
+- On every page: Ensure all form fields are correctly labeled and identifiable.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

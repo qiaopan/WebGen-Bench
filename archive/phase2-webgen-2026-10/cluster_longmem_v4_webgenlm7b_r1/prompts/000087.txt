@@ -1,0 +1,21 @@
+Please implement an entertainment directory website to display band information and advertisements. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos. Additionally, the website should allow advertisers to register, log in, and upload their ad content. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements. Implement floral white for the page background and dark goldenrod for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display band information and advertisements
+2. band registration and login functionality
+   Note from earlier websites: For band registration: allow public access to band information without requiring login.
+3. input their bio
+4. provide picture links and audio sample links
+5. provide direct links to YouTube videos
+6. advertisers to register, log in, and upload their ad content
+   Note from earlier websites: For the advertiser registration: implement a client-side submit handler in the form component using @submit.
+7. browse band information
+8. listen to audio samples
+9. watch videos
+10. view advertisements
+11. floral white for the page background and dark goldenrod for the elements
+
+General notes from earlier websites:
+- On every page: ensure state updates correctly with event handlers for navigation buttons.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

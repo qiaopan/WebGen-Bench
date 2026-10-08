@@ -1,0 +1,25 @@
+Please implement an e-government system for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. The system should have functionalities for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. Users should be able to browse related information, submit applications, approve, query status, and perform related operations. The system should also include functions such as leave, middle-level cadres leaving Shenzhen, attendance, and "five powers" management, which can design and circulate corresponding forms and processes. Implement light pink for the page background and medium violet red for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. office management
+2. infrastructure management
+3. procurement management
+4. personnel management
+5. financial management
+6. decision-making management
+7. browse related information
+   Note from earlier websites: On every page: Update state with navigation handlers and allow public content access.
+8. submit applications
+   Note from earlier websites: For form submission: Use `v-if` in leave, middle-level cadres, and FivePowersForm components.
+   Note from earlier websites: For the booking form: Implement a submit handler in ApplicationForm to handle submission and show confirmation.
+9. approve
+10. query status
+11. perform related operations
+12. leave
+13. middle-level cadres leaving Shenzhen
+14. attendance
+15. "five powers" management
+16. design and circulate corresponding forms and processes
+17. light pink for the page background and medium violet red for the elements
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

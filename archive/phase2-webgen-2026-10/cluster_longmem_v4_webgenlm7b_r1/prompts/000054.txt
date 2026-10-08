@@ -1,0 +1,20 @@
+Please implement a high-performance sports recruitment platform that connects athletes and sports organizations. The platform should have functionalities for athlete registration, job posting, job application, and message notification. Users should be able to log in, browse job listings, apply for jobs of interest, and receive relevant notifications. Sports organizations should be able to post jobs, and communicate with athletes. Set ghost white as the body background and use slate gray for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a high-performance sports recruitment platform that connects athletes and sports organizations.
+2. The platform should have functionalities for athlete registration
+3. job posting
+4. job application
+5. message notification
+6. browse job listings
+7. apply for jobs of interest
+8. receive relevant notifications
+9. Sports organizations should be able to post jobs
+10. communicate with athletes
+11. Set ghost white as the body background and use slate gray for the UI
+
+General notes from earlier websites:
+- For the booking form: add event handlers for navigation buttons to update state correctly.
+- On every page: implement guest mode for public content access without login.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

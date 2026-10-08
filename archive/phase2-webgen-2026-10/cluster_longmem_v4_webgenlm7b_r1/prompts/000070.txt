@@ -1,0 +1,18 @@
+Please implement a poetry blog website for displaying and sharing poetry content. The website should have functionalities for browsing poetry, searching poetry, posting poetry, and commenting on poetry. Users should be able to browse different types of poetry, search for specific poetry, post their own poetry, and comment on others' poetry. Apply light goldenrod for layout; use olive drab for buttons and cards.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a poetry blog website for displaying and sharing poetry content.
+2. The website should have functionalities for browsing poetry
+   Note from earlier websites: On every page: ensure components are mounted and interactive.
+3. searching poetry
+4. posting poetry
+5. and commenting on poetry
+   Note from earlier websites: For the poetry commenting form: use @click to update state and display comments.
+6. Users should be able to browse different types of poetry
+7. search for specific poetry
+8. post their own poetry
+9. and comment on others' poetry
+10. Apply light goldenrod for layout; use olive drab for buttons and cards.
+   Note from earlier websites: For the navigation menu: add @click to update `activeTab` state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
