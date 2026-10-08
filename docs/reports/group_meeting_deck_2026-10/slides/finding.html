@@ -1,0 +1,10 @@
+<section id="finding" data-section="关键发现" data-transition="fade" style="background:#14213D;color:#F4F1EA;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<p style="font-size:28px;color:#8FB8EE;font-weight:700">关键发现 · 视角转换</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:76px;font-weight:700;line-height:1.2">记忆不该教小模型"注意什么"，<br>而该给它<span style="color:#8FB8EE">可以照抄的代码</span></h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;border-left:4px solid #8FB8EE;padding:8px 0 8px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">听代码，不听文字</h3><p style="font-size:28px;line-height:1.5;color:#C9D3E3">文字救白屏 ≤1/3，代码示例 7/9；与 Metis 中代码记忆的作用一致（Dai et al., 2026）</p></div>
+<div style="flex:1;border-left:4px solid #8FB8EE;padding:8px 0 8px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">条件泛化，做法具体</h3><p style="font-size:28px;line-height:1.5;color:#C9D3E3">"有多页面时"可以泛化；"怎么写"必须是具体写法（ExpeL 的 insight + 成功示例，Zhao et al., 2024）</p></div>
+<div style="flex:1;border-left:4px solid #8FB8EE;padding:8px 0 8px 32px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">示例只给片段</h3><p style="font-size:28px;line-height:1.5;color:#C9D3E3">整份文件会被当成"已写完"，模型直接交脚手架</p></div>
+</div>
+<aside>这是整个故事的转折点。问题不在于记忆的内容对不对，而在于形式是不是小模型能执行的。第一，小模型听代码、不听文字，这和 Metis 里代码记忆的作用一致。第二，条件可以泛化，比如“网站有多个页面时”，但做法必须具体到代码写法，这对应 ExpeL 的 insight 加成功示例。第三，示例只能给片段，整份文件会被当成已经写完的答案。</aside>
+</section>

@@ -1,0 +1,22 @@
+<section id="order-design" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">顺序鲁棒性 · 实验设计</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">对 Long Memory 来说，任务顺序就是实验变量</h2>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:34px;font-weight:700">四种顺序，每次从空库开始</h3>
+<ol style="font-size:28px;line-height:1.6;color:#4A5568">
+<li>原始 manifest（领域分块）</li>
+<li>分层打乱，种子 11</li>
+<li>分层打乱，种子 29</li>
+<li>跨领域轮换交错</li>
+</ol>
+</div>
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:34px;font-weight:700">两臂交叉执行（ABBA）</h3>
+<p style="font-size:28px;line-height:1.5;color:#4A5568">每题 Long Memory 和 No Memory 背靠背；谁先跑逐题轮换：L→N，N→L，L→N……</p>
+<p style="font-size:28px;line-height:1.5;color:#4A5568">抵消集群负载、评测状态随时间的漂移。</p>
+</div>
+</div>
+<p style="font-size:26px;color:#6A7179">报告：按任务配对的差值 + bootstrap 置信区间；按领域、位置分组。</p>
+<aside>顺序鲁棒性。原来的 benchmark 每题独立，顺序无所谓；但对 Long Memory 来说，顺序决定了每道题能看到哪些经验，所以顺序本身就是实验变量。我们计划跑四种顺序，每次都从空库开始：原始的领域分块顺序、两个不同种子的分层打乱，以及跨领域轮换交错。每种顺序下，两组逐题背靠背执行，谁先跑按 ABBA 轮换，抵消集群负载随时间的漂移。四种顺序都提升，说明记忆普遍有效；只有领域分块有效，说明是邻近领域效应；交错明显变差，说明跨领域检索是瓶颈。</aside>
+</section>

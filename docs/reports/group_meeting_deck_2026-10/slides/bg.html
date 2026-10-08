@@ -1,0 +1,10 @@
+<section id="bg" data-section="研究背景与问题" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">研究背景</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:64px;font-weight:700;line-height:1.2">大模型能从需求生成整个网站，<br>但每个任务都是"从零开始"</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px"><h3 style="font-size:36px;font-weight:700">WebGen-Bench</h3><p style="font-size:30px;line-height:1.5;color:#4A5568">101 个网站需求（20 个领域，Lu et al., 2025）。生成后用 GUI 智能体逐项点击测试功能，再给外观打 1–5 分。</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px"><h3 style="font-size:36px;font-weight:700">现状</h3><p style="font-size:30px;line-height:1.5;color:#4A5568">生成器做完一个网站就忘了。同一类错误（白屏、漏 import、缺导航）在下一个任务里反复出现。</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px"><h3 style="font-size:36px;font-weight:700">长期记忆</h3><p style="font-size:30px;line-height:1.5;color:#4A5568">做完一题就反思、存经验，下一题检索注入（ExpeL, Zhao et al., 2024；ReasoningBank, 2025；Voyager, Wang et al., 2023；Metis, Dai et al., 2026）。</p></div>
+</div>
+<aside>先说背景。WebGen-Bench 有 101 个网站需求，覆盖 20 个领域。模型生成网站以后，用一个 GUI 智能体逐项点击测试功能，再给外观打 1 到 5 分。现在的问题是，生成器每做完一个网站就忘了，同样的错误，比如白屏、漏 import、缺导航，会在下一个任务里反复出现。长期记忆的思路，是做完一题就反思、把经验存下来，下一题检索出来注入 prompt，相关工作有 ExpeL、ReasoningBank、Voyager，以及今年的 Metis。论文里 WebGen-LM-7B 的准确率是 28.4%，这是我们的起点。</aside>
+</section>

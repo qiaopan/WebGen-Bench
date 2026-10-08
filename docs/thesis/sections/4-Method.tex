@@ -1,0 +1,80 @@
+\chapter{Method}
+\label{chap:method}
+
+\section{Starting Point: Why No Memory Fails}
+\label{sec:nm-failures}
+We began by inspecting the code that No Memory actually produced, rather than its scores. Two findings shaped everything that followed.
+
+\paragraph{Blank pages from basic errors.} Bolt.diy's Vue template declares only \texttt{vue} as a dependency, and WebGen-LM-7B never edits \texttt{package.json} (0 of 81 inspected responses). When it imports \texttt{vue-router} or uses a Vue function such as \texttt{ref} without importing it, the whole site renders as a blank page and every test case fails. In an early Long Memory run, 26 of 74 tasks were blank, 19 of them because of an undeclared \texttt{vue-router} import. These are not hard tasks; they are basic errors that the model repeats.
+
+\paragraph{Text is not followed.} In a diagnostic on nine tasks that had produced blank pages, we added a single sentence to the prompt, phrased in several ways (``add vue-router to package.json'', ``do not use vue-router'', ``put pages in App.vue with \texttt{ref} and \texttt{v-if}'', or the same sentence at both the start and the end). None recovered more than one task in three. A ten-line code example of the same idea recovered seven of nine. This matches the observation that small models follow long textual guidance poorly~\cite{harada2025curse,li2025smallmodels} and suggested that memory should be delivered as code.
+
+\section{Design History}
+\label{sec:history}
+Each version was motivated by an error analysis of the previous one. \Cref{tab:history} summarises the path; we describe the main steps below.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Design iterations. Each row addresses a failure observed in the previous row.}
+\label{tab:history}
+\begin{tabularx}{\textwidth}{p{3.2cm}XXX}
+\toprule
+Attempt & Problem addressed & Inspired by & Outcome \\
+\midrule
+Three-layer memory (trajectories, cases, experiences/skills) & Traceable lessons & \cite{zhao2024expel,wang2023voyager,reasoningbank2025} & Abstract experiences too vague; kept concrete cases only \\
+Guidance compression & Injected text 5.7$\times$ the requirement; only the home page was built & \cite{harada2025curse,liu2024lost} & One task 0.25 $\rightarrow$ 0.83, but compression dropped required features \\
+Step-wise reflection & Guesses stored as lessons & \cite{zeller2009whyprograms,chen2023selfdebug,dhuliawala2023cove} & Better evidence; high run-to-run variance \\
+Dedup + utility (v3) & 34 near-identical lessons filled the pool & \cite{zhao2024expel,chhikara2025mem0,zhou2025memento} & Less repetition; blank pages unchanged \\
+Requirement checklist (v4) & Requirement drowned by guidance & \cite{wallace2024hierarchy,liu2024lost} & Strong early, worse than No Memory later \\
+Code pool (v6) & Text not followed; generic entries & \cite{dai2026metis,wang2023voyager,wang2025awm} & A one-line example caused untouched scaffolds \\
+Fragments only (v7) & Example read as a finished file & -- & Best version; gap grows over time \\
+Short \gls{cot} (rejected) & Missing imports & \cite{li2025smallmodels} & 0/5 produced any files \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Phase 1 (text memory).} Our first memory followed ExpeL-style reflection: after each task a reflection model wrote functional and appearance \emph{cases} (trigger, expected state, observation, cause, preventative action) with evidence references, and later tasks retrieved and rewrote relevant cases into guidance. Early on, a scaffold bug meant that guidance was never delivered: Bolt.diy treats Enter as ``send'', so everything after the first line break was dropped. After fixing this, we found that long guidance made the model build only the home page, and that compressing it helped but sometimes removed required features. We also learned that rules given to the reflection model must teach a method of investigation, not specific answers; conclusions written by hand would make the memory a human-designed prompt rather than a learned one.
+
+\paragraph{v4: requirement checklist.} The memory model splits the original requirement into a checklist and attaches each retrieved lesson verbatim to the checklist item it concerns. Code checks reject checklist items that share no content words with the requirement (to avoid importing features from other tasks), and re-split the requirement if the checklist covers too little of it. v4 was clearly better than No Memory on the first 30 tasks (39.3\% vs 26.0\%) but slightly worse on the remaining 71 (27.8\% vs 29.5\%).
+
+\paragraph{v6: code pool.} Motivated by \Cref{sec:nm-failures}, the code pool turns recurring code-level problems into code examples (\Cref{sec:codepool}). Its first version showed a one-line import wrapped in \texttt{<script setup>} tags. To the generator this looked like a finished empty component, and in two of six tasks that received it the model returned the untouched Vite scaffold.
+
+\paragraph{v7: fragments only.} v7 requires every example to be a fragment: verbatim lines from a working file, no tag lines, and at least one line that \emph{uses} the imported function. It also fixes a leak through which a statistics block, meant only for ranking, reached the prompt. v7 is the version we evaluate in \Cref{chap:results}.
+
+\paragraph{Rejected: short planning step.} Asking the generator to first list, per file, the Vue functions it would use and then write the code produced planning text only, losing Bolt.diy's file format in five of five tasks.
+
+\section{Final Pipeline (v7)}
+\label{sec:pipeline}
+For each task, in order:
+\begin{enumerate}
+  \item \textbf{Requirement checklist.} The memory model splits the requirement into items (\Cref{sec:checklist}).
+  \item \textbf{Retrieve lessons.} Functional lessons are retrieved by similarity and judged for applicability by the memory model; only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
+  \item \textbf{Code pool.} At most two verified fragments whose trigger condition holds (\Cref{sec:codepool}).
+  \item \textbf{Generate and evaluate.} One generation by WebGen-LM-7B; official functional and appearance evaluation.
+  \item \textbf{Reflect and store.} The memory model reflects on the evaluated task; new lessons are deduplicated against existing ones, utilities are updated, and code facts are computed for the code pool.
+\end{enumerate}
+The products of step 5 are read by steps 2 and 3 of later tasks; this is the only path through which tasks influence each other.
+
+\subsection{Requirement Checklist}
+\label{sec:checklist}
+The original requirement remains at the top of the prompt and is declared binding. The checklist below it repeats every requested feature, so that memory content cannot crowd a feature out of the model's attention~\cite{liu2024lost,wallace2024hierarchy}. Lessons are attached to the item they concern rather than listed separately, which avoids a separate list being read as the full scope of the task.
+
+\subsection{Code Pool}
+\label{sec:codepool}
+The code pool is computed without an \gls{llm} for detection:
+\begin{itemize}
+  \item \textbf{Problem facts.} After each task, code analysis of the generated site records undeclared imports (\texttt{import:<package>}), Vue functions used without import (\texttt{vue-api}), and compile errors obtained by compiling each \gls{sfc} with \texttt{@vue/compiler-sfc} exactly as Vite would.
+  \item \textbf{Trigger.} A problem key becomes active only after it has appeared in at least two different tasks, following Metis's rule of promoting a procedure only after it recurs~\cite{dai2026metis}.
+  \item \textbf{Source.} The example comes from the chain's own earlier websites that scored at least 0.5 and compile. Successful sites supply \emph{how} to write it; failed sites decide \emph{when} it is needed~\cite{reasoningbank2025}.
+  \item \textbf{Fragment selection.} The memory model picks the key lines; code then verifies that the lines are verbatim from the source file, contain at most 15 lines, contain no \texttt{<script>}/\texttt{<template>} tag lines, and include the import of the most frequently missed function plus a line that calls it. If the model fails twice, a rule-based extraction is used.
+\end{itemize}
+Because the triggers are general (missing imports, page switching), the code pool behaves partly like a learned prompt prefix: once active, many later tasks receive the same fragment. We report when each entry first became active and plan an ablation with a fixed prefix from task one (\Cref{chap:discussion}).
+
+\subsection{Memory Hygiene}
+\begin{itemize}
+  \item \textbf{Concrete only.} Common-pool entries without a code construct (for example \texttt{@click}, \texttt{v-if}, an \texttt{import} line) are dropped. Rewriting may generalise the \emph{condition} under which a lesson applies but not the \emph{action}.
+  \item \textbf{Deduplication at storage time.} A new lesson is compared with similar stored lessons; if the memory model judges it to share the same root cause and fix, it is recorded as support for the old lesson instead of a new entry~\cite{chhikara2025mem0}.
+  \item \textbf{Utility and retirement.} For each lesson we count injections $u$ and recurrences $r$ (the same problem reappearing after injection), and compute utility $(u - r + 1)/(u + 2)$~\cite{zhou2025memento,zhao2024expel}. Ranking uses support $\times$ severity $\times$ utility; a lesson injected at least five times with utility below 0.3 is no longer injected.
+  \item \textbf{No hand-written conclusions.} Instructions to the reflection model describe how to investigate (follow the code path, trace styles from element to global stylesheet, list candidate causes and rule them out) but never what the answer is.
+\end{itemize}

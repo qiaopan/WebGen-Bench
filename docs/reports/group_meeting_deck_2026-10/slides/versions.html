@@ -1,0 +1,13 @@
+<section id="versions" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">版本迭代</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700">每一版都由上一版的错误分析驱动</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:28px">
+<tr><th style="width:12%;text-align:left">版本</th><th style="width:44%;text-align:left">做了什么</th><th style="width:44%;text-align:left">暴露的问题</th></tr>
+<tr><td>旧版</td><td>文字经验 + 通用池</td><td>白屏多；空泛条目反复注入</td></tr>
+<tr><td>v4</td><td>+ 需求清单、去重、效用排序</td><td>前 30 题好，后期输给 No Memory</td></tr>
+<tr><td>v6</td><td>+ 代码池、具体化过滤、退役</td><td>一行 import 示例 → 交脚手架（3/13）</td></tr>
+<tr><td>v7</td><td>+ 示例须含调用行、去文件包装；统计块不注入</td><td>剩余：少量缺 import（7B 基础错误）</td></tr>
+</table>
+<p style="font-size:28px;color:#4A5568">迭代流程：本地小样本（3–5 题）只做代码检查 → 有效才上集群，集群一次只跑一个冻结版本。</p>
+<aside>这一页把版本串起来。旧版是文字经验加通用池，白屏多、空话反复注入；v4 加了需求清单、去重和效用排序，前期好、后期输给 No Memory；v6 加了代码池、具体化过滤和退役机制，但一行 import 的示例导致交回模板；v7 要求示例带调用行、去掉文件包装，统计块也不再注入。我们的流程是：新想法先在本地 3 到 5 题上只做代码检查，有效才上集群，集群一次只跑一个冻结的版本。v5 只是本地调试版。</aside>
+</section>

@@ -1,0 +1,28 @@
+HISTORICAL CASES TO ADAPT FOR THE CURRENT TASK
+
+The current task is the binding website requirement. Adapt the following historical
+cases only when their underlying implementation lesson applies. Do not copy the old
+business domain, wording, colors, or layout.
+
+CASE A — Contact form confirmation (historical successful case)
+Trigger: user fills name, email, and message, then clicks Send.
+Expected change: the form validates input, submits, and displays a visible confirmation
+message with the user's name.
+Observed success: after valid submission a confirmation message was shown.
+Implementation lesson: use explicit local submission state and render an observable
+success branch; do not rely on an invisible or implicit submission.
+Verification: fill valid values, click Send once, and confirm the success message remains.
+
+CASE B — Date-of-birth format validation (historical failure case)
+Trigger: user submits a credit-score inquiry form with a DOB value.
+Observed failure: malformed or ambiguous DOB input caused validation errors and blocked
+submission.
+Implementation lesson: make the accepted DOB format explicit, validate it before submit,
+and show a clear inline error when invalid.
+Verification: test one valid DOB and one invalid DOB, confirming the valid path reaches
+the expected result and the invalid path gives visible feedback.
+
+TASK-SPECIFIC ADAPTATION
+Before writing code, translate only the applicable lessons above into concrete
+implementation decisions for the current credit-repair website. Keep the public task
+requirement intact, and implement the adapted behaviour rather than merely describing it.

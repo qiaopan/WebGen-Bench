@@ -1,0 +1,11 @@
+<section id="ch3" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#EB6834;font-weight:700">挑战 3 · 失败发生在代码层</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">一处小错就整站 0 分，而且模型改不了依赖</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #EB6834;padding:32px 0 0 0"><p style="font-size:80px;font-weight:700">26 / 74</p><p style="font-size:30px;color:#4A5568;line-height:1.4">旧 Long Memory 的任务白屏（整题 0 分）</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #EB6834;padding:32px 0 0 0"><p style="font-size:80px;font-weight:700">19</p><p style="font-size:30px;color:#4A5568;line-height:1.4">其中 import 了 vue-router 却没声明</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #EB6834;padding:32px 0 0 0"><p style="font-size:80px;font-weight:700">0 / 81</p><p style="font-size:30px;color:#4A5568;line-height:1.4">生成器回复里改过 package.json 的次数</p></div>
+</div>
+<p style="font-size:30px;line-height:1.5;color:#4A5568">官方协议只生成一次、不修复。第一阶段我们自己的补丁把这类错误掩盖了；按官方协议跑，这些错误就暴露出来，而且 No Memory 同样会犯。</p>
+<aside>第三个挑战：真正致命的失败发生在代码层。旧版 Long Memory 74 题里有 26 题白屏，其中 19 题是 import 了 vue-router 却没在 package.json 里声明。而生成器的 81 次回复里，一次都没有改过 package.json。第一阶段我们自己的修复补丁把这类错误掩盖了；按官方协议一次生成、不修复，它们就全部暴露出来，No Memory 也一样会犯。所以结论是：记忆必须作用在代码层，而且必须是生成器写自己的文件就能做到的事。</aside>
+</section>

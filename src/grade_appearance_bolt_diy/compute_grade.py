@@ -70,12 +70,13 @@ def first_grade_int(text: str) -> int:
     #  ▸ (-?\d+)   capture an optional sign and at least one digit
     match = re.search(r'Grade.*?(\d)', text, flags=re.IGNORECASE | re.DOTALL)
     return int(match.group(1)) if match else 0
-    
+
             
-def get_grade(in_dir, prefix):
+def get_grade(in_dir, prefix, benchmark_total):
     app_paths = [get_app_path(in_dir, app) for app in os.listdir(in_dir) if app.startswith(prefix)]
     
     total_grade = 0
+    evaluated_count = 0
     for app_path in tqdm(app_paths):
         result_path = os.path.join(app_path, "shots", "result.json")
         if not os.path.isfile(result_path):
@@ -83,11 +84,26 @@ def get_grade(in_dir, prefix):
         result = load_json(result_path)
         grade = first_grade_int(result["model_output"])
         total_grade += grade
+        evaluated_count += 1
         
-    grade = round(total_grade / 101, 2)
-    save_json({"grade": grade}, os.path.join(in_dir, "grade.json"))
+    benchmark_grade = round(total_grade / benchmark_total, 2) if benchmark_total else 0
+    evaluated_grade = round(total_grade / evaluated_count, 2) if evaluated_count else 0
+    save_json(
+        {
+            "grade": benchmark_grade,
+            "benchmark_total": benchmark_total,
+            "evaluated_count": evaluated_count,
+            "evaluated_average": evaluated_grade,
+        },
+        os.path.join(in_dir, "grade.json"),
+    )
     
-    return grade
+    return {
+        "benchmark_average": benchmark_grade,
+        "benchmark_total": benchmark_total,
+        "evaluated_count": evaluated_count,
+        "evaluated_average": evaluated_grade,
+    }
         
         
 if __name__ == "__main__":
@@ -95,8 +111,14 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Compute the grade based on model output.")
     parser.add_argument("--in_dir", default="downloads/OpenAILike/Qwen2.5-Coder-32B-Instruct", help="Path to the input directory")
     parser.add_argument("--prefix", default="00", help="Prefix for the app directories")
+    parser.add_argument(
+        "--test_file",
+        default="data/test.jsonl",
+        help="JSONL group file used to determine the benchmark denominator",
+    )
     args = parser.parse_args()
     in_dir = os.path.join(args.in_dir, "extracted")
     prefix = args.prefix
-    print(get_grade(in_dir, prefix))
-    
+    with open(args.test_file, "r", encoding="utf-8") as handle:
+        benchmark_total = sum(1 for line in handle if line.strip())
+    print(get_grade(in_dir, prefix, benchmark_total))

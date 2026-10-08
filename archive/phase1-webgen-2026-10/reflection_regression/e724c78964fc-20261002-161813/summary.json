@@ -1,0 +1,178 @@
+{
+  "prompt_version": "e724c78964fc",
+  "gold": "/Users/ma/Downloads/792/webgen/config/reflection_regression/gold_v1.json",
+  "tasks": {
+    "000014": [
+      {
+        "check": "task000001_0",
+        "expect": "uncertain",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_2",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "cause not named"
+        ],
+        "cause": "The services view does not include a separate introductory content block, so the page never presents the requested introduction even after the tester reaches the services section."
+      }
+    ],
+    "000016": [
+      {
+        "check": "task000001_0",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The homepage does not expose a reachable entry point to the company introduction route/section, so the tester could not navigate to the history, mission, and values content before the interaction budg"
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The run never reached the news feature. The homepage shown in the screenshots did not expose a visible way to open News and Updates, so the tester exhausted interactions without completing the task."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The contact form exists in code, but the page shown to the tester did not provide a visible navigation path to it, so the check ran out of interactions before reaching the ta"
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      }
+    ],
+    "000017": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      },
+      {
+        "check": "task000001_4",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      }
+    ],
+    "000019": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_1",
+        "expect": "uncertain",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not completed because the tester ran out of interactions before finishing the extra verification steps; the trajectory does not show a concrete search failure."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "none",
+        "ok": true,
+        "problems": [],
+        "cause": ""
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The website does not provide a dedicated customer cases or success stories feature or entry point, so the tester could only inspect unrelated pages and buttons."
+      },
+      {
+        "check": "task000001_5",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      }
+    ],
+    "000021": [
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      }
+    ]
+  },
+  "ok": 10,
+  "checks": 18
+}

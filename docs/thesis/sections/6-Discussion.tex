@@ -1,0 +1,29 @@
+\chapter{Discussion}
+\label{chap:discussion}
+
+\section{Form Matters More Than Amount}
+The central observation of this work is that a small generator uses memory very selectively. Textual lessons, even correct and relevant ones, were rarely followed, and generic ones accumulated and displaced useful content. Short verified code fragments were followed. This agrees with Metis's finding that code memory complements text memory~\cite{dai2026metis}, and adds that for a 7B generator the format of the memory can decide whether it helps at all. The form of the code also matters: a fragment that looked like a complete file was copied as a finished answer, producing an untouched scaffold.
+
+A second observation is that part of the gain is not ``smarter'' code but protection against collapse. In the earliest phase, short prompts made the model return the default scaffold in five of eight tasks, while longer, specific prompts did not. Both effects are real benefits of memory, but they should be described separately.
+
+\section{Limitations and Threats to Validity}
+\begin{itemize}
+  \item \textbf{Single runs.} Each arm was run once per order. Single tasks varied widely between runs in earlier diagnostics, so per-task conclusions are weak; we rely on paired comparisons over many tasks. \todo{Update after order experiments.}
+  \item \textbf{One generator and one scaffold.} All results are for WebGen-LM-7B with Bolt.diy and a Vue template. Larger generators may follow text well and benefit less from code fragments.
+  \item \textbf{Residual generator errors.} About 4.6\% of generated components omit a Vue import with or without memory; examples did not reduce this random slip, and the protocol forbids repairing it after generation.
+  \item \textbf{Code pool as a learned prefix.} Because its triggers are general, the code pool behaves partly like a fixed prompt prefix. A fixed-prefix-from-task-one ablation is needed to separate learning from the presence of code.
+  \item \textbf{Appearance grader.} We grade appearance with Qwen2.5-VL-32B instead of GPT-4o, so appearance scores are compared only between our arms. On tasks where both arms produce a working site, appearance is unchanged (3.25 vs 3.22), so our gains are functional only.
+  \item \textbf{Iterative development on the same benchmark.} The pipeline was designed while observing results on WebGen-Bench tasks. Reflection rules describe methods rather than answers, memory uses only earlier tasks, and the final runs start from an empty memory, but some overfitting of design choices to this benchmark cannot be excluded.
+  \item \textbf{Evaluator noise.} \gls{gui} testers can exhaust their interaction budget or misjudge pages. We keep raw evaluator transcripts and distinguish interaction-budget exhaustion from logic failures.
+  \item \textbf{Memory model stronger than generator.} The 72B memory model is larger than the 7B generator; the results show what a small generator can gain with a stronger teacher, not self-improvement in isolation.
+\end{itemize}
+
+\section{Ethical Considerations and Impact}
+\paragraph{Data and privacy.} The benchmark requirements are synthetic and contain no personal data. All models run on university hardware; no task data were sent to external services.
+\paragraph{Environmental cost.} Each full run of 101 tasks takes about a day on two H200 GPUs, and the study required many runs. We reduced cost by testing changes on three to five tasks, by checking generated code statically before evaluating, and by avoiding repeated validations.
+\paragraph{Self-improving code agents.} A memory that turns observed outcomes into future behaviour can also entrench mistakes or unsafe patterns. Our design keeps full provenance of every memory, requires code examples to compile, and never edits the source record, so that any injected content can be traced back to the task that produced it. Deployed systems would additionally need review of stored code for security.
+\paragraph{Economy and society.} Tools that let small, locally hosted models build working websites lower the cost of software creation and keep data on local infrastructure, which may benefit small organisations. They may also reduce demand for routine front-end work. Generated websites still require human review for correctness and accessibility.
+\paragraph{Research integrity.} We report negative results (short \gls{cot}, the scaffold regression in v6, v4's decline) and invalidated our own earlier results when a delivery bug was found.
+
+\section{Project Management}
+The project was organised in versions. The cluster ran one frozen version at a time; new ideas were tested locally on small samples and with static code checks, and a version was replaced only when the new one was shown to be better. Decisions and their evidence were recorded continuously in a decision log, which made it possible to reconstruct why each component exists.

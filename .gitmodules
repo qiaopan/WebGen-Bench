@@ -1,0 +1,4 @@
+[submodule "bolt.diy-Fork"]
+	path = bolt.diy-Fork
+	url = git@github.com:qiaopan/bolt.diy.git
+	branch = diy-fork

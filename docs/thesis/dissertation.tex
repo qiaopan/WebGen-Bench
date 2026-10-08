@@ -1,0 +1,110 @@
+\documentclass[a4paper,12pt,numbered,print]{uathesis}
+\usepackage{graphicx}
+\usepackage{cmap}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage[inline]{enumitem}
+\usepackage[table,usenames,dvipsnames]{xcolor}
+\usepackage{cleveref}
+\usepackage{makecell}
+\usepackage[acronym]{glossaries}
+\usepackage{glossary-mcols}
+\renewcommand*{\glspostdescription}{}
+\renewcommand{\glossarypreamble}{\vspace*{-4em}}
+
+\usepackage[Lenny]{fncychap}
+\ChNameVar{\fontsize{18}{20}\usefont{OT1}{ptm}{m}{n}\selectfont}
+\ChTitleVar{\huge\bfseries\fontfamily{ptm}\selectfont}
+\usepackage{titlesec}
+
+\newtheorem{definition}{Definition}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\renewcommand\floatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+\setcounter{totalnumber}{50}
+\setcounter{topnumber}{50}
+\setcounter{bottomnumber}{50}
+
+\definecolor{light-gray}{gray}{0.95}
+\newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
+% Placeholder for numbers or text that depend on experiments still running.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,columns=fullflexible}
+
+\newlist{questions}{enumerate}{2}
+\setlist[questions,1]{label=\textit{RQ\arabic*.},ref=\textit{RQ\arabic*}}
+\setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
+
+\renewcommand{\figurename}{Figure}
+
+\makeglossaries
+\loadglsentries{glossary}
+
+\begin{document}
+\title{Learning from Earlier Websites: Cross-Task Long-Term Memory for a Small Website-Generation Model}
+\author{Qiaopan Ma}
+\subjectarea{Artificial Intelligence}
+\dept{School of Computer Science}
+\supervisor{Qian Liu}
+\crest{\includegraphics[width=0.2\textwidth]{University_of_Auckland_Coat_of_Arms.png}}
+\degreetitle{Master of Artificial Intelligence}
+\degreedate{2026}
+\university{The University of Auckland}
+
+\maketitle
+
+\frontmatter
+\begin{abstract}
+Large language model (LLM) agents that generate websites solve every task from scratch: what went wrong on one website is forgotten before the next one starts. This dissertation asks whether a \emph{small} generator, the 7-billion-parameter WebGen-LM-7B, can improve across a sequence of WebGen-Bench tasks if it is given a long-term memory built from its own earlier attempts, without changing its weights or the official evaluation protocol.
+
+We first reproduce the official No Memory baseline on a self-hosted cluster (28.5\% accuracy on 101 tasks versus 28.4\% reported). An analysis of its failures shows that most zero-score tasks are not hard tasks but blank pages caused by basic code errors, such as importing a package that is not installed, and that the model rarely follows advice written as text. A first text-based memory therefore helps early in the sequence but falls behind No Memory later, as generic advice accumulates in the prompt.
+
+The final design (v7) combines three parts: a requirement checklist that keeps every requested feature visible; a code pool that, once a problem has appeared in at least two tasks, injects a short verified code fragment taken from the chain's own successful websites; and memory hygiene through deduplication at storage time, a concreteness filter and utility-based retirement. In a single run over all 101 tasks, v7 reaches 40.0\% accuracy against 28.5\% for No Memory (mean paired gain 11.5 points, 95\% CI 6.0--16.9) and reduces zero-score tasks from 30 to 13; unlike a text-only memory, its advantage holds over the last 71 tasks (40.4\% vs 29.5\%). Gains are functional: appearance on sites that work is unchanged. \todo{Add ablation and task-order results.}
+
+The main lesson is that, for a small generator, \emph{what form} a memory takes matters more than how much is remembered: verified code fragments transfer where textual lessons do not. We discuss the limits of these single-run results, the cost of the evaluation, and the ethical considerations of self-improving code agents.
+\end{abstract}
+
+\begin{acknowledgements}
+\todo{Thank your supervisor, the School of Computer Science for access to the CS ML cluster, and anyone else who helped.}
+
+\begin{flushright}
+Qiaopan Ma
+
+November, 2026
+\end{flushright}
+\end{acknowledgements}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+\addtocontents{toc}{\vspace{-4em}}
+\listoffigures
+\addtocontents{lof}{\vspace{-4em}}
+\listoftables
+\addtocontents{lot}{\vspace{-4em}}
+\printglossary[type=\acronymtype, style=mcolindex, nonumberlist]
+
+\mainmatter
+\include{sections/1-Introduction}
+\include{sections/2-Background}
+\include{sections/3-Setup}
+\include{sections/4-Method}
+\include{sections/5-Results}
+\include{sections/6-Discussion}
+\include{sections/7-Conclusion}
+
+\backmatter
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+\end{document}

@@ -1,0 +1,41 @@
+\chapter{Introduction}
+\label{chap:intro}
+\glsresetall
+
+\section{Motivation}
+Agents built on \glspl{llm} can now turn a natural-language request into a running website~\cite{lu2025webgenbench}. Benchmarks such as WebGen-Bench evaluate this ability end to end: the agent writes a project, the project is started, and a \gls{vlm} tester clicks through the site to check whether each requested feature works~\cite{lu2025webgenbench}. In these benchmarks every task is solved in isolation. An agent that produced a blank page because it imported an uninstalled package on one task will make the same mistake on the next one.
+
+Humans do not work this way. A developer who has broken a build once remembers why. Recent work on agent memory tries to give \glspl{llm} the same ability by storing lessons from earlier trajectories and retrieving them for later tasks~\cite{zhao2024expel,wang2023voyager,reasoningbank2025,dai2026metis}. Most of these studies use large, capable models. It is less clear whether memory helps a \emph{small} model, which may not reliably follow long instructions~\cite{harada2025curse,li2025smallmodels} and may be distracted by irrelevant context~\cite{shi2023distracted,du2025contextlength}.
+
+This dissertation studies that question on WebGen-Bench with WebGen-LM-7B, the 7-billion-parameter generator released with the benchmark. We keep the generator's weights, the scaffold (Bolt.diy) and the official evaluation protocol fixed, and change only the text that is added to the prompt from a memory of earlier tasks.
+
+\section{Research Questions}
+\begin{questions}[itemindent=1.5em]
+    \item Can a cross-task long-term memory, built only from the agent's own earlier tasks, improve the functional accuracy of a small website generator under the official WebGen-Bench protocol? \label{rq1}
+    \item What form of memory does a small generator actually use: textual lessons, structured requirement checklists, or code examples? \label{rq2}
+    \item Does the benefit grow as experience accumulates, and is it robust to the order in which tasks are presented? \label{rq3}
+\end{questions}
+
+\section{Contributions}
+\begin{enumerate}
+    \item A faithful, fully self-hosted reproduction of the WebGen-Bench No Memory baseline for WebGen-LM-7B (28.5\% vs 28.4\% reported), together with a failure analysis showing that a large share of zero scores are blank pages caused by basic code errors (\Cref{chap:setup}).
+    \item A long-term memory pipeline for website generation with three components, a requirement checklist, a code pool of verified fragments, and memory hygiene, each motivated by a failure of the previous version (\Cref{chap:method}).
+    \item Empirical evidence that, for a small generator, verified code fragments are followed where textual advice is not, and that a text-only memory can become harmful as generic lessons accumulate (\Cref{chap:results}).
+    \item An experimental design for cross-task memory that controls for task order and time drift (four task orders, paired runs with ABBA crossover), and an honest account of the limits of single-run results (\Cref{chap:results,chap:discussion}).
+\end{enumerate}
+
+\section{Organisation of Thesis}
+\begin{description}
+    \item[\textbf{\Cref{chap:background}: \nameref{chap:background}}] \hfill \\
+    Website-generation benchmarks, memory for \gls{llm} agents, and why small models are different.
+    \item[\textbf{\Cref{chap:setup}: \nameref{chap:setup}}] \hfill \\
+    The benchmark, models, cluster, protocol and metrics, and the reproduced baseline.
+    \item[\textbf{\Cref{chap:method}: \nameref{chap:method}}] \hfill \\
+    The failure analysis that started the work, the design iterations, and the final pipeline.
+    \item[\textbf{\Cref{chap:results}: \nameref{chap:results}}] \hfill \\
+    Main comparison, learning curves, error analysis, ablation and task-order experiments.
+    \item[\textbf{\Cref{chap:discussion}: \nameref{chap:discussion}}] \hfill \\
+    Interpretation, limitations, threats to validity and ethical considerations.
+    \item[\textbf{\Cref{chap:conclusion}: \nameref{chap:conclusion}}] \hfill \\
+    Answers to the research questions and future work.
+\end{description}
