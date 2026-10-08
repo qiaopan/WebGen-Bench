@@ -30,6 +30,8 @@ v7 相对 No Memory 逐题配对平均 +11.5 个百分点（95% bootstrap CI 6.0
 
 核心结论：**对小模型来说，记忆的形式比记忆的多少更重要**——经过核对的代码片段能迁移，文字经验不能。
 
+**与已有工作的关系（已对照全文核对，见 [`docs/reports/literature_positioning_2026-10.md`](docs/reports/literature_positioning_2026-10.md)）：** 强模型上的结论恰好相反——Metis（GPT-4o）发现只用先前任务的记忆时文字比代码工具迁移更稳（73.3% vs 53.3%），Memory Transfer Learning（GPT-5-mini 等）发现抽象 insight 迁移最好。两者的"代码"与我们不同（Metis 的代码是被执行的工具，我们的是让生成器模仿的片段），但一起说明：**最合适的记忆形式取决于用它的模型能做什么**。Super Library Agent 同样用 WebGen-Bench，但目标是跨应用复用代码、提高可维护性（24 题、强模型，准确率差异不显著），不记忆失败、不研究顺序。
+
 ## 1. 研究问题
 
 1. **RQ1**：只用 agent 自己先前任务产生的经验，能否在官方 WebGen-Bench 协议下提升小模型的功能准确率？
@@ -162,6 +164,11 @@ v7 相对 No Memory 逐题配对平均 +11.5 个百分点（95% bootstrap CI 6.0
 
 已核对出处：
 
+- Dai et al., 2026. *Metis: Bridging Text and Code Memory for Self-Evolving Agents.* arXiv:2606.24151.
+- Kim et al., 2026. *Memory Transfer Learning: How Memories are Transferred Across Domains in Coding Agents.* arXiv:2604.14004.
+- Sung et al., 2026. *Super Library Agent: Joint Generation and Maintenance of Multiple Applications Beyond the Single Codebase.* Findings of EMNLP 2026, arXiv:2608.29310.
+- Wei et al., 2025. *Evo-Memory: Benchmarking LLM Agent Test-time Learning with Self-Evolving Memory.* arXiv:2511.20857.
+- Shu et al., 2026. *AgentCL: Toward Rigorous Evaluation of Continual Learning in Language Agents.* arXiv:2606.02461.
 - Lu et al., 2025. *WebGen-Bench: Evaluating LLMs on Generating Interactive and Functional Websites from Scratch.* arXiv:2505.03733.
 - Du et al., 2025. *Context Length Alone Hurts LLM Performance Despite Perfect Retrieval.* Findings of EMNLP 2025, arXiv:2510.05381.
 - Liu et al., 2024. *Lost in the Middle: How Language Models Use Long Contexts.* TACL 12.
@@ -171,7 +178,7 @@ v7 相对 No Memory 逐题配对平均 +11.5 个百分点（95% bootstrap CI 6.0
 待核对（写进论文前逐条确认）：
 
 - 经验记忆：ExpeL（Zhao et al., 2024）、ReasoningBank（2025）、Mem0（Chhikara et al., 2025）、Memento（Zhou et al., 2025）、Generative Agents（Park et al., 2023）。
-- 代码 / 技能记忆：Voyager（Wang et al., 2023）、Agent Workflow Memory（Wang et al., 2025）、Metis（Dai et al., 2026，arXiv:2606.24151）。
+- 代码 / 技能记忆：Voyager（Wang et al., 2023）、Agent Workflow Memory（Wang et al., 2025）。
 - 指令遵守：Curse of Instructions（Harada et al., 2025）、IFScale（Jaroslawicz et al., 2025）；小模型推理：Li et al., 2025。
 - 排查与验证：Zeller, *Why Programs Fail*；Self-Debug（Chen et al., 2023）；Chain-of-Verification（Dhuliawala et al., 2023）；Self-Refine（Madaan et al., 2023）。
 
