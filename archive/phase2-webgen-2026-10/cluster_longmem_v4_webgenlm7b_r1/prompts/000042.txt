@@ -1,0 +1,13 @@
+Please implement an email sending platform for sending emails. The platform should have functionalities for composing, sending, and managing emails. Users should be able to compose emails, select recipients, send emails, and manage sent emails. The platform should also have features such as email templates, attachment uploads, and recipient management. Use cornsilk for the background and peru for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an email sending platform for sending emails.
+   Note from earlier websites: For email sending: use @submit in the component to update state and show confirmation.
+2. The platform should have functionalities for composing, sending, and managing emails.
+3. Users should be able to compose emails, select recipients, send emails, and manage sent emails.
+4. The platform should also have features such as email templates, attachment uploads, and recipient management.
+   Note from earlier websites: For email templates: implement attachment uploads and recipient management.
+5. Use cornsilk for the background and peru for components.
+   Note from earlier websites: On every page: ensure components are mounted and interactive with event handlers.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,15 @@
+Please implement a cryptocurrency escrow system for secure cryptocurrency transactions. Buyers should be able to browse and select sellers' cryptocurrency products, conduct transactions, and deposit cryptocurrencies into an escrow account. Sellers should be able to view and manage their products and transaction records. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities. Initialize the background color with light gray and component color with dark red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a cryptocurrency escrow system for secure cryptocurrency transactions.
+2. Buyers should be able to browse and select sellers' cryptocurrency products
+   Note from earlier websites: For the product listings: implement 'View Details' handler in 'ProductManagement.vue'.
+3. conduct transactions
+   Note from earlier websites: For the TransactionForm: implement a submit handler with `@click` to display a confirmation message.
+4. and deposit cryptocurrencies into an escrow account.
+5. Sellers should be able to view and manage their products and transaction records.
+6. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities.
+7. Initialize the background color with light gray and component color with dark red.
+   Note from earlier websites: On every page: ensure all form fields are labeled and navigation buttons update `activeTab` state correctly.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

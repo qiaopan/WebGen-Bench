@@ -1,0 +1,55 @@
+Please implement a recruitment website for hiring drivers and posting job listings. The website should have functionalities for user registration, job posting, job application, and contact form. Users should be able to register and create profiles, apply for jobs, and manage their contact information. Clients should be able to view their active job postings. The website should include pages such as home, about us, clients, drivers, jobs, and contact. Design the site using white as the background and navy for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a recruitment website for hiring drivers and posting job listings.
+2. The website should have functionalities for user registration, job posting, job application, and contact form.
+3. Users should be able to register and create profiles, apply for jobs, and manage their contact information.
+4. Clients should be able to view their active job postings.
+5. The website should include pages such as home, about us, clients, drivers, jobs, and contact.
+6. Design the site using white as the background and navy for content blocks.
+
+General notes from earlier websites:
+- For user registration: use the 'updateProfile' method in 'UserProfile.vue' to update profiles without alerts.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,56 @@
+Please implement a website called "World of Imagination" to showcase and inspire users' imagination. The website should have functionalities for showcasing user-created content, sharing ideas, discussing, and interacting. Users should be able to browse others' creative works, share their own ideas via the share ideas form, participate in discussions, and interact with other users. Choose azure mist for the background; set all component colors to dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. showcase user-created content
+2. share ideas
+   Note from earlier websites: For the ShareIdeasForm.vue: include a route in src/App.vue and show a confirmation on @submit.
+3. discussing
+4. interacting
+5. browse others' creative works
+6. share their own ideas via the share ideas form
+7. participate in discussions
+8. interact with other users
+9. choose azure mist for the background; set all component colors to dark slate blue
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

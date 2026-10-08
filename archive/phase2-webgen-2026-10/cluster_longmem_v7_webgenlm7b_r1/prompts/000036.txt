@@ -1,0 +1,18 @@
+Please implement a website to automatically search and compare product prices across different states. The website should allow users to select specific product categories and parameters. The website should be able to automatically search and compare product prices across different states, including finding the lowest-priced products, and provide detailed product information, including price, quantity, and supplier information. Apply seashell to the canvas background and crimson to all visible components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website to automatically search and compare product prices across different states.
+2. The website should allow users to select specific product categories and parameters.
+   Note from earlier websites: For the booking form: use unique IDs in 'ProductFilter.vue' for parameter inputs from g0.
+3. The website should be able to automatically search and compare product prices across different states, including finding the lowest-priced products, and provide detailed product information, including price, quantity, and supplier information.
+   Note from earlier websites: For the product details: use `ref` and `v-if` to show details and categories from g1, g2.
+4. Apply seashell to the canvas background and crimson to all visible components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

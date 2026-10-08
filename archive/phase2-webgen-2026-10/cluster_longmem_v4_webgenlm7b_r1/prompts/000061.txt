@@ -1,0 +1,14 @@
+Please develop a children's recycling game website to educate kids on proper waste recycling. The game should include competitive elements such as a leaderboard to keep kids engaged and motivated. The game should use a cartoon-style visual design to make it visually appealing to children. Kids should be able to play the game, receive feedback, learn how to correctly sort waste into the corresponding containers, and receive rewards and recognition through the game. Use seashell for container backgrounds and crimson for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please develop a children's recycling game website to educate kids on proper waste recycling.
+2. The game should include competitive elements such as a leaderboard to keep kids engaged and motivated.
+   Note from earlier websites: For the leaderboard: ensure `@click` updates `activeTab` state correctly.
+3. The game should use a cartoon-style visual design to make it visually appealing to children.
+4. Kids should be able to play the game, receive feedback, learn how to correctly sort waste into the corresponding containers, and receive rewards and recognition through the game.
+5. Use seashell for container backgrounds and crimson for component visuals.
+   Note from earlier websites: For the game: use seashell for backgrounds and crimson for components.
+6. On every page: label all form fields clearly and correctly.
+   Note from earlier websites: On every page: label all form fields clearly and correctly.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

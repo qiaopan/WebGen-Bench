@@ -1,0 +1,55 @@
+Please implement a social website for user registration, making friends, and sharing. The website should have a registration function, allowing users to create an account and log in. Users should be able to invite friends to join the website and vote on content. Users should be able to upload pictures and earn points. The website should have a personal homepage that displays user information and updates. Use light cyan as the default background and cadet blue for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a social website for user registration, making friends, and sharing.
+2. The website should have a registration function, allowing users to create an account and log in.
+   Note from earlier websites: For the login form: use `@submit.prevent` and `v-model` to prevent validation errors when fields are filled.
+3. Users should be able to invite friends to join the website and vote on content.
+   Note from earlier websites: For the homepage: implement `FriendInvitation.vue` with a confirmation after form submission.
+4. Users should be able to upload pictures and earn points.
+5. The website should have a personal homepage that displays user information and updates.
+   Note from earlier websites: On every page: use a ref for the current page and `v-if` to conditionally render active components.
+6. Use light cyan as the default background and cadet blue for component styling.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

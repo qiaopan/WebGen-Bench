@@ -1,0 +1,19 @@
+Please implement an online trading website for bidding and trading. The website should have functionalities for bidding and trading, allowing users to browse trading opportunities, place orders, manage their trading accounts, and view their trading history. Set the background color to lemon chiffon and the component color to chocolate.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an online trading website for bidding and trading.
+2. The website should have functionalities for bidding and trading,
+3. allowing users to browse trading opportunities,
+4. place orders,
+5. manage their trading accounts,
+   Note from earlier websites: For the trading account: use `ref` and `v-if` to show selected account details.
+6. Set the background color to lemon chiffon and the component color to chocolate.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

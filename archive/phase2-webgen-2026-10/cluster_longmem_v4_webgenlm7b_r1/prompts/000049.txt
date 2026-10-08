@@ -1,0 +1,16 @@
+Please implement a barber shop management website for managing barbers and services. The website should have functionalities for adding barbers, services, and sending WhatsApp notifications. Users should be able to browse barbers and services, add new barbers and services, and send notifications to clients. Style the layout with snow in the background and dim gray for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. adding barbers
+   Note from earlier websites: For barbers and services: allow browsing, adding, and send notifications with WhatsApp.
+2. adding services
+3. sending WhatsApp notifications
+   Note from earlier websites: For notifications: use @submit in the component to show a confirmation after successful submission.
+4. browsing barbers
+5. browsing services
+6. snow in the background and dim gray for the interface
+
+General notes from earlier websites:
+- On every page: label all interactive elements correctly and ensure navigation updates state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

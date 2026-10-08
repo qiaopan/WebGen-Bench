@@ -1,0 +1,23 @@
+Please implement a paper cup manufacturing system to manage inventory, production, and sales of paper cups. The system should have functionalities for managing raw materials, finished products, inventory, production, and sales. Users should be able to record and track the inventory, usage, and sales of raw materials and finished products, and generate detailed reports. The system should also have customer management capabilities, including recording customer information, sales history, and sales statistics. Assign light goldenrod to the background and olive drab to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. manage inventory, production, and sales of paper cups
+2. functionalities for managing raw materials
+   Note from earlier websites: For the RawMaterialsInventory: Implement a @submit handler to update inventory and show confirmation.
+3. finished products
+4. inventory
+5. production
+6. sales
+   Note from earlier websites: For the SalesForm: Implement a @submit handler to handle form submission and show confirmation.
+7. record and track the inventory, usage, and sales of raw materials and finished products
+8. generate detailed reports
+9. customer management capabilities
+10. recording customer information
+11. sales history
+12. sales statistics
+13. light goldenrod to the background and olive drab to the UI elements
+
+General notes from earlier websites:
+- On every page: Add event handlers for navigation buttons to set the state correctly.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

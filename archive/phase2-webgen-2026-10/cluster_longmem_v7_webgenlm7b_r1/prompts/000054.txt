@@ -1,0 +1,62 @@
+Please implement a high-performance sports recruitment platform that connects athletes and sports organizations. The platform should have functionalities for athlete registration, job posting, job application, and message notification. Users should be able to log in, browse job listings, apply for jobs of interest, and receive relevant notifications. Sports organizations should be able to post jobs, and communicate with athletes. Set ghost white as the body background and use slate gray for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. high-performance sports recruitment platform
+2. connects athletes and sports organizations
+3. athlete registration
+   Note from earlier websites: For athlete registration: implement `RegistrationForm.vue` and show confirmation after profile creation.
+4. job posting
+5. job application
+6. message notification
+7. browse job listings
+8. apply for jobs of interest
+9. receive relevant notifications
+10. sports organizations should be able to post jobs
+11. communicate with athletes
+12. ghost white as the body background and use slate gray for the UI
+
+General notes from earlier websites:
+- For the login form: use `@submit.prevent` and `v-model` to prevent validation errors on valid credentials.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

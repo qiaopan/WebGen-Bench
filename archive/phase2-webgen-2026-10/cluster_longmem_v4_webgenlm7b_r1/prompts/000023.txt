@@ -1,0 +1,21 @@
+Please implement a customer relationship management website for managing sales leads and reporting. The website should have functionalities for automated message sending, organizing and categorizing leads, updating lead information and status, updating settings and dropdown menus, and reporting. Users should be able to browse and manage sales leads, view reports, and receive best practice and integration advice. Define background as papaya whip; define components with dark orange.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer relationship management website for managing sales leads and reporting
+2. functionalities for automated message sending
+3. organizing and categorizing leads
+4. updating lead information and status
+   Note from earlier websites: For lead management: implement 'Edit' button for updating lead details using v-if.
+5. updating settings and dropdown menus
+6. reporting
+   Note from earlier websites: For the 'Reporting.vue': implement 'generateReport' function and 'Reports' link using v-if.
+7. Users should be able to browse and manage sales leads
+8. view reports
+9. receive best practice and integration advice
+10. Define background as papaya whip
+11. define components with dark orange
+
+General notes from earlier websites:
+- On every page: ensure state updates correctly with event handlers on navigation clicks.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

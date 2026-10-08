@@ -1,0 +1,64 @@
+Please implement a customer service call logging system to record and manage customer service calls. The system should have functionalities for client identification, call type selection, information recording, action step recording, follow-up step recording, and additional information recording. Users should be able to create new call logs, view open calls, view to-do calls, and generate call log reports. The system should also have a client creator wizard, client information modification functionality, and permission control. Set page background to light pink; color all components with medium violet red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer service call logging system
+2. client identification
+3. call type selection
+4. information recording
+5. action step recording
+6. follow-up step recording
+7. additional information recording
+8. create new call logs
+9. view open calls
+10. view to-do calls
+11. generate call log reports
+12. client creator wizard
+13. client information modification functionality
+   Note from earlier websites: For client info: Implement 'updateClientInfo' in 'ClientModification.vue' to update client data.
+14. permission control
+15. light pink
+   Note from earlier websites: On every page: Use client-side validation with v-if to check all fields before form submission.
+16. medium violet red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

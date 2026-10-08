@@ -1,0 +1,23 @@
+Please implement a real estate website to display property information and provide search functionality. The website should have features such as property listings, property details, search, and filtering. Users should be able to browse property listings, view property details, use the search function to find specific properties, and filter properties based on certain conditions. Assign alice blue as the background color and apply steel blue to all elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. property listings
+2. property details
+   Note from earlier websites: For property details: use `ref` and `v-if` to show selected property info.
+3. search
+   Note from earlier websites: For the search bar: use a client-side handler to update results on form submission.
+4. filtering
+5. browse property listings
+6. view property details
+7. use the search function to find specific properties
+8. filter properties based on certain conditions
+9. assign alice blue as the background color and apply steel blue to all elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

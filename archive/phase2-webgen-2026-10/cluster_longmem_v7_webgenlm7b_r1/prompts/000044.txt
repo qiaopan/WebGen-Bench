@@ -1,0 +1,60 @@
+Please implement a supply chain traceability website for tracking and verifying the origin and circulation of products with the unique product IDs. The website should have functionalities for product registration, tracking, inquiry, and verification. Users should be able to register products, track the circulation path of products, query the current status of products, and verify the authenticity of products. The website should also have data statistics and analysis functions to help users understand the operation of the supply chain. Define the background as misty rose and components as firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. supply chain traceability website
+2. tracking and verifying the origin and circulation of products with the unique product IDs
+3. functionalities for product registration
+   Note from earlier websites: For the product registration: use v-if to show validation messages and confirmation state.
+4. tracking
+5. inquiry
+6. verification
+7. register products
+8. track the circulation path of products
+9. query the current status of products
+10. verify the authenticity of products
+11. data statistics and analysis functions
+12. help users understand the operation of the supply chain
+13. background as misty rose and components as firebrick
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

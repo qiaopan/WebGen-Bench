@@ -1,0 +1,15 @@
+Please implement a fishing contest website to manage and display fishing contest information. The website should have functionalities for posting contest announcements, displaying contest results, and showcasing contest photos. Users should be able to browse contest information, register for contests, and view contest results. Set primary background to mint cream and elements to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. posting contest announcements
+   Note from earlier websites: For contest announcements: use @click to update `activeTab` state for navigation.
+2. displaying contest results
+3. showcasing contest photos
+   Note from earlier websites: For contest photos: apply mint cream background and teal elements.
+4. browse contest information
+   Note from earlier websites: On every page: label all form fields correctly and identifiably.
+5. register for contests
+6. view contest results
+7. set primary background to mint cream and elements to teal
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,58 @@
+Please implement an online trivia contest app for hosting knowledge competitions. The app should have functionalities for contest enrollment, question display, answer submission, scoring, and leaderboard. Users should be able to browse and enroll in contests, answer contest questions, submit answers, view their scores and rankings, and compare their performance with others on the leaderboard. Specify beige as the base color and saddle brown for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online trivia contest app
+2. contest enrollment
+3. question display
+4. answer submission
+5. scoring
+6. leaderboard
+7. browse and enroll in contests
+8. answer contest questions
+9. submit answers
+10. view their scores and rankings
+11. compare their performance with others on the leaderboard
+12. beige as the base color and saddle brown for all components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

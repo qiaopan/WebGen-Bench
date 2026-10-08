@@ -1,0 +1,51 @@
+Please implement a 2048 game website for users to play the 2048 game. The website should have functionalities for starting a new game, moving tiles, merging tiles, game over, and reviving. Users should be able to start a new game, move tiles up, down, left, or right, merge identical tiles, and win the game by achieving the 2048 result. If the game is over, users can choose to revive and continue playing. Choose linen for the background; set all component colors to maroon.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a 2048 game website for users to play the 2048 game.
+2. The website should have functionalities for starting a new game, moving tiles, merging tiles, game over, and reviving.
+3. Users should be able to start a new game, move tiles up, down, left, or right, merge identical tiles, and win the game by achieving the 2048 result.
+4. If the game is over, users can choose to revive and continue playing.
+5. Choose linen for the background; set all component colors to maroon.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 13 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

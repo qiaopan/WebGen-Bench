@@ -1,0 +1,17 @@
+Please implement a real-time culinary guide application to display restaurant and recipe information. The application should have functionalities for browsing restaurants, searching recipes, viewing reviews and ratings, and more. Users should be able to browse nearby restaurants, search for specific recipes, view other users' reviews and ratings, and add their own reviews and ratings. Color the background using lemon chiffon and set component styles to chocolate.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a real-time culinary guide application to display restaurant and recipe information.
+2. The application should have functionalities for browsing restaurants
+   Note from earlier websites: On every page: add event handlers for navigation buttons to set the state correctly.
+3. searching recipes
+4. viewing reviews and ratings
+5. Users should be able to browse nearby restaurants
+6. search for specific recipes
+7. view other users' reviews and ratings
+8. add their own reviews and ratings
+   Note from earlier websites: For the ReviewForm: implement @submit handler to show a confirmation message.
+9. Color the background using lemon chiffon and set component styles to chocolate
+   Note from earlier websites: For the app: set background to lemon chiffon and component styles to chocolate.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

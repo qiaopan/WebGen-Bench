@@ -1,0 +1,21 @@
+Please implement a technical website to display technical information and solutions. The website should have functionalities for browsing technical articles, searching technical information, and viewing solutions. Users should be able to browse technical articles, search technical information, view solutions, and communicate with other users.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a technical website to display technical information and solutions.
+2. The website should have functionalities for browsing technical articles
+3. searching technical information
+4. and viewing solutions
+5. Users should be able to browse technical articles
+6. search technical information
+7. view solutions
+8. and communicate with other users
+   Note from earlier websites: For the message submission: update state in handler and render with `v-if`.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

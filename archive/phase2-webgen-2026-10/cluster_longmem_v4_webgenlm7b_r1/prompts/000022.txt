@@ -1,0 +1,22 @@
+Please implement a customer service call logging system to record and manage customer service calls. The system should have functionalities for client identification, call type selection, information recording, action step recording, follow-up step recording, and additional information recording. Users should be able to create new call logs, view open calls, view to-do calls, and generate call log reports. The system should also have a client creator wizard, client information modification functionality, and permission control. Set page background to light pink; color all components with medium violet red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer service call logging system
+   Note from earlier websites: For the call logging system: implement client creator wizard, info modification, and permission control using Vue ref.
+2. client identification
+3. call type selection
+4. information recording
+5. action step recording
+6. follow-up step recording
+7. additional information recording
+8. create new call logs
+9. view open calls
+10. view to-do calls
+11. generate call log reports
+12. client creator wizard
+13. client information modification functionality
+14. permission control
+15. set page background to light pink; color all components with medium violet red
+   Note from earlier websites: On every page: set background to light pink and color components medium violet red with CSS.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

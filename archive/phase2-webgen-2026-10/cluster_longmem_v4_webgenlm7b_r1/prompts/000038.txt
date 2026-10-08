@@ -1,0 +1,17 @@
+Please implement a short-term apartment rental website for showcasing and renting apartments. The website should have functionalities for searching, filtering, and booking apartments. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records. Use linen as the screen background and maroon for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short-term apartment rental website for showcasing and renting apartments.
+2. The website should have functionalities for searching, filtering, and booking apartments.
+   Note from earlier websites: For the Filters component: implement a submit handler using v-if for filter logic.
+3. Users should be able to browse different types of apartments,
+4. search and filter apartments that meet their criteria,
+5. book selected apartments,
+6. and view booking records.
+7. Use linen as the screen background and maroon for component highlights.
+
+General notes from earlier websites:
+- On every page: ensure all form fields are correctly labeled and identifiable.
+- For navigation: add a @click event handler that sets the activeTab state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

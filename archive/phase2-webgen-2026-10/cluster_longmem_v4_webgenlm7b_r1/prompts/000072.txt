@@ -1,0 +1,18 @@
+Please create a comprehensive CV website to display personal information and work experience. The website should have functionalities for displaying personal information, work experience, skills, education background, and projects. Users should be able to browse the CV, view work experience, understand skills and education background, and showcase personal projects. Use a light pink background and apply medium violet red to the UI components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display personal information
+   Note from earlier websites: On every page: ensure components are mounted and displayed correctly.
+2. display work experience
+3. display skills
+4. display education background
+5. display projects
+6. browse the CV
+7. view work experience
+8. understand skills and education background
+9. showcase personal projects
+10. light pink background
+11. medium violet red to the UI components
+   Note from earlier websites: For the navigation buttons: add a `@click` event handler to update the state correctly.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

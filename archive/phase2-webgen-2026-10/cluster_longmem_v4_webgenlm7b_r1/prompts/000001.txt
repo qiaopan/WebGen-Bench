@@ -1,0 +1,16 @@
+Please implement a website for generating stock reports to provide stock information and analysis. The website should have the functionality to search and summarize stock information, and generate customized stock reports based on user requirements. Users should be able to input stock codes or names, select report formats and content, and the website will automatically generate the corresponding reports. The reports should include basic stock information, market trends, financial data, and more. Set the background color to white and the component color to navy.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for generating stock reports to provide stock information and analysis.
+2. The website should have the functionality to search and summarize stock information,
+   Note from earlier websites: For the StockSearch component: Implement a submit handler that updates result state and renders with v-if.
+3. and generate customized stock reports based on user requirements.
+4. Users should be able to input stock codes or names,
+   Note from earlier websites: On every page: Ensure all form fields are labeled and navigation updates activeTab state on click.
+5. select report formats and content,
+6. and the website will automatically generate the corresponding reports.
+7. The reports should include basic stock information, market trends, financial data, and more.
+8. Set the background color to white and the component color to navy.
+   Note from earlier websites: For the website: Use white background and navy components consistently.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

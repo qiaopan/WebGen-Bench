@@ -1,0 +1,57 @@
+Please implement a news blog website for the shipping industry to publish news and company information. The website should have sections for news, company profiles, and events. Users should be able to browse news, company information, and events, and subscribe to newsletters. The website should have a backend management system that allows administrators to manage ad spaces. Implement styling with old lace for the background and rosy brown for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. sections for news
+2. sections for company profiles
+   Note from earlier websites: For the company profile: use `ref` and `v-if` to conditionally display selected company details.
+3. sections for events
+4. users should be able to browse news
+5. users should be able to browse company information
+6. users should be able to browse events
+7. users should be able to subscribe to newsletters
+   Note from earlier websites: On every page: ensure all forms validate fields before submission.
+8. backend management system that allows administrators to manage ad spaces
+9. styling with old lace for the background and rosy brown for components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import HomeView from './views/HomeView.vue'
+import ServicesView from './views/ServicesView.vue'
+import BookingView from './views/BookingView.vue'
+import StatusView from './views/StatusView.vue'
+import ContactView from './views/ContactView.vue'
+
+const currentView = ref('home')
+</script>
+
+<template>
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" class="nav-btn">Home</button>
+      <button @click="currentView = 'services'" class="nav-btn">Services</button>
+      <button @click="currentView = 'booking'" class="nav-btn">Book Now</button>
+      <button @click="currentView = 'status'" class="nav-btn">Service Status</button>
+      <button @click="currentView = 'contact'" class="nav-btn">Contact Us</button>
+    </nav>
+
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <ServicesView v-if="currentView === 'services'" />
+      <BookingView v-if="currentView === 'booking'" />
+      <StatusView v-if="currentView === 'status'" />
+      <ContactView v-if="currentView === 'contact'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 13 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

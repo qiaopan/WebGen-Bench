@@ -1,0 +1,18 @@
+Please implement a short-term apartment rental website for showcasing and renting apartments. The website should have functionalities for searching, filtering, and booking apartments. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records. Use linen as the screen background and maroon for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short-term apartment rental website for showcasing and renting apartments.
+2. The website should have functionalities for searching, filtering, and booking apartments.
+3. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records.
+   Note from earlier websites: For the booking form: use `v-model` for apartment selection to link form data and show booking confirmation.
+   Note from earlier websites: On every page: ensure all interactive elements update the UI correctly to prevent interaction issues.
+4. Use linen as the screen background and maroon for component highlights.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,21 @@
+Please create a one-page website for promoting Fundraiser Day, including introduction to the event, fundraiser testimonials, offer information, and company information. The website should have functionalities such as an automatically moving carousel for displaying offers, a section for displaying fundraiser testimonials, and a section for displaying company information. Users should be able to browse the website to learn more about the Fundraiser Day event. Establish cornsilk as the main background and peru for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. one-page website for promoting Fundraiser Day
+2. introduction to the event
+3. fundraiser testimonials
+4. offer information
+5. company information
+6. automatically moving carousel for displaying offers
+7. section for displaying fundraiser testimonials
+8. section for displaying company information
+9. users should be able to browse the website to learn more about the Fundraiser Day event
+10. cornsilk as the main background and peru for the controls
+
+RECORDED OUTCOMES OF EARLIER GENERATIONS (counts from earlier tasks, not requirements):
+These are facts about how earlier websites turned out; they show correlation, not proof. Weigh them when choosing how to implement this website.
+- Recorded problem "content introduction": present in 2 of the last 3 generations (67%).
+- Checks on "form submission": 2 of 2 non-passing results concerned expectations the public requirement did not state.
+- Checks on "introduction navigation": 2 of 2 non-passing results concerned expectations the public requirement did not state.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

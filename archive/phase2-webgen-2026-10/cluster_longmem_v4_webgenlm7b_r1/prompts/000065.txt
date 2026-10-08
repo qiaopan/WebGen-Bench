@@ -1,0 +1,15 @@
+Please implement an agriculture-related website for displaying and managing agricultural information. The website should have functionalities for browsing agricultural news, viewing farm product information, and checking weather forecasts. Users should be able to browse agricultural-related news, view different types of farm product information, check local weather forecasts, and perform searches and filters. Apply theme using light cyan as background and cadet blue for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. browsing agricultural news
+2. viewing farm product information
+   Note from earlier websites: For farm product listings: implement a client-side handler for 'View Details' button.
+3. checking weather forecasts
+4. performing searches and filters
+5. theme using light cyan as background and cadet blue for elements
+
+General notes from earlier websites:
+- Ensure all form fields are correctly labeled and identifiable.
+- Ensure that the `activeTab` state updates correctly with a `@click` event handler.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

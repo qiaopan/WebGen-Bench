@@ -1,0 +1,17 @@
+Please implement a health survey website for women to fill out and submit health information. The website should have functionalities for filling out the survey, and submitting information. Users can fill out the relevant survey, and submit their information. The system will automatically collect the information and provide data management, permission management, data review, and reporting functions. Use whitesmoke as the default background and dark cyan for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. fill out the survey
+   Note from earlier websites: For the HealthSurveyForm: implement a submit handler with `v-if` for confirmation after form submission.
+2. submit their information
+3. data management
+   Note from earlier websites: For data management: collect info, manage permissions, review data, and report; use whitesmoke and dark cyan.
+4. permission management
+5. data review
+6. reporting functions
+7. whitesmoke as the default background and dark cyan for component styling
+
+General notes from earlier websites:
+- On every page: ensure all interactive elements are correctly labeled and identifiable.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

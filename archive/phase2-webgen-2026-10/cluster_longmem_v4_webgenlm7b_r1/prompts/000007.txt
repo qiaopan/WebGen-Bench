@@ -1,0 +1,26 @@
+Please develop a web-based Texas Hold'em poker game with features such as game lobby, table games, and chat functionality. Users should be able to create or join game rooms, play Texas Hold'em, view game records, and manage their account information. The game lobby should display available game rooms, current game status, and player information. The table game should display player hand cards, community cards, betting information, and action buttons. Implement azure for the page background and midnight blue for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web-based Texas Hold'em poker game
+2. game lobby
+   Note from earlier websites: For the GameLobby: implement a submit handler with @click to confirm new game room creation.
+3. table games
+4. chat functionality
+5. create or join game rooms
+6. play Texas Hold'em
+7. view game records
+8. manage their account information
+9. game lobby should display available game rooms
+10. game lobby should display current game status
+11. game lobby should display player information
+12. table game should display player hand cards
+13. table game should display community cards
+14. table game should display betting information
+15. table game should display action buttons
+16. azure for the page background and midnight blue for the elements
+   Note from earlier websites: For the color scheme: use azure for the background and midnight blue for elements.
+
+General notes from earlier websites:
+- On every page: ensure all form fields are correctly labeled and identifiable.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

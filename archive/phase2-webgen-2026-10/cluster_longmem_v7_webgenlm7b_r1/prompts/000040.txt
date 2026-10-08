@@ -1,0 +1,25 @@
+Please implement a consulting business website that provides leadership and business training services. The website should have an e-commerce component, allowing customers to purchase services directly from the site. The website should include features such as workshops, online classes, podcasts, and blogs. Users should be able to browse and purchase services, and interact with the website. Set all pages to have a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. consulting business website
+2. provides leadership and business training services
+3. e-commerce component
+4. customers to purchase services directly from the site
+5. workshops
+   Note from earlier websites: For the workshop and online class views: use `ref` and `v-if` to show selected item details.
+6. online classes
+7. podcasts
+8. blogs
+9. Users should be able to browse and purchase services
+10. Users should be able to interact with the website
+11. light cyan background and cadet blue components
+   Note from earlier websites: For the design: complement light cyan background with subtle imagery or icons.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing imports. Earlier websites broke here (a component calls onUnmounted(), ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const bookingId = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

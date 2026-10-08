@@ -1,0 +1,13 @@
+Please implement an e-commerce integration feature that allows customers to customize shirts. Customers should be able to input information such as shirt model, fabric, and measurements. The system should be able to generate a corresponding shirt design based on the customer's input and allow them to preview and confirm the design. The system should also be able to handle orders and payments. Declare floral white as the global background color and dark goldenrod for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an e-commerce integration feature that allows customers to customize shirts.
+   Note from earlier websites: For shirt customization: use `@click` to update `activeTab` state.
+2. Customers should be able to input information such as shirt model, fabric, and measurements.
+   Note from earlier websites: Ensure all form fields are correctly labeled and identifiable.
+3. The system should be able to generate a corresponding shirt design based on the customer's input and allow them to preview and confirm the design.
+4. The system should also be able to handle orders and payments.
+5. Declare floral white as the global background color and dark goldenrod for all UI pieces.
+   Note from earlier websites: On every page: set floral white background and dark goldenrod UI.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

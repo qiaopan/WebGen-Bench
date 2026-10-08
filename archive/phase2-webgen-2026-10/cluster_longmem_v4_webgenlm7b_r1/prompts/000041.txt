@@ -1,0 +1,17 @@
+Please implement an online trading website for bidding and trading. The website should have functionalities for bidding and trading, allowing users to browse trading opportunities, place orders, manage their trading accounts, and view their trading history. Set the background color to lemon chiffon and the component color to chocolate.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an online trading website for bidding and trading.
+2. The website should have functionalities for bidding and trading,
+3. allowing users to browse trading opportunities,
+4. place orders,
+5. manage their trading accounts,
+6. and view their trading history.
+7. Set the background color to lemon chiffon and the component color to chocolate.
+   Note from earlier websites: Set background to lemon chiffon, component to chocolate.
+
+General notes from earlier websites:
+- Ensure all form fields are correctly labeled and identifiable.
+- Ensure `@click` updates `activeTab` state correctly for navigation buttons.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
