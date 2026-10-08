@@ -1,0 +1,172 @@
+{
+  "prompt_version": "5ab53d3d770d",
+  "gold": "/Users/ma/Downloads/792/webgen/config/reflection_regression/gold_v1.json",
+  "tasks": {
+    "000014": [
+      {
+        "check": "task000001_0",
+        "expect": "uncertain",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The check was not completed because the tester ran out of interactions before activating the form’s submit control; no page-side failure is shown in the trajectory."
+      },
+      {
+        "check": "task000001_2",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The run ended before the tester could fully scroll through and inspect the services content, so no concrete defect in the services introduction was established."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "cause not named"
+        ],
+        "cause": "The Services view does not provide a separate introductory section for credit repair services, so the tester only encountered service cards and a CTA instead of the requested introduction."
+      }
+    ],
+    "000016": [
+      {
+        "check": "task000001_0",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The site does not present a reachable entry point to the company introduction content, so the tester could not navigate to the page that contains history, mission, and values."
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The product showcase route exists, but the homepage view shown to the tester did not expose any reachable navigation control to open it, so the tester could not get to the page that contains the detai"
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The news page exists in the router, but the homepage shown to the tester did not expose any visible navigation or link to reach it, so the feature could not be accessed from the page they were on."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The contact form is present in the router and component code, but the visible page shown to the tester did not expose any navigation or on-screen entry point to reach it. The"
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The site provides the About page in the router, but it does not expose a visible, reachable navigation control for first-time visitors to open that section from the homepage."
+      }
+    ],
+    "000017": [
+      {
+        "check": "task000001_0",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The run ended before the tester reached the introduction section, so no concrete page defect was established from the trajectory."
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The About Us section rendered its container but the company details did not appear in the visible card area. The cause is not established from the supplied evidence beyond the blank display."
+      },
+      {
+        "check": "task000001_4",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The trajectory does not establish a concrete rendering defect in the testimonials/company sections; it only shows that the tester ended up on a blank or unreadable view after navigation. Because the s"
+      }
+    ],
+    "000019": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The site does not expose dedicated navigation or routes for the requested software solutions and customer stories sections; the tester instead encountered Products, Services, News, and Contact."
+      },
+      {
+        "check": "task000001_1",
+        "expect": "uncertain",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not fully exercised: the tester reached relevant results, but the run ended before sorting and broken-link verification could be completed. The evaluator log also shows an interaction er"
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not completed: the trajectory shows repeated attempts to click \"Read More\" on the news list, but no concrete defect such as a broken link, missing article detail, or rejected valid actio"
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The website does not implement any dedicated customer cases, success stories, or case studies page/section, so the tester could not reach the requested content from the available navigation."
+      },
+      {
+        "check": "task000001_5",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The global stylesheet resets the light-theme root background to white, so the site never renders the required misty rose page background even though firebrick is used for som"
+      }
+    ],
+    "000021": [
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "cause not named"
+        ],
+        "cause": "The RSVP buttons are present but have no attached reservation behavior, so the click does nothing visible and the reservation flow never starts."
+      }
+    ]
+  },
+  "ok": 13,
+  "checks": 18
+}

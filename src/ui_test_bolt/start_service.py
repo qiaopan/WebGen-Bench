@@ -10,7 +10,8 @@ from pathlib import Path
 
 WRAPPER_FILENAME = "start-wrapper.cjs"
 DETECTION_TIMEOUT = 60  # seconds
-PM2_LOG_DIR = os.path.expanduser("~/.pm2/logs")
+# PM2 writes logs under $PM2_HOME (default ~/.pm2); the cluster queue gives each job its own PM2_HOME.
+PM2_LOG_DIR = os.path.join(os.environ.get("PM2_HOME") or os.path.expanduser("~/.pm2"), "logs")
 
 WRAPPER_TEMPLATE = """
 const {{ spawn }} = require('child_process');
@@ -94,7 +95,11 @@ def write_ecosystem_file(config, output_file):
 
 def remove_npm_run_dev(command_line: str) -> str:
     parts = [part.strip() for part in command_line.split("&&")]
-    filtered_parts = [part for part in parts if part != "npm run dev" and part != "npm run start" and part != "npm start"]
+    # Generated shell actions sometimes include flags (for example
+    # ``npm run dev -- --open``).  A development server is a long-running
+    # action and must be started by PM2 later, never during dependency setup.
+    dev_server = re.compile(r"^npm\s+(?:run\s+)?(?:dev|start)(?:\s|$)")
+    filtered_parts = [part for part in parts if not dev_server.match(part)]
     return " && ".join(filtered_parts)
 
 
@@ -125,6 +130,7 @@ def run_npm_install(apps, base_dir, commands):
                 raw_cmd,
                 _add_flag(raw_cmd, "--force"),
                 _add_flag(raw_cmd, "--legacy-peer-deps"),
+                _add_flag(raw_cmd, "--ignore-scripts"),
             ]
 
             for idx, cmd in enumerate(attempts, start=1):

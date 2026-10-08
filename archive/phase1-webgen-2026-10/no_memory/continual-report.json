@@ -1,0 +1,103 @@
+{
+  "pipeline_status": "completed",
+  "completed_at": "2026-10-02T03:18:52.173597Z",
+  "task_count": 1,
+  "selected_batches": null,
+  "selected_task_ids": [
+    "000026"
+  ],
+  "new_events": [
+    {
+      "key": "batch:2:task:000026:disabled",
+      "status": "complete",
+      "batch": 2,
+      "task_id": "000026",
+      "mode": "disabled",
+      "evaluation": [
+        {
+          "check": "task000001_0",
+          "outcome": "failed",
+          "answer": "generation failed before evaluation",
+          "failure_stage": "generation",
+          "failure_type": "generation_failed",
+          "failure_reason": "The generated project never built or started",
+          "reached_target_action": false,
+          "logic_failure_observed": false
+        },
+        {
+          "check": "task000001_1",
+          "outcome": "failed",
+          "answer": "generation failed before evaluation",
+          "failure_stage": "generation",
+          "failure_type": "generation_failed",
+          "failure_reason": "The generated project never built or started",
+          "reached_target_action": false,
+          "logic_failure_observed": false
+        },
+        {
+          "check": "task000001_2",
+          "outcome": "failed",
+          "answer": "generation failed before evaluation",
+          "failure_stage": "generation",
+          "failure_type": "generation_failed",
+          "failure_reason": "The generated project never built or started",
+          "reached_target_action": false,
+          "logic_failure_observed": false
+        },
+        {
+          "check": "task000001_3",
+          "outcome": "failed",
+          "answer": "generation failed before evaluation",
+          "failure_stage": "generation",
+          "failure_type": "generation_failed",
+          "failure_reason": "The generated project never built or started",
+          "reached_target_action": false,
+          "logic_failure_observed": false
+        },
+        {
+          "check": "task000001_4",
+          "outcome": "failed",
+          "answer": "generation failed before evaluation",
+          "failure_stage": "generation",
+          "failure_type": "generation_failed",
+          "failure_reason": "The generated project never built or started",
+          "reached_target_action": false,
+          "logic_failure_observed": false
+        },
+        {
+          "check": "appearance",
+          "outcome": "scored",
+          "score": null,
+          "failure_stage": "generation",
+          "failure_type": "generation_failed"
+        }
+      ],
+      "generation_failed": true,
+      "error": "s/PollList.vue(21,39): error TS2339: Property \\'activePoll\\' does not exist on type \\'CreateComponentPublicInstanceWithMixins<ToResolvedProps<__VLS_Props, { back: (...args: any[]) => void; \"select-poll\": (...args: any[]) => void; }>, { Poll: DefineComponent<__VLS_Props, {}, {}, {}, {}, ... 14 more ..., any>; emit: (event: \"back\" | \"select-poll\", ...args: any[]) => void; }, ... 23 more ..., {}>\\'.\\n', 'deterministic_repair_files': ['src/components/PollList.vue'], 'settle_checks': 1, 'attempt': 6}"
+    }
+  ],
+  "new_summary": {
+    "checks": {
+      "passed": 0,
+      "partial": 0,
+      "failed": 5
+    },
+    "total": 5
+  },
+  "protocol": "continual-domain-block-v1",
+  "manifest": "/Users/ma/Downloads/792/webgen/data/experiment_splits/continual_domain_blocks/manifest.json",
+  "manifest_sha256": "1f3f5fac5c932e6dcfc9b589302415388173f4e4e6c1c2a0b78c5d9c48ab3971",
+  "memory_config_sha256": "5bea594d6bd4551b32316d05ae2ffdb258e2a9ea11ef86a8c9e972239c95ef24",
+  "generator_model": "WebGen-LM-7B",
+  "memory_model": "webgen-memory-gpt4o",
+  "embedding_model": "webgen-memory-embedding",
+  "functional_evaluator_model": "qwen2.5-vl-32b-awq",
+  "appearance_evaluator_model": "webgen-appearance-evaluator-gpt4o",
+  "post_task_reflection": false,
+  "memory_representation": "abstract",
+  "modes": [
+    "disabled"
+  ],
+  "guidance_selfcheck": false,
+  "guidance_file_sha256": null
+}

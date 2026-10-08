@@ -10,7 +10,8 @@ from pathlib import Path
 
 WRAPPER_FILENAME = "start-wrapper.cjs"
 DETECTION_TIMEOUT = 60  # seconds
-PM2_LOG_DIR = os.path.expanduser("~/.pm2/logs")
+# PM2 writes logs under $PM2_HOME (default ~/.pm2); the cluster queue gives each job its own PM2_HOME.
+PM2_LOG_DIR = os.path.join(os.environ.get("PM2_HOME") or os.path.expanduser("~/.pm2"), "logs")
 
 WRAPPER_TEMPLATE = """
 const {{ spawn }} = require('child_process');

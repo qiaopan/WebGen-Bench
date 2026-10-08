@@ -91,7 +91,13 @@ def get_shell_start(zip_file_paths, output_root):
     for zip_file in tqdm(zip_file_paths):
         json_file = zip_file.replace(".zip", ".json")
         data = load_json(json_file)
-        shell_actions, last_start_action = extract_bolt_actions(data["messages"][-1]["content"])
+        assistant_content = "\n".join(
+            message.get("content", "")
+            for message in data.get("messages", [])
+            if message.get("role") == "assistant"
+            and isinstance(message.get("content"), str)
+        )
+        shell_actions, last_start_action = extract_bolt_actions(assistant_content)
         commands[os.path.basename(zip_file).replace(".zip", "")] = {"shell_actions": shell_actions, "last_start_action": last_start_action}
 
     save_json(commands, os.path.join(output_root, "commands.json"))
@@ -107,7 +113,14 @@ def main():
     in_dir = args.in_dir
     test_file = args.t
     test_datas = load_jsonl(test_file)
-    zip_files = [os.path.join(in_dir, file) for file in os.listdir(in_dir) if file.endswith(".zip") and file.startswith("00")]
+    # Only canonical finalized artifacts are evaluable.  Retry/repair archives
+    # (for example ``000006.attempt-1.failed.zip``) intentionally have no
+    # matching chat export and must not enter the appearance batch.
+    zip_files = [
+        os.path.join(in_dir, file)
+        for file in sorted(os.listdir(in_dir))
+        if re.fullmatch(r"\d{6}\.zip", file)
+    ]
     
     output_root = os.path.join(in_dir, "extracted")
     if not os.path.exists(output_root):
@@ -162,9 +175,18 @@ def main():
         if len(image_paths) == 0:
             print(f"shots not found in {app}, skipping...")
             continue
-        output = get_score_result(image_paths, instruction)
-        save_json({"model_output": output}, result_path)
+        output, usage, model = get_score_result(image_paths, instruction)
+        save_json(
+            {"model_output": output, "usage": usage, "model": model},
+            result_path,
+        )
         print(f"Processed {app} with {len(image_paths)} images.")
+        print(
+            "Token usage: "
+            f"input {usage['prompt_tokens']}, "
+            f"output {usage['completion_tokens']}, "
+            f"total {usage['total_tokens']}"
+        )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,174 @@
+{
+  "prompt_version": "e724c78964fc",
+  "gold": "/Users/ma/Downloads/792/webgen/config/reflection_regression/gold_v1.json",
+  "tasks": {
+    "000014": [
+      {
+        "check": "task000001_0",
+        "expect": "uncertain",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The run ended before the final submit action, so the confirmation state was never exercised."
+      },
+      {
+        "check": "task000001_2",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not completed because the tester exhausted interactions while scrolling through the services section; the evaluator log also reports a driver error, so no website-side failure is establi"
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The tester ran out of interactions before locating the requested introduction, and the visible services page content did not establish that the introduction was missing from the site."
+      }
+    ],
+    "000016": [
+      {
+        "check": "task000001_0",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The homepage did not present a reachable entry point to the company introduction page, so the tester could not navigate to the history, mission, and values content within the available interactions."
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The check ran out of interactions before the target was reached, and the evaluator log also reports a driver error. The homepage shown in the screenshots does not provide a visible entry point to the "
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The check was not exercised to the target feature before the interaction budget was exhausted; the trajectory shows scrolling and waiting on the homepage, but no successful navigation to the news rout"
+      },
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The contact page exists in the router, but the tested page did not expose any visible link or button to reach it, so the tester ran out of interactions before the form could be used."
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "uncertain",
+        "ok": false,
+        "problems": [
+          "expected established, got uncertain"
+        ],
+        "cause": "The checked feature was not reached; the homepage evidence shows no visible entry point to the company introduction page, and the run also ended with a driver interaction error before the target could"
+      }
+    ],
+    "000017": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not completed on the intended intro view; the tester ended on the About Us section, and the screenshots do not establish that the introduction content itself is missing. The blank card i"
+      },
+      {
+        "check": "task000001_1",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The testimonials content is present in the component, but the text is not readable on the rendered cards because the inherited page text color blends into the white card back"
+      },
+      {
+        "check": "task000001_2",
+        "expect": "established",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "cause not named"
+        ],
+        "cause": "The company-information section was reached, but its rendered content was not visible in the screenshot; the cause is established as an empty-looking rendered state rather than a navigation miss."
+      },
+      {
+        "check": "task000001_4",
+        "expect": "any",
+        "got": "established",
+        "ok": false,
+        "problems": [
+          "hedged wording but established"
+        ],
+        "cause": "The testimonial section is present, but the text is not readable in the screenshot; the cards appear blank because the displayed content is not visually legible. The cause is established by the screen"
+      }
+    ],
+    "000019": [
+      {
+        "check": "task000001_0",
+        "expect": "any",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The required sections were not implemented in the router or header navigation, so the tester could not reach them. The run also hit an interaction-budget/driver limitation, but the missing sections ar"
+      },
+      {
+        "check": "task000001_1",
+        "expect": "uncertain",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The check was not fully exercised because the agent hit its interaction limit after confirming that searches returned relevant results; the remaining concerns were not verified."
+      },
+      {
+        "check": "task000001_3",
+        "expect": "any",
+        "got": "uncertain",
+        "ok": true,
+        "problems": [],
+        "cause": "The run ended because the tester exhausted its interaction budget before completing the article-detail interaction; the screenshots do not establish a page defect, only that the detail view was not re"
+      },
+      {
+        "check": "task000001_4",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "The requested customer cases / success stories feature is not present in the site’s routes or navigation, so the tester had nowhere to reach it. The run also ended with a driver error, but the establi"
+      },
+      {
+        "check": "task000001_5",
+        "expect": "established",
+        "got": "established",
+        "ok": true,
+        "problems": [],
+        "cause": "(unverified against code) The global light-mode stylesheet sets the root background to white, so the required misty rose background is overridden on the page."
+      }
+    ],
+    "000021": [
+      {
+        "check": "task000001_3",
+        "expect": "established",
+        "got": "none",
+        "ok": false,
+        "problems": [
+          "expected established, got none"
+        ],
+        "cause": ""
+      }
+    ]
+  },
+  "ok": 12,
+  "checks": 18
+}

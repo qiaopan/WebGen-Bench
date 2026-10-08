@@ -1,0 +1,19 @@
+HISTORICAL CORRECTION CASES — REFERENCE ONLY
+The current task requirement above is binding and has the highest priority.
+Do not copy the historical business content, wording, colors, or layout.
+Use these cases only to prevent the described implementation failures.
+
+1) Navigation labels — implementation pattern
+Create navigation entries from the exact public requirement labels, not synonyms.
+Render exactly Home, About Us, Services, and Contact Us, and bind each entry to its
+corresponding route/page. Before finishing, click every entry and verify the expected
+page content is visible and the active label remains identifiable.
+
+2) Contact form confirmation — implementation pattern
+Create an explicit submitted/success state in the contact-form component. In the
+submit handler, validate the fields first; on valid submission set submitted=true
+and render a persistent inline confirmation element on the page. Do not rely only
+on window.alert, and do not clear the fields before setting the success state.
+Clear fields only after the success branch is rendered. Verify by entering valid
+name/email/message values, clicking Send once, and checking that the confirmation
+element remains visible after the click.
