@@ -14,9 +14,9 @@
 ### 2026-10-08：文献检索与定位
 - 整理在 `docs/reports/literature_positioning_2026-10.md`（Metis、Super Library Agent、Memory Transfer Learning、Evo-Memory、AgentCL 已对照全文核对）。定位：强模型上文字/抽象经验更好（Metis、MTL），7B 上代码片段更好 → 记忆形式取决于模型能力；Super Library Agent 同用 WebGen-Bench 但目标是可维护性、24 题、准确率不显著、不研究顺序。注意 Metis 的代码是被执行的工具，与我们的提示内片段不同，不能写成"直接矛盾"。
 - 已同步论文（第 2 章相关工作 4 段、第 6 章讨论、bib 4 条并补全 Metis 题名）、PPT（新增"相关工作与定位"页，修正"关键发现"页原先"与 Metis 一致"的错误说法，参考文献页）、README。
-- 14B 下载作业 23430 已提交（CPU，`scripts/cluster/download_model.sbatch`），在等集群人工审批（PENDING_APPROVAL）。
+- 14B 下载作业 23430 已取消（10-08 用户决定不做 14B，见 DECISIONS）；32B 作为未来工作。
 
-### 2026-10-08：固定前缀消融已排队；14B 待准备
+### 2026-10-08：固定前缀消融已排队（14B 已取消，下面的 14B 步骤留作 32B 参考）
 - 集群 `filler.conf` 末尾加了固定前缀（备份 `filler.conf.bak-before-fixed-prefix`），整体：只有清单（v7）→ 种子 11 → 29 → 47 → 交错 → 固定前缀，预计约 10-15 全部完成。src、配置、`worker_lib.sh`、`start_services.sh` 已同步（v7 行为不变，见 DECISIONS）。
 - 14B 待做：下载权重到 `/data/qma258/models/WebGen-LM-14B`（长任务需放进 Slurm 作业）；当前 worker 退出后，用 `WEBGEN_GENERATOR_WEIGHTS=WebGen-LM-14B`、`WEBGEN_GENERATOR_API_MODEL=WebGen-LM-14B`（注意 `.env` 里也有该变量）另提交 worker；先试启动确认显存，再按 manifest 顺序跑 Long Memory/No Memory 的 P 行。
 
