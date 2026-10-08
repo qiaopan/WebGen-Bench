@@ -414,3 +414,6 @@
 - **每个顺序都跑 No Memory**，与 Long Memory 逐题背靠背、ABBA 轮换谁先跑。作用：时间配对；共 5 次 No Memory 可量化运行噪声。原 manifest 顺序的 No Memory r2 从队列删除。
 - **消融（只有清单）不随顺序重复**：它回答组成部分的贡献，且不读写记忆，与 No Memory 一样理论上不受顺序影响，只跑当前 manifest 顺序这一次。
 - **与原论文的关系（已核对原文）：** WebGen-Bench（arXiv 2505.03733）主结果为单次运行、无误差线；其 NeurIPS checklist 第 7 项回答 No，理由是 "Error bars are not reported because it would be too computationally expensive"。其 Limitations（附录 B）没有提这一点。论文中表述为：我们重复 No Memory 以量化运行噪声，并在多种顺序下重复 Long Memory、按任务配对报告置信区间；但每个顺序内 Long Memory 仍是单次运行。
+
+### 2026-10-08：顺序实验缩减为两类各一次（用户决定，取代"各 2 次"）
+- 时间成本高，只跑 ① 种子 11（领域挨着：打乱领域块与块内顺序）和 ② 种子 29（领域打散：101 题完全随机），各一次，Long Memory / No Memory 逐题 ABBA。种子 47 与交错顺序不跑（顺序文件保留，需要时可加回队列）。加上已有的 manifest 原顺序，"领域挨着"有 2 次（其中 manifest 不是交替执行）、"领域打散"有 1 次；No Memory 共 3 次。论文如实写明打散一类只有一次运行。
