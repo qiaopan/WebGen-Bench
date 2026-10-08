@@ -4,6 +4,8 @@
 \section{Form Matters More Than Amount}
 The central observation of this work is that a small generator uses memory very selectively. Textual lessons, even correct and relevant ones, were rarely followed, and generic ones accumulated and displaced useful content. Short verified code fragments were followed. This agrees with Metis's finding that code memory complements text memory~\cite{dai2026metis}, and adds that for a 7B generator the format of the memory can decide whether it helps at all. The form of the code also matters: a fragment that looked like a complete file was copied as a finished answer, producing an untouched scaffold.
 
+This contrasts with findings for strong models. With a GPT-4o executor, Metis finds that text memory transfers more reliably than code tools~\cite{dai2026metis}, and Memory Transfer Learning finds that abstract insights transfer best~\cite{kim2026mtl}. The mechanisms differ (Metis executes its code; we show code to the generator), so the results are not direct contradictions, but together they suggest that the best form of memory depends on what the model using it can execute. A strong model can turn an abstract lesson into correct code itself; a 7B generator, in our observations, could not, and needed the code. The planned experiment with WebGen-LM-14B tests this within one model family.
+
 A second observation is that part of the gain is not ``smarter'' code but protection against collapse. In the earliest phase, short prompts made the model return the default scaffold in five of eight tasks, while longer, specific prompts did not. Both effects are real benefits of memory, but they should be described separately.
 
 \section{Limitations and Threats to Validity}
