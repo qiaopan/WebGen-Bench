@@ -9,10 +9,10 @@
 \paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. \todo{Domains adjacent vs mixed orders (two runs each).}
 
 \section{Future Work}
+Three experiments would address the main open questions about this work most directly:
 \begin{itemize}
-  \item \textbf{Other generators.} Repeat the main comparison with one generator of a different architecture or capability, keeping Bolt.diy fixed, to test whether the code-over-text effect is specific to small models.
-  \item \textbf{Other agents.} Integrate the memory with other coding agents (e.g.\ OpenHands, Aider) on a stratified subset of tasks once the effect is stable.
-  \item \textbf{Other evaluators.} Re-grade existing screenshots with a second strong \gls{vlm} and re-check a stratified sample of functional verdicts.
-  \item \textbf{Ablations.} Fixed code prefix from task one; without the concreteness filter; different trigger thresholds.
-  \item \textbf{Verification loops for memory.} Let the memory model revise reflections and fragments until code-checkable criteria hold~\cite{madaan2023selfrefine,dhuliawala2023cove}.
+  \item \textbf{Fixed code prefix.} Give the final v7 code fragments from the first task on, without reading or writing memory. If this matches v7, the gain comes from having code in the prompt rather than from accumulating experience.
+  \item \textbf{A second generator.} Repeat the main comparison with WebGen-LM-14B, keeping Bolt.diy, the memory pipeline and the evaluation fixed, to test whether the code-over-text effect is specific to small models.
+  \item \textbf{Held-out evaluation.} Because the method was developed while observing results on this benchmark, freeze the method on the first 30 tasks and report the remaining 71 separately.
 \end{itemize}
+Further directions are re-grading with a second strong \gls{vlm} evaluator, integrating the memory with other coding agents (e.g.\ OpenHands, Aider) on a stratified subset of tasks, letting the memory model revise reflections and fragments until code-checkable criteria hold~\cite{madaan2023selfrefine,dhuliawala2023cove}, and transferring the approach to repository-level coding benchmarks such as SWE-bench.

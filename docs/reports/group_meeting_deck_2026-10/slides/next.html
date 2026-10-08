@@ -1,11 +1,15 @@
-<section id="next" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
-<p style="font-size:28px;color:#2A78D6;font-weight:700">未来工作</p>
-<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700">换掉生成器、评测器和智能体，结论还成立吗？</h2>
-<div style="display:flex;gap:32px">
-<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px"><h3 style="font-size:34px;font-weight:700">不同生成 LLM</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">更大或更强的模型是否更听文字经验？"代码优于文字"是不是小模型特有？</p></div>
-<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px"><h3 style="font-size:34px;font-weight:700">不同评测 VLM</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">换评测模型后提升是否稳定，排除评测偏好的影响</p></div>
-<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px"><h3 style="font-size:34px;font-weight:700">不同智能体</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">从 Bolt.diy 换到能自己修复、跑命令的智能体框架</p></div>
+<section id="next" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:96px 128px 140px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">下一步 · 想请老师给意见</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:50px;font-weight:700;line-height:1.2">交完论文后，补 3 个实验冲 workshop / Findings</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:24px">
+<tr><th style="width:30%;text-align:left">补的实验</th><th style="width:44%;text-align:left">回答的质疑</th><th style="width:26%;text-align:left">成本</th></tr>
+<tr><td>固定前缀消融</td><td>从第 1 题起直接给 v7 的代码片段、不读写记忆：是记忆在起作用，还是 prompt 里有代码就够？</td><td>101 题一次，约 20 小时</td></tr>
+<tr><td>第二个生成模型（WebGen-LM-14B）</td><td>"代码优于文字"是不是只对 7B 成立？</td><td>两组各一次，约 1.5–2 天</td></tr>
+<tr><td>留出验证</td><td>方法是看着这个基准改出来的：前 30 题定版，后 71 题单独报告</td><td>不用新跑，重新划分</td></tr>
+</table>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:28px;font-weight:700">投稿去向</h3><p style="font-size:24px;line-height:1.5;color:#4A5568">短期：LLM agent / 记忆 / 代码生成相关 workshop；补完实验后：ACL/EMNLP Findings</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:28px;font-weight:700">更远的方向</h3><p style="font-size:24px;line-height:1.5;color:#4A5568">换评测 VLM、换智能体（OpenHands/Aider）、迁移到 SWE-bench</p></div>
 </div>
-<p style="font-size:28px;color:#4A5568;line-height:1.5">另外：外观经验的利用；把方法迁移到 SWE-bench 等代码任务。</p>
-<aside>下一步想换掉三样东西，看结论是否还成立。第一，换生成模型：更大更强的模型是不是更听文字经验，“代码优于文字”是不是小模型特有的。第二，换评测模型，排除评测偏好的影响。第三，换智能体，从 Bolt.diy 换到能自己跑命令、自己修复的框架。另外也想把方法迁移到 SWE-bench 这类代码任务。想请老师和大家给意见：先做哪一个替换最有说服力。谢谢大家。</aside>
+<aside>最后讲下一步。论文会先按时在 11 月 16 日交。交完以后，我想补三个实验，争取投 workshop 或者 Findings，想请老师给意见。第一是固定前缀消融：从第一题开始就直接给 v7 最后学到的代码片段，不读也不写记忆。如果它和 v7 一样好，说明起作用的是 prompt 里有代码，而不是记忆的积累；这是审稿人最可能问的问题。第二是换一个生成模型，比如同一家族的 WebGen-LM-14B，看“代码优于文字”是不是只对 7B 成立。第三是留出验证：我们的方法是看着这个基准一版一版改出来的，有过拟合的嫌疑，所以把前 30 题当开发集、后 71 题单独报告，这个不需要新跑。投稿去向，短期考虑 agent、记忆或代码生成相关的 workshop，补完实验后考虑 ACL 或 EMNLP 的 Findings。更远的方向是换评测模型、换智能体，以及迁移到 SWE-bench。想请老师和大家给意见：这些实验里哪一个最值得先做，投哪里比较合适。谢谢大家。</aside>
 </section>
