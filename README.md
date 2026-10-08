@@ -1,182 +1,166 @@
-# 面向网站生成的跨任务长期记忆：第一阶段报告（WebGen-Bench，2026-09 至 2026-10）
+# 让小模型越做越好：面向网站生成的跨任务长期记忆
 
-> **状态：已封版归档（2026-10-03）。** 本仓库是 [WebGen-Bench](https://arxiv.org/abs/2505.03733) 的 fork，在其上实现并试验了网站生成 agent 的跨任务长期记忆（Long Memory）。由于 GUI 评测的资源开销和噪声过大，这条线暂停，后续可能转向 SWE 类基准。原 WebGen-Bench README 保留在本文末尾。
+**奥克兰大学（The University of Auckland）人工智能硕士（Master of Artificial Intelligence）毕业论文项目 · COMPSCI 792 Research Project**
+
+作者：Qiaopan Ma · 导师：Qian Liu · 2026
+
+> 本仓库是 [WebGen-Bench](https://arxiv.org/abs/2505.03733) 的 fork。我们在它上面实现并评估了网站生成 agent 的**跨任务长期记忆（Long Memory）**：做完一题就把评测结果反思成经验，下一题检索、注入 prompt，不改模型权重，也不改官方评测协议。原 WebGen-Bench README 保留在本文末尾。
 >
-> - 结果快照：[`archive/phase1-webgen-2026-10/`](archive/phase1-webgen-2026-10/)（进度记录、记忆库、反思、prompt、回归集结果）
-> - 决策与交接：[`docs/agent-memory/DECISIONS.md`](docs/agent-memory/DECISIONS.md)、[`docs/agent-memory/HANDOFF.md`](docs/agent-memory/HANDOFF.md)
+> - 论文 LaTeX 源文件：[`docs/thesis/`](docs/thesis/README.md)
+> - 组会 PPT 源文件（含演讲稿）：[`docs/reports/group_meeting_deck_2026-10/`](docs/reports/group_meeting_deck_2026-10/README.md)
+> - 决策与交接记录：[`docs/agent-memory/DECISIONS.md`](docs/agent-memory/DECISIONS.md)、[`docs/agent-memory/HANDOFF.md`](docs/agent-memory/HANDOFF.md)
+> - 第一阶段（2026-09）结果快照：[`archive/phase1-webgen-2026-10/`](archive/phase1-webgen-2026-10/)
 > - 配套的 Bolt 改动：`bolt.diy-Fork` 子模块（分支 `diy-fork`）
 
 ## 摘要
 
-我们研究：一个网站生成 agent 能否把已完成任务的评测结果反思成经验，在后续任务中复用，从而生成更好的网站。系统用 WebGen-LM-7B（Mac 本地 Q8_0）在 Bolt.diy 中生成网站，用 Qwen2.5-VL-32B 做 GUI 功能评测、GPT-4o 做截图外观评分；Long Memory 在每个任务后把每项未通过的检查反思成带证据的 case，下一个任务开始前检索、改写、压缩成几条 guidance 注入 prompt。
+网站生成 agent 每个任务都从零开始，同样的错误会在下一题重复出现。我们研究：**在官方评测协议下，一个 7B 的网站生成模型（WebGen-LM-7B）能否靠自己以前做过的任务积累经验，越做越好？**
 
-在两臂都生成出网站的 7 个任务上，当前 Long Memory 平均准确率 0.53，No Memory 0.40；Long Memory 在 4 个任务上更好、3 个更差。**这个差异不能作为结论**：样本只有 7 个，同一任务单次结果波动很大（同一任务 Long Memory 5 次运行在 0.08 到 0.67 之间），而且各任务的 Long Memory 结果来自不断调整的不同协议版本。
+我们先在学校 H200 集群上全部自部署，复现了官方 No Memory 基线（101 题准确率 28.5%，论文 28.4%）。分析它的失败发现：大量零分题不是难题，而是一处基础代码错误导致的整站白屏（例如 import 了没安装的包）；并且小模型几乎不听文字建议，却会照抄代码。纯文字的记忆（v4）前 30 题有效，后期因为空泛条目越攒越多，反而输给 No Memory。
 
-本阶段更有价值的是一组方法层面的发现：
+最终方法（v7）由三部分组成：**需求清单**保证需求里的每个功能都可见；**代码池**在某个问题出现 ≥2 次后，从本链自己做对的网站里摘出经过核对的代码片段注入；**记忆卫生**（存储前去重、只留具体写法、按效用退役）防止空话累积。单次运行、101 题上：
 
-1. **注入内容的“覆盖”比“长度”更关键。** guidance 太长会让 7B 生成器只写首页；但压缩时删掉某个需求功能，生成器就只实现 guidance 提到的那部分，被删的功能直接缺失。
-2. **小模型的反思能看到现象，却很难追到根因**，而且同一 prompt 多次运行结果差异很大。需要回归集来评估 prompt 版本。
-3. **基础设施问题会伪装成模型能力问题。** 例如 Bolt 的 Node 默认 300 秒超时让所有构建修复回复静默丢失；评测浏览器的深色模式让 Vite 默认样式变成白底白字。
+| | No Memory | v4（文字记忆） | **v7（代码记忆）** |
+|---|---|---|---|
+| 准确率 | 28.5% | 30.9% | **40.0%** |
+| 零分题 | 30 | 20 | **13** |
+| 第 31–101 题准确率 | 29.5% | 27.8% | **40.4%** |
 
-## 1. 问题与动机
+v7 相对 No Memory 逐题配对平均 +11.5 个百分点（95% bootstrap CI 6.0–16.9）。提升在功能而不在外观：两组都生成出可用网站的 68 题上，外观分 3.25 vs 3.22。
 
-WebGen-Bench 要求模型从一段自然语言需求生成可交互网站，再由 GUI agent 按隐藏的检查清单逐项测试。WebGen-Agent 等工作用同一任务的评测反馈反复修复网站；我们关心的是另一个问题：**不使用当前任务的隐藏评测，只靠先前任务积累的经验，能否提升新任务的结果？** 这与 ReasoningBank、ExpeL 等“从经验中学习”的思路一致，但对象是代码生成加 GUI 评测这一高噪声场景。
+核心结论：**对小模型来说，记忆的形式比记忆的多少更重要**——经过核对的代码片段能迁移，文字经验不能。
+
+## 1. 研究问题
+
+1. **RQ1**：只用 agent 自己先前任务产生的经验，能否在官方 WebGen-Bench 协议下提升小模型的功能准确率？
+2. **RQ2**：小模型真正用得上哪种形式的记忆：文字经验、需求清单，还是代码示例？
+3. **RQ3**：收益是否随经验积累而保持或增长？是否对任务顺序稳健？
 
 ## 2. 实验设置
 
 | 角色 | 模型 / 环境 |
 |---|---|
-| 生成器 | WebGen-LM-7B，官方权重自行量化为 Q8_0，llama.cpp 运行于 Apple M5 24GB，经 Bolt.diy（OpenAI-like provider）生成项目 |
-| 功能评测 | Qwen2.5-VL-32B-Instruct-AWQ（vLLM，RTX 5090），WebVoyager 式 GUI agent，每项检查约 15 步交互 |
-| 外观评测 | Azure GPT-4o，截图 1–5 分 |
-| 记忆（检索 / 改写 / 压缩） | Azure GPT-4o + embedding |
-| 反思 | Azure gpt-5.4-mini |
+| 生成器 | WebGen-LM-7B（BF16，vLLM），Bolt.diy，**只生成一次、不修复**（官方协议） |
+| 功能评测 | Qwen2.5-VL-32B-Instruct，WebVoyager 式 GUI agent 逐项点击测试 |
+| 外观评测 | Qwen2.5-VL-32B-Instruct（论文用 GPT-4o，这是唯一偏差；外观只在我们的组之间比较） |
+| 记忆 / 反思 | Qwen2.5-VL-72B-Instruct-AWQ + bge-m3 embedding |
+| 硬件 | 奥克兰大学 CS ML 集群，每个作业 2×H200，单个任务约 12 分钟；不调用任何商业 API |
 
-- **任务：** WebGen-Bench 101 个任务按 20 个 domain block 排序（`data/experiment_splits/continual_domain_blocks/manifest.json`）。本阶段两臂共同覆盖 000014–000021、000026 共 9 个任务，其中 000018 的 Long Memory 当前无有效结果。
-- **两臂：** No Memory（`--modes disabled`，不检索、不反思、不写记忆）与 Long Memory（`--modes continual --post-task-reflection --memory-representation case_only`，压缩配置 `config/long_memory_condensed.json`）。两臂使用同一生成器、评测器和构建修复流程（最多 5 次修复）。
-- **计分（论文口径）：** accuracy = (Yes + 0.5·Partial) / 检查数；构建失败（start failed）单独统计，不计入准确率。
-- **防泄漏：** 不使用当前任务的隐藏评测修复当前任务；检索、统计时只排除当前任务自身（leave-one-task-out）。计划从 000029 起两臂逐任务交替执行，谁先跑也交替。
+- **任务：** WebGen-Bench 全部 101 个任务，按 manifest 的 20 个领域分块顺序执行。
+- **指标：** 准确率 =（通过 + 0.5×部分通过）/ 检查数（官方口径）；外观 1–5 分；零分题数。比较按任务配对，不把检查当作独立样本。
+- **对照组：** No Memory = 同一模型、同一评测，只给需求原文，不检索、不反思、不写记忆。
+- **防泄漏：** 留一任务（leave-one-task-out）——检索永远排除当前任务自己的记录；评测结果不回流修复同一题。
 
-## 3. 方法：Long Memory
+## 3. 方法
 
-### 3.1 记忆结构
+### 3.1 出发点：No Memory 为什么失败
 
-三层，存于同一个 SQLite（`src/long_memory_schema.sql`）：
+- **整站白屏来自基础错误。** Bolt 的 Vue 模板只声明了 `vue` 一个依赖，而生成器的回复从不修改 `package.json`（0/81）。一旦 import 了 `vue-router`，整站白屏、所有检查失败。
+- **小模型不听文字，听代码。** 在原本白屏的任务上只加一句文字建议（正说、反说、放首尾都试过），最多救回 1/3；给一段 10 行左右的页面切换代码示例，救回 7/9。让模型先写规划（short CoT）则 5/5 丢掉了 Bolt 的文件格式。
 
-- `trajectories`：每次运行的不可变记录，包括 prompt、产物和评测结果。
-- `reflection_cases`：每项失败或部分通过的检查对应一条 case，记录功能、触发、预期、观察、原因、预防做法、证据和原因可信度。
-- `experiences` / `skills`：更高层的候选知识，经过 candidate → active/rejected 的准入。
+### 3.2 流水线（每个任务）
 
-另有 `memory_sources`（只追加的出处记录）以及统计表 `run_facts` / `check_facts`。
+1. **需求清单**：记忆模型把需求逐条拆开。
+2. **检索经验**：功能经验按相似度取候选，由记忆模型判断是否适用，只保留 hard match，挂到对应的清单条目下；通用池只保留含具体写法的条目。
+3. **代码池**：最多 2 段经过核对的代码片段（见 3.4）。
+4. **生成 + 评测**：WebGen-LM-7B 生成一次，官方功能与外观评测。
+5. **反思入库**：记忆模型按排查步骤反思每项未通过的检查；新经验去重、更新效用、用代码重新计算网站事实并更新代码池。
 
-### 3.2 任务后反思（`src/post_task_reflection.py`）
+第 5 步的产物会被下一题的第 2、3 步读取，这是任务之间唯一的信息通道。
 
-- 每项未通过的检查单独调用一次反思模型。它只看到这项检查自己的评测轨迹、最后的截图、网站源码，以及代码事实（例如入口引入的全局样式表在 `:root/body` 上的全部声明）。
-- 反思前必须按顺序填写 `investigation`，共 9 步：
-  1. 读任务；
-  2. 评测员是否真的到达目标，没到的话为什么；
-  3. 看截图；
-  4. 查报错；
-  5. 沿代码链检查：路由 → 入口 → 挂载 → 数据或处理函数 → 渲染；
-  6. 样式追踪：只在代码里有内容、截图上却是空白或看不清时做，按元素 → 父容器 → 全局样式表的顺序；
-  7. 列 2–3 个候选原因，逐一用证据排除；
-  8. 写结论；
-  9. fix_check：只按这条经验改代码，这项检查能否通过。
-- `cause_confidence` 只有网站缺陷被直接证据证实时才标 `established`。评测员自身的局限（交互次数用完等）一律标 `uncertain`，这类 case 存档但不参与检索。
-- 每条经验另外调用一次路由：原因在所有页面共享的文件（入口、全局样式、路由、根布局）里，就标 `site_wide`，否则标 `feature`。site_wide 的经验按根因分组，每组只留一条进入通用池。
-- 构建失败由代码直接生成固定标签的 `[implementation]` case，不交给模型起名。
-- 每次反思记录 `prompt_version`（全部反思指令的指纹）。
+### 3.3 需求清单（`build_checklist`，`src/reflection_case_memory.py`）
 
-### 3.3 检索与改写（`src/reflection_case_memory.py`）
+需求原文放在 prompt 最前并声明优先；下面逐条列出清单，经验原文挂在对应条目下，而不是单独列一个"注意事项"——单独的列表会被小模型当成要做的全部范围。代码检查每个条目都和需求有共同实词（防止从别的任务带入需求里没有的功能），覆盖率低于 60% 就带着缺失的词重拆。
 
-1. 需求拆成至多 3 个功能 aspect 和 1 个外观 aspect。
-2. 每个 aspect 用 embedding 取候选，由记忆模型判为 hard_match、soft_transfer 或 reject。每个 aspect 选一条，优先选还没被其他 aspect 选中的。
-3. 对每个（case, aspect）组合，改写成当前任务可执行的做法。必须保留原 case 中“缺的那个元素”和原有的限定语，不能加入与需求冲突的要求。
-4. 早期代码里写死过一个“首屏展示所有功能”的外观 aspect，它产生了与导航冲突的 guidance，已删除。
+### 3.4 代码池（`src/code_memory.py`）
 
-### 3.4 通用池与统计
+- **用代码而不是模型检测问题：** 每个任务结束后，对生成的网站计算未声明的包（`import:<pkg>`）、用了 Vue 函数却没 import（`vue-api`）、以及用 `@vue/compiler-sfc` 按 Vite 的方式编译得到的错误（`compile:*`）。
+- **反复出现才固化：** 同一问题在 ≥2 个任务出现后才建立代码记忆（参考 Metis）。
+- **写法来自自己做对的网站：** 从本链得分 ≥0.5、能编译、没有上述问题的网站里摘代码；失败的网站决定"什么时候需要"，成功的网站提供"怎么写"。
+- **只给片段，不给整份文件：** 记忆模型挑关键行，代码核对——逐字来自源文件、≤15 行、不含 `<script>/<template>` 标签行、必须包含 import 行和一行真实调用。整份文件或只有一行 import 的示例会被小模型当成"已经写完"，直接交回模板（v6 的教训）。
+- **按条件取用：** 每条代码记忆带名称和适用条件，由记忆模型按当前需求判断是否注入，像技能库一样（参考 Voyager）。
 
-- **通用池：** 收所有 `[implementation]` case，不经相关性判断。取至多 6 个候选（出现在 ≥2 个任务的“广泛”经验，加 2 个保底名额），按“出现次数 × 严重度”排序（failed 记 1.0，partial 记 0.5，构建失败按丢掉的检查数计），再泛化改写成适用于任何网站的要求。
-- **统计：** 只记录事实和样本量，只用于排序，不直接注入 prompt。
+### 3.5 记忆卫生
 
-### 3.5 压缩与注入
+- **只留具体写法：** 通用池条目没有代码写法（`@click`、`v-if`、`import`…）就丢掉；改写时只泛化"什么时候用"，不泛化"怎么做"。
+- **存储前去重：** 新经验与相似的旧经验比较，同一根因、同一修法就记为对旧经验的支持，不新增（参考 Mem0）。
+- **效用与退役：** 效用 =（注入次数 − 复现次数 + 1）/（注入次数 + 2）；注入 ≥5 次且效用 <0.3 的经验停止注入（参考 Memento、ExpeL）。
+- **结论不手写：** 给反思模型的规则只教排查方法（沿代码链检查、从元素追到全局样式表、列出候选原因逐一排除），具体经验必须由系统从证据中产出。
 
-把检索和通用池的候选合并成至多 6 条 guidance，总长度不超过需求的 1.5 倍。规则如下：
+### 3.6 版本演进
 
-- 每条以它对应的需求部分开头（如“Voting: …”“Every page: …”），是一句约 90 字符以内的命令式短句，不写验证句、不写空泛修饰词。
-- **覆盖优先：** 每个功能候选都必须被某条 guidance 引用，只有“重复”或“不适用”可以删。代码会检查覆盖和每条长度，不满足就让模型重写一次。
-- 通用池前两条保底。
-- prompt 中需求原文在最前；guidance 开头写明“需求优先，这些注意事项不是完整清单”，结尾再提醒一句“需求列出的都要做”（利用 Lost in the Middle 的首尾效应）。
+| 版本 | 改动 | 暴露的问题 |
+|---|---|---|
+| 第一阶段（Mac 本地，2026-09） | 三层记忆、分步反思、guidance 压缩 | prompt 换行 bug 使经验从未送达；压缩会删掉需求功能 |
+| v3 | 源头去重、效用排序 | 文字经验仍救不回白屏 |
+| v4 | + 需求清单 | 前 30 题好，后 71 题输给 No Memory |
+| v6 | + 代码池、具体化过滤、退役 | 一行 import 示例 → 模型交回模板 |
+| **v7（最终）** | 示例只给片段、必须带调用行；统计块不注入 | 约 4.6% 的组件仍漏 Vue import（见 §5） |
 
-## 4. 结果（截至 2026-10-02）
+## 4. 结果
 
-| 任务 | No Memory | Long Memory（当前） | 其他 Long Memory 运行（已归档） |
+| 范围（准确率 / 外观 / 零分题） | No Memory | v4 | v7 |
 |---|---|---|---|
-| 000014 | 0.40（外观 3） | 0.60（3），未压缩旧版 | — |
-| 000015 | 0.40（3） | 1.00（3），未压缩旧版 | — |
-| 000016 | 0.50（2） | 0.17（2） | 未压缩 0.25；诊断副本（压缩）0.83 |
-| 000017 | 0.58（3） | 0.33（3） | 去掉首屏 aspect 前 0.58 |
-| 000018 | 0.67（3） | 待重跑 | 5 次：0.33 / 0.17 / 0.17 / 0.08 / 0.67 |
-| 000019 | 0.33（3） | 0.42（4） | 未压缩 0.33 |
-| 000020 | 0.50（3） | 0.40（4） | — |
-| 000021 | 0.10（3） | 0.80（3） | 未压缩 0.10 |
-| 000026 | 构建失败 | 0.40（2） | 未压缩 0.80（4） |
+| 第 1–30 题 | 26.0% / 3.26 / 11 | 39.3% / 3.29 / 1 | 39.0% / 3.38 / 4 |
+| 第 31–60 题 | 36.3% / 3.16 / 6 | 35.0% / 3.20 / 5 | **45.3%** / 3.07 / 3 |
+| 第 61–101 题 | 24.8% / 3.31 / 13 | 22.9% / 3.14 / 14 | **37.1%** / 3.20 / 6 |
+| **全部 101 题** | 28.5% / 3.25 / 30 | 30.9% / 3.21 / 20 | **40.0% / 3.21 / 13** |
 
-在两臂都有网站的 7 个任务（014、015、016、017、019、020、021）上：No Memory 平均 0.40，Long Memory 平均 0.53。**注意：** Long Memory 的 014、015 是未压缩旧协议，016–021 是 10 月 1 日的几个中间版本，026 又是 10 月 2 日的版本；同一任务多次运行差异很大。因此这张表只能说明“可能有正向信号”，不能作为记忆有效的证据。正式结论需要冻结协议、整体重跑，并对每个任务做多次运行。
+- **学习曲线与 gap 图：** [`docs/reports/learning_curve_v4_v7.png`](docs/reports/learning_curve_v4_v7.png)、[`docs/reports/gap_curve_v4_v7.png`](docs/reports/gap_curve_v4_v7.png)。后段三组准确率都下降，是题目更难；看同一题上与 No Memory 的差，v4 在第 40–60 题最多落后约 27 个百分点，v7 在第 60 题以后稳定领先 10–25 个百分点。
+- **提升从哪里来：** 整站白屏或编译错的题数，No Memory 26、v4 19、v7 8。v4 共注入 102 条无代码写法的条目，v7 只有 31 条。
+- **零分题：** v7 的 13 个零分题中有 10 个 No Memory 也是 0 分，多为该生成器做不出的难题。
 
 ## 5. 主要发现
 
-**F1. prompt 送达本身就可能出错。** Bolt 的输入框把 Enter 当成“发送”，9 月 26 日之前带换行的 prompt 只送达了第一段，此前所有 Long Memory 生成实际上只看到了需求原文。已改为用 Shift+Enter 输入换行，并用聊天导出核对 `prompt_delivered`。
+1. **形式决定小模型能否用上记忆。** 文字经验正确也不被执行；代码片段被执行。
+2. **文字记忆会随时间变坏。** 空泛条目越攒越多，挤占 prompt，v4 后段低于 No Memory。
+3. **示例必须是片段。** 整份文件或只有 import 的示例被当成已写完的答案，模型直接交回模板。
+4. **整站白屏能被纠正，单页缺 import 不能。** 按文件统计，v7 有 27/592、No Memory 有 27/586 个组件漏 Vue import（约 4.6%），出现位置没有规律，更像随机笔误。我们试了让示例随数据更新、同时示范 `ref` 和 `computed`（v8，开关 `WEBGEN_CODE_POOL_REFRESH`，默认关闭），4 题只改善 1 题。官方协议不允许生成后修复，因此停在 v7，把它写为生成器的残余错误率。
+5. **基础设施问题会伪装成模型能力问题**（第一阶段）：Bolt 把换行当发送导致经验从未送达；Node 默认 300 秒超时让修复回复静默丢失；评测浏览器的深色模式让 Vite 默认样式变成白底白字。
 
-**F2. guidance 太长会喧宾夺主。** 未压缩的 guidance 约为需求的 5.7 倍，000016 两次都只生成了首页（0.25）；压缩后的诊断版生成了全部 5 个页面（0.83）。这与“上下文越长、表现越差”的文献一致（Du et al., 2025；Liu et al., 2024）。
+## 6. 局限与进行中的实验
 
-**F3. 但 guidance 也会被当成“要做的全部”。** 000018 中压缩删掉了“状态查询”，000026 中删掉了“投票确认”和“结果页”，生成器恰好只实现了 guidance 提到的功能，被删的那些直接缺失。由此得出的规则是：压缩时**只缩短、不删除需求功能**。实现后，026 的 guidance 从需求的约 4 倍降到约 1.3 倍，且 6 条覆盖了全部功能。
+- **单次运行、固定顺序。** 正在进行：
+  - **消融"只有清单"**（v7 配置 + 不读写任何记忆，同一顺序）：区分提升来自需求拆解还是记忆积累。
+  - **顺序鲁棒性**：四种顺序（原始领域分块、两个种子的分层打乱、跨领域交错），每次从空库开始；Long Memory 与 No Memory 逐题背靠背、按 ABBA 轮换谁先跑，报告配对差与 bootstrap 置信区间。
+- 只用一种生成器（WebGen-LM-7B）和一种框架（Bolt.diy + Vue）。
+- 代码池的触发条件很通用，效果接近"学到的固定前缀"；需要"从第 1 题起给固定前缀"的消融区分。
+- 记忆模型（72B）强于生成器（7B）；外观评测用 32B 代替 GPT-4o。
+- 方法在 WebGen-Bench 上迭代设计，存在对该基准过拟合的可能；正式运行从空库开始、只用先前任务，以降低这一风险。
 
-**F4. 人为写死的设计假设会经由记忆放大。** 代码里写死的“首屏展示所有功能”外观 aspect，被改写成“落地页展示全部内容，不需要导航”，导致 000018 没有导航、000017 改用标签页。删除后，相应的导航检查恢复通过。
-
-**F5. 评测环境本身会制造失败。** 评测浏览器使用深色模式，Vite 默认的 `src/style.css`（`:root { color: rgba(255,255,255,.87) }`）在白色卡片里变成白底白字。代码中内容完整，评测员却看不到，判为 failed。所有生成项目都残留这个文件，约一半引入了它，两臂都受影响。
-
-**F6. 小模型的反思可靠性有限。** gpt-5.4-mini 能从截图看出“文字看不见”，但多数时候追不到全局样式表；它会把“看起来…”这样的猜测标成 established；分步输出变长后，还会把 JSON 字段嵌错层（已在代码里修复）；同一 prompt 两次运行可以分别得到 5/5 和 1/5。我们为此建了一个人工核对的回归集（5 个任务、18 项检查，`config/reflection_regression/gold_v1.json`、`scripts/reflection_regression.py`），各 prompt 版本的得分在 12–13/18 之间，版本之间的差异小于运行之间的随机波动。库中唯一一条“文字对比度”通用经验，只是某一次运行碰巧追到了 `style.css`，不易复现。用它解释后续任务的改善会有假阳性风险。
-
-**F7. 基础设施问题会伪装成模型能力问题。**
-- 修复前，Bolt 会先做一次非流式的“上下文优化”摘要调用；Node.js 内置 fetch 默认 300 秒收不到响应头就超时，AI SDK 再重试 2 次。Mac 上的 7B 写摘要超过 5 分钟，于是所有修复回复都静默丢失，6 次构建的代码完全相同。现已通过预加载把超时提高到 30 分钟（`tools/bolt-preload/`）。
-- runner 把“修复次数用完”也当成可重试的故障，从头重新生成；在 temperature 0 下只会得到同样的项目。现改为直接记为构建失败。
-
-**F8. “页面写了却没有入口”是这个 7B 生成器最常见的错误**（000016、000021、000026），即使 guidance 明确要求导航，也不总被遵守。
-
-## 6. 局限
-
-- 样本小（7–9 个任务），每个任务每臂只跑一次；GUI 评测和生成的随机性都很大。
-- Long Memory 协议在实验过程中多次修改，链中混有不同版本的结果；正式比较需要冻结后整体重跑。
-- 回归集的标准答案是人工判断（已发现并改正 1 处），而且只覆盖 5 个任务。
-- 评测本身存在混杂因素：交互次数上限、深色模式、对下拉框的操作能力等，它们对两臂的影响不一定相同。
-- 资源开销：每个任务每臂约 40–90 分钟（Mac 上生成约 10 token/s，加上 32B VLM 评测），101 个任务两臂合计需要数百小时。
-
-## 7. 经验与后续方向
-
-这一阶段可以迁移到下一阶段（例如 SWE 类基准）的做法：
-
-1. 注入的记忆要**覆盖当前任务的全部要求**，长度只能靠缩短措辞来控制，不能靠删条目。
-2. 反思要强制走排查步骤并留下记录（`investigation`），可信度要与证据一致，不确定的经验存档但不参与检索。
-3. 改 prompt 时要配**回归集和多次运行**，避免“修好新任务、弄坏旧任务”；每条记忆都记录生成它的 prompt 版本。
-4. 先确认“送达”和“评测环境”没问题，再讨论模型能力。
-5. 结论不要手写进记忆：系统只给通用排查方法，具体经验必须由系统自己从证据中产出。
-
-SWE 类基准用测试用例判定，结果更确定、成本更低，更适合检验“经验能否跨任务迁移”。
-
-## 8. 代码地图与复现
+## 7. 代码地图与复现
 
 | 位置 | 内容 |
 |---|---|
-| `scripts/run_continual_memory.py` | continual runner（两臂共用）；构建失败记录与不重试规则 |
-| `scripts/catchup_remaining.sh` | 队列执行（启动前跑 preflight） |
-| `scripts/preview_guidance.py` | 只跑第一、二阶段，预览 guidance（只读记忆库） |
-| `scripts/compare_task.py` | 单任务两臂对比表 |
-| `scripts/reflection_regression.py` + `config/reflection_regression/gold_v1.json` | 反思 prompt 回归集 |
-| `scripts/replace_reflection.py`、`scripts/finish_post_task.py` | 替换或补做某任务的反思 |
-| `scripts/backfill_prompt_stats.py` | 注入长度统计，导出 `prompt_length_analysis.csv` |
-| `scripts/start_bolt_provider.sh` + `tools/bolt-preload/` | 启动 Bolt（带 30 分钟 fetch 超时） |
-| `scripts/keep_tunnel.sh` | 评测服务器 SSH 隧道守护（登录信息放在 `.env` 的 `WEBGEN_EVAL_SSH_HOST`） |
-| `config/long_memory.json` / `config/long_memory_condensed.json` | No Memory 与 Long Memory 的配置（改动会改变配置指纹） |
+| `scripts/run_continual_memory.py` | 两臂共用的 runner（`--modes disabled` / `continual`） |
+| `src/reflection_case_memory.py` | 需求清单、检索、改写、压缩、去重与效用 |
+| `src/code_memory.py` | 代码事实（未声明的包、缺 import、编译错误）与代码池 |
+| `src/post_task_reflection.py` | 任务后分步反思 |
+| `src/long_memory.py`、`src/long_memory_schema.sql` | SQLite 记忆库 schema |
+| `config/long_memory_cluster_v7.json` | 最终版本 v7；`..._checklist_only_v7.json` 为消融；v3–v6 为历史版本 |
+| `scripts/cluster/` | Slurm 作业（`worker.sbatch`、`run_queue.sbatch`）、服务启动、队列（`enqueue.sh`、`filler.conf`）、健康检查、拉取结果 |
+| `scripts/plot_learning_curve.py`、`scripts/plot_gap_curve.py` | 学习曲线与 gap 图 |
+| `scripts/preview_guidance.py` | 只跑检索与注入，预览 prompt（只读记忆库） |
+| `docs/thesis/` | 论文 LaTeX（UoA 模板） |
 
-运行前用 `scripts/preflight_reflective_models.py` 检查五个角色均可用。完整输出目录（约 20 GB）不在 git 中，关键文件见 `archive/phase1-webgen-2026-10/`。
+集群用法见 [`docs/agent-memory/HANDOFF.md`](docs/agent-memory/HANDOFF.md)「WebGen 第二阶段」。完整输出（生成的网站、评测轨迹、截图、记忆库）不在 git 中。
 
 ## 参考文献
 
 已核对出处：
 
 - Lu et al., 2025. *WebGen-Bench: Evaluating LLMs on Generating Interactive and Functional Websites from Scratch.* arXiv:2505.03733.
-- Lu et al., 2025. *WebGen-Agent: Enhancing Interactive Website Generation with Multi-Level Feedback and Step-Level Reinforcement Learning.* arXiv:2509.22644.
 - Du et al., 2025. *Context Length Alone Hurts LLM Performance Despite Perfect Retrieval.* Findings of EMNLP 2025, arXiv:2510.05381.
 - Liu et al., 2024. *Lost in the Middle: How Language Models Use Long Contexts.* TACL 12.
 - Wallace et al., 2024. *The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions.* arXiv:2404.13208.
 - Shi et al., 2023. *Large Language Models Can Be Easily Distracted by Irrelevant Context.* ICML 2023.
 
-待核对（凭记忆列出）：
+待核对（写进论文前逐条确认）：
 
-- Curse of Instructions、ManyIFEval、IFScale（多条指令同时遵守）。
-- ReasoningBank、ExpeL、Generative Agents、Reflexion（从经验中学习）。
-- Zeller, *Why Programs Fail*；Agans, *Debugging: The 9 Indispensable Rules*；Kang et al., 2023 AutoSD；Chen et al., 2023 Self-Debug；Dhuliawala et al., 2023 Chain-of-Verification（排查与验证方法）。
+- 经验记忆：ExpeL（Zhao et al., 2024）、ReasoningBank（2025）、Mem0（Chhikara et al., 2025）、Memento（Zhou et al., 2025）、Generative Agents（Park et al., 2023）。
+- 代码 / 技能记忆：Voyager（Wang et al., 2023）、Agent Workflow Memory（Wang et al., 2025）、Metis（Dai et al., 2026，arXiv:2606.24151）。
+- 指令遵守：Curse of Instructions（Harada et al., 2025）、IFScale（Jaroslawicz et al., 2025）；小模型推理：Li et al., 2025。
+- 排查与验证：Zeller, *Why Programs Fail*；Self-Debug（Chen et al., 2023）；Chain-of-Verification（Dhuliawala et al., 2023）；Self-Refine（Madaan et al., 2023）。
 
 ---
 
