@@ -9,9 +9,8 @@
 \paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. \todo{Domains adjacent vs mixed orders (two runs each).}
 
 \section{Future Work}
-Beyond the fixed-prefix ablation (\Cref{sec:ablation}), two experiments would address the main open questions most directly:
+Beyond the fixed-prefix ablation (\Cref{sec:ablation}) and the stronger generator (\Cref{sec:stronger}), one experiment would address the main remaining question:
 \begin{itemize}
-  \item \textbf{A stronger generator.} Repeat the main comparison with WebGen-LM-32B, keeping Bolt.diy, the memory pipeline and the evaluation fixed, to test whether the code-over-text effect is specific to small models. WebGen-LM-14B is not a useful contrast here: with Bolt.diy it reaches 29.4\% against 28.4\% for the 7B model, whereas the 32B model reaches 38.2\%~\cite{lu2025webgenbench}. Notably, the 7B generator with v7 memory (40.0\%) already exceeds the 32B model without memory.
   \item \textbf{Held-out evaluation.} Because the method was developed while observing results on this benchmark, freeze the method on the first 30 tasks and report the remaining 71 separately.
 \end{itemize}
 Further directions are re-grading with a second strong \gls{vlm} evaluator, integrating the memory with other coding agents (e.g.\ OpenHands, Aider) on a stratified subset of tasks, letting the memory model revise reflections and fragments until code-checkable criteria hold~\cite{madaan2023selfrefine,dhuliawala2023cove}, and transferring the approach to repository-level coding benchmarks such as SWE-bench.
