@@ -12,7 +12,7 @@
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
 ### 2026-10-08：32B（FP8）已排进当前作业（见 DECISIONS 同日条目）
-- 32B 下载作业 23432（`luzimu/WebGen-LM-32B` @7d10337c，约 65 GB，CPU）在等审批；**切换前必须确认下载完成**（`/data/qma258/models/WebGen-LM-32B/config.json`），否则切换脚本会中止并计失败。
+- 32B 权重已下载完成（10-08 23:04，`/data/qma258/models/WebGen-LM-32B`，14 个分片齐全，含缓存 73 GB）。下载作业 23432 一直卡在人工审批，已取消，改为在 worker 作业里 `srun --overlap --ntasks=1` 下载，约 2 分钟（注意：不加 `--ntasks=1` 会按作业任务数启动 8 份）。
 - 队列末尾：`X scripts/cluster/switch_generator.sh /data/qma258/queue/switched-to-32b-fp8`，然后 P manifest 顺序 32B。目标配置 `$WG/queue/generator.env.next`。补位脚本的运行副本已原子替换为新版，并排了 `reload-filler-2`。
 - **约 10-15 切换时要人工检查：** worker 日志里的 `SWITCH_DONE`/`SWITCH_FAILED`、`nvidia-smi` 显存、第一个 32B 任务是否正常。若 `FILLER_HALT`，补位停止，worker 空闲 60 分钟后会退出、释放卡。
 
