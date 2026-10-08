@@ -14,7 +14,7 @@
 ### 2026-10-08：顺序实验已排队（集群）
 - 顺序文件 `data/experiment_splits/task_orders/{blocks_seed11,random_seed29,blocks_seed47,interleave}.json`（`scripts/make_task_orders.py`；同领域相邻对数：manifest 81/100，blocks 81，random 6，interleave 0）。
 - `worker_lib.sh` 的 `filler_next` 新增 `P ORDER LM_OUT NM_OUT [LM_CFG]` 行：按顺序文件逐题，位置偶数 L→N、奇数 N→L；顺序文件复制到各输出目录 `task-order.json`。本地模拟 404 步核对通过。已同步集群，并排了一个空操作 `reload-filler` 让补位脚本重启加载新代码。
-- 集群 `filler.conf`：只有清单（v7）→ P 种子 11 → P 种子 29（10-08 用户决定只跑这两个，种子 47 与交错已注释掉，备份 `filler.conf.bak-two-orders`）；No Memory r2（manifest）已删除。输出 `outputs/experiment/cluster_order_<名>_{longmem_v7,nomem}`。每个顺序约 30 小时，预计 10-11 前后完成；10-16 组会。
+- 集群 `filler.conf`：只有清单（v7）→ P 种子 11 → P 种子 29 → P 种子 47 → P 交错（10-08 曾缩减为两个，讨论后恢复，备份 `filler.conf.bak-before-readd`）；No Memory r2（manifest）已删除。输出 `outputs/experiment/cluster_order_<名>_{longmem_v7,nomem}`。每个顺序约 30 小时：11、29 约 10-11 完成，全部约 10-13–14；10-16 组会。
 - **作业上限：** 23385 于 10-06 开始，30 天上限约 11-05，足够。
 
 ### 2026-10-08：后续 Long Memory 的顺序鲁棒性计划（尚未启动）
