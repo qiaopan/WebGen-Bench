@@ -16,10 +16,11 @@ PPT：https://claude.ai/artifact/4hFFsiPiUgY397YXaZhNqE（幻灯片源文件在 
 - [ ] `conclusion` 页：填"需求拆解贡献 [__]、记忆贡献 [__]"。
 - [ ] 若需要，加一张三条线的学习曲线（No Memory / 只有清单 / v7）。
 
-## 阶段 3：顺序实验（种子 11 领域挨着、种子 29 领域打散，Long Memory / No Memory ABBA 交叉执行）跑完
-- [ ] `order-1`、`order-2`：每页贴该顺序的 gap 图，填准确率、配对差与 95% bootstrap CI、零分题，标题写一句话结论。
-- [ ] `conclusion` 页：填"领域挨着 vs 打散"是否都稳定提升；论文表 tab:order 同步填。
-- [ ] `order-design` 页：确认顺序定义与实际执行一致（`data/experiment_splits/task_orders/`）。
+## 阶段 3：顺序实验（领域挨着：种子 11、47；领域打散：种子 29 随机、交错；Long Memory / No Memory ABBA）跑完
+- 11、29 先跑完时先填 `order-1`、`order-2`，做第一次挨着 vs 打散对比；47、交错跑完再填 `order-3`、`order-4`。
+- [ ] `order-1` 到 `order-4`：每页贴该顺序的 gap 图，填准确率、配对差与 95% bootstrap CI、零分题，标题写一句话结论。
+- [ ] `conclusion` 页：填"领域挨着 vs 打散（各 2 次）是否都稳定提升"；论文表 tab:order 同步填。
+- [ ] `order-design` 页：确认分层打乱与交错的精确定义与实际执行一致。
 
 ## 汇报前
 - [ ] 封面：姓名、导师、日期。

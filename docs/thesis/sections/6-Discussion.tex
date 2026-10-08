@@ -8,7 +8,7 @@ A second observation is that part of the gain is not ``smarter'' code but protec
 
 \section{Limitations and Threats to Validity}
 \begin{itemize}
-  \item \textbf{Single runs.} WebGen-Bench itself reports single runs without error bars. We go further by repeating No Memory three times to measure run-to-run noise and by running Long Memory under two additional orders with paired comparisons, but within each order Long Memory is still a single run, and the domains-mixed kind has only one run, so per-task conclusions remain weak.
+  \item \textbf{Single runs.} WebGen-Bench itself reports single runs without error bars. We go further by repeating No Memory five times to measure run-to-run noise and by repeating Long Memory under four additional orders with paired comparisons, but within each order Long Memory is still a single run, so per-task conclusions remain weak.
   \item \textbf{One generator and one scaffold.} All results are for WebGen-LM-7B with Bolt.diy and a Vue template. Larger generators may follow text well and benefit less from code fragments.
   \item \textbf{Residual generator errors.} About 4.6\% of generated components omit a Vue import with or without memory; examples did not reduce this random slip, and the protocol forbids repairing it after generation.
   \item \textbf{Code pool as a learned prefix.} Because its triggers are general, the code pool behaves partly like a fixed prompt prefix. A fixed-prefix-from-task-one ablation is needed to separate learning from the presence of code.

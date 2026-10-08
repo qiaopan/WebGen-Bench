@@ -4,14 +4,14 @@
 <div style="display:flex;gap:32px">
 <div style="flex:1;background:#EEF3FA;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:12px">
 <h3 style="font-size:30px;font-weight:700">领域挨着（同领域连续做）</h3>
-<p style="font-size:24px;line-height:1.5;color:#4A5568">已有：manifest 原顺序（主结果）<br>① 种子 11：打乱领域块和块内顺序</p>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">已有：manifest 原顺序（主结果）<br>① 种子 11：打乱领域块和块内顺序<br>③ 种子 47：同上，换一个种子</p>
 </div>
 <div style="flex:1;background:#FFF4EE;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:12px">
 <h3 style="font-size:30px;font-weight:700">领域打散</h3>
-<p style="font-size:24px;line-height:1.5;color:#4A5568">② 种子 29：101 题完全随机</p>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">② 种子 29：101 题完全随机<br>④ 交错：相邻题都来自不同领域（最不利）</p>
 </div>
 </div>
-<p style="font-size:24px;line-height:1.5;color:#4A5568">两类各新跑一次（时间成本考虑），每次从空库开始；Long Memory 与 No Memory 逐题背靠背，谁先跑按 ABBA 轮换。No Memory 共 3 次，用来量出运行噪声。</p>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">按 ①→②→③→④ 排队：先各得到一次"挨着""打散"，再重复。每种顺序都从空库开始，Long Memory 与 No Memory 逐题背靠背，谁先跑按 ABBA 轮换。No Memory 共 5 次，用来量出运行噪声。</p>
 <p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:48px;font-size:22px;color:#6A7179">WebGen-Bench 原论文为单次运行、无误差线（自查清单：计算成本太高，Lu et al., 2025）。报告：按任务配对差值 + bootstrap 置信区间；按领域、经验来源、位置分组。</p>
-<aside>这一部分回答一个一定会被问到的问题：v7 赢了 No Memory 11.5 个点，是不是因为同领域的题挨着做，前一题刚做过类似网站，后一题自然好做？为了回答它，我们把顺序分成两类。左边是领域挨着：除了已有的原顺序，再用种子 11 把领域块的先后和块内顺序打乱，同领域仍连续做。右边是领域打散：种子 29，101 题完全随机，相邻题大多来自不同领域。考虑到时间成本，两类各新跑一次。每种顺序下两组逐题背靠背，ABBA 轮换谁先跑。No Memory 一共跑 3 次，用来量出运行本身的波动，作为判断 11.5 个点是否可信的参照。原论文的结果都是单次运行、没有误差线，作者在自查清单里说明是因为计算成本，这里我们做得更严谨一些；不过打散这一类只有一次运行，结论只能算初步。解读方式：两类都赢，说明记忆普遍有效；只有挨着赢，说明收益来自同领域经验。</aside>
+<aside>这一部分回答一个一定会被问到的问题：v7 赢了 No Memory 11.5 个点，是不是因为同领域的题挨着做，前一题刚做过类似网站，后一题自然好做？为了回答它，我们把顺序分成两类，每类跑两次。左边是"领域挨着"：除了已有的原顺序，再用两个种子把领域块的先后和块内顺序打乱。右边是"领域打散"：一个完全随机的顺序，一个刻意交错、相邻题都来自不同领域的顺序，后者对记忆最不利。我们按 1、2、3、4 的优先级排队，这样先拿到挨着和打散各一次的数据，即使时间不够也有结论。每种顺序下两组逐题背靠背，ABBA 轮换谁先跑。No Memory 一共跑 5 次，用来量出运行本身的波动，作为判断 11.5 个点是否可信的参照。原论文的结果都是单次运行、没有误差线，作者在自查清单里说明是因为计算成本，这里我们做得更严谨一些；不过每个顺序里的 Long Memory 仍然只跑一次。解读方式：两类都赢，说明记忆普遍有效；只有挨着赢，说明收益来自同领域经验；交错明显最差，说明跨领域检索是瓶颈。</aside>
 </section>
