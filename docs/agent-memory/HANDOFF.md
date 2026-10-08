@@ -16,6 +16,13 @@
 - **agent 放后面的原因：** 换 OpenHands/Aider 等 agent 会同时改变文件操作、上下文、prompt 注入接口和 repair loop；主效应未稳定前，不能把差异归因于 memory。若前两阶段成立，先用约 20 个按 domain 和 v7 胜/负/平分层抽样任务做跨 agent integration pilot，接口可用后再决定是否完整 101 题。
 - **视觉模型的用途：** 不把不同视觉模型当作主生成实验的第一优先级。对已有全量截图用第二个强视觉模型复评 appearance；再从 v7 相对 No Memory 的胜/负/平中分层抽样，用第二个 GUI/视觉评测器复核功能结论，重点是白屏、interaction-budget exhaustion 与疑似误判。这是评测稳健性检查，可复用已有 artifacts，远低于重新生成完整 benchmark 的成本。
 
+### 2026-10-08：v7 101 题跑完（最终结果，单次运行）
+- 准确率（按检查数合计）/ 外观 / 零分：No Memory 28.5% / 3.25 / 30，v4 30.9% / 3.21 / 20，**v7 40.0% / 3.21 / 13**。前 30 题：26.0 / 39.3 / 39.0；后 71 题：29.5 / 27.8 / **40.4**（零分 19 / 19 / 9）。
+- 按任务配对：v7−No Memory 平均 +11.5 个百分点（bootstrap 95% CI [6.0, 16.9]，胜 54、负 24、平 23）；v7−v4 +8.9（[2.9, 15.1]）。v7 的 13 个零分题中 10 个 No Memory 也是 0。
+- 外观：只看两组都有可用网站且有外观分的 68 题，No Memory 3.25、v7 3.22 → 增益只在功能，不在外观（局限措辞据此确定）。注意外观均值只算有评分的任务，与 67 题中期报告的口径不同。
+- 学习曲线已用 101 题重画（曲线是逐题平均，终点 40.8/31.9/29.3，与按检查数合计的数字略有差别）。论文初稿 `docs/thesis/`（Overleaf 包 `docs/thesis_overleaf.zip`）已更新这些数字；PPT 尚未更新（按 `docs/reports/ppt_todo.md` 阶段 1）。
+- 工人作业 23385 已转入"只有清单（v7）"消融。
+
 ### 2026-10-08：组会 PPT
 - 幻灯片 https://claude.ai/artifact/4hFFsiPiUgY397YXaZhNqE（31 页，源文件在当时 session 的 scratchpad `deck/project/`；丢失时从 artifact 读回）。按实验阶段要补的内容（v7 跑完、消融跑完、顺序实验跑完、外观核对）记在 `docs/reports/ppt_todo.md`，到对应阶段直接按清单更新。
 

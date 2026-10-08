@@ -1,0 +1,18 @@
+\chapter{Conclusion}
+\label{chap:conclusion}
+
+\section{Answers to the Research Questions}
+\paragraph{\ref{rq1}} Yes, in a single run over 101 tasks: v7 improves accuracy from 28.5\% to 40.0\% (paired gain 11.5 points, 95\% CI 6.0--16.9) and reduces zero-score tasks from 30 to 13 under the official protocol, without changing the generator or the evaluation. The gain is functional rather than visual. \todo{Task-order experiments.}
+
+\paragraph{\ref{rq2}} The small generator used verified code fragments and a requirement checklist; it largely ignored textual lessons, and generic textual lessons became harmful as they accumulated. Fragments must be partial: a complete file was copied as a finished answer. \todo{Add checklist-only ablation result.}
+
+\paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. \todo{Robustness across four orders.}
+
+\section{Future Work}
+\begin{itemize}
+  \item \textbf{Other generators.} Repeat the main comparison with one generator of a different architecture or capability, keeping Bolt.diy fixed, to test whether the code-over-text effect is specific to small models.
+  \item \textbf{Other agents.} Integrate the memory with other coding agents (e.g.\ OpenHands, Aider) on a stratified subset of tasks once the effect is stable.
+  \item \textbf{Other evaluators.} Re-grade existing screenshots with a second strong \gls{vlm} and re-check a stratified sample of functional verdicts.
+  \item \textbf{Ablations.} Fixed code prefix from task one; without the concreteness filter; different trigger thresholds.
+  \item \textbf{Verification loops for memory.} Let the memory model revise reflections and fragments until code-checkable criteria hold~\cite{madaan2023selfrefine,dhuliawala2023cove}.
+\end{itemize}

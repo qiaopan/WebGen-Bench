@@ -1,0 +1,20 @@
+\chapter{Background and Related Work}
+\label{chap:background}
+
+\section{Website Generation Benchmarks}
+WebGen-Bench~\cite{lu2025webgenbench} contains 101 website requirements from 20 application domains, each paired with a set of functional test cases (647 in total). A generated project is installed and started, and a \gls{gui} agent based on WebVoyager~\cite{he2024webvoyager} executes each test case and returns \emph{Pass}, \emph{Partial} or \emph{Fail}. A separate \gls{vlm} grades the appearance of the landing page from 1 to 5. The authors also release WebGen-LM, generators fine-tuned on agent trajectories; with the Bolt.diy scaffold, WebGen-LM-7B reaches 28.4\% accuracy and an appearance score of 2.5. Larger general models such as Qwen2.5-Coder-32B score lower (9.5\%), which makes the 7B model a good subject: it is neither at the floor nor at the ceiling of the benchmark.
+
+WebGen-Bench is a static benchmark. It does not define any interaction between tasks, so neither memory across tasks nor the order of tasks is part of its protocol. Introducing memory makes the order a treatment variable, which we handle explicitly in \Cref{sec:order-design}.
+
+\section{Memory for LLM Agents}
+\paragraph{Experience and insight memory.} ExpeL~\cite{zhao2024expel} lets an agent collect trajectories, extract natural-language insights, and maintain them with add, edit, upvote and downvote operations. ReasoningBank~\cite{reasoningbank2025} distils reusable reasoning strategies from both successful and failed trajectories. Generative Agents~\cite{park2023generative} rank memories by recency, importance and relevance.
+
+\paragraph{Skill and code memory.} Voyager~\cite{wang2023voyager} stores executable skills as code with a description and retrieves them by description. Agent Workflow Memory~\cite{wang2025awm} stores reusable workflows. Metis~\cite{dai2026metis} combines textual memory with code tools, promotes a procedure to code only after it recurs, and verifies the code before storing it; it reports that text and code memories are complementary.
+
+\paragraph{Memory maintenance.} Mem0~\cite{chhikara2025mem0} decides at write time whether a new memory should be added, should update an old one, or is redundant. Memento~\cite{zhou2025memento} learns the utility of stored cases from their outcomes. Our hygiene component borrows these ideas: deduplication at storage time and a utility score for each memory.
+
+\section{Small Models, Long Prompts and Instruction Following}
+Several results suggest that adding text to a prompt is not free. Models become less likely to satisfy all instructions as their number grows~\cite{harada2025curse,jaroslawicz2025ifscale}; information in the middle of a long context is used less than at its start or end~\cite{liu2024lost}; irrelevant context distracts models~\cite{shi2023distracted}; and longer inputs alone can reduce performance even with perfect retrieval~\cite{du2025contextlength}. Models can be trained to prioritise instructions by source~\cite{wallace2024hierarchy}, which motivates keeping the user requirement explicitly above any memory content. Small models also struggle to benefit from long reasoning chains~\cite{li2025smallmodels}, which is consistent with our negative result for a short planning step (\Cref{sec:history}).
+
+\section{Self-Correction and Debugging}
+Reflection on failed attempts is related to self-correction methods such as Self-Refine~\cite{madaan2023selfrefine}, Self-Debug~\cite{chen2023selfdebug} and Chain-of-Verification~\cite{dhuliawala2023cove}. These methods repair the \emph{same} task with feedback. We do not allow this in the formal comparison, because repairing a benchmark task using its hidden evaluation results would leak the answer. Reflection is used only to write memory for \emph{later} tasks. The investigation steps we ask the reflection model to follow are modelled on systematic debugging~\cite{zeller2009whyprograms}.

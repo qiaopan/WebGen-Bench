@@ -1,0 +1,104 @@
+\chapter{Results}
+\label{chap:results}
+
+All results in this chapter come from a single run per arm over all 101 tasks in manifest order. Accuracy pools all test cases (as in the official script); the learning curve averages per-task accuracy, so its end points differ slightly.
+
+\section{Main Comparison}
+\Cref{tab:main} compares the three arms on the same tasks.
+
+\begin{table}[ht]
+\centering
+\caption{Results on all 101 tasks (single run, manifest order). Accuracy in \%. Appearance is averaged over tasks with an appearance grade.}
+\label{tab:main}
+\begin{tabular}{lccc}
+\toprule
+Arm & Accuracy & Appearance & Zero-score tasks \\
+\midrule
+No Memory & 28.5 & 3.25 & 30 \\
+Long Memory v4 & 30.9 & 3.21 & 20 \\
+Long Memory v7 & \textbf{40.0} & 3.21 & \textbf{13} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Per task, v7 beats No Memory on 54 tasks, loses on 24 and ties on 23; the mean paired difference in per-task accuracy is $+11.5$ points (95\% bootstrap \gls{ci} $[6.0, 16.9]$). Against v4 the difference is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties).
+
+\section{Learning Curve}
+\Cref{fig:curve} plots cumulative and rolling accuracy in execution order. v4 and v7 are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks v4 falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while v7 keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (v7) vs 26.0\% (No Memory) vs 23.2\% (v4).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/learning_curve_v4_v7.png}
+\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, v4 and v7.}
+\label{fig:curve}
+\end{figure}
+
+\Cref{fig:gap} shows the same data as a paired gap to No Memory. Both memories lead early; between tasks 40 and 60 v4 falls up to 27 points below No Memory while v7 stays near or above zero, and from task 60 onwards v7 stays clearly positive.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/gap_curve_v4_v7.png}
+\caption{Rolling 10-task mean of the per-task accuracy gap to No Memory, by execution order. Positive values mean Long Memory is better.}
+\label{fig:gap}
+\end{figure}
+
+\section{Why v4 Declines and v7 Improves}
+\Cref{tab:prompt} counts what actually reached the generator's prompt. In v4, generic entries (``ensure form fields are correctly labelled'') appeared in about two thirds of tasks throughout, and a separate ``General notes'' block became more frequent over time, while nothing addressed blank pages and missing imports. In v7 the concreteness filter almost removed generic entries, and the code pool supplied fragments in most later tasks.
+
+\begin{table}[ht]
+\centering
+\caption{Prompt content by segment (number of tasks or items), tasks 1--30 / 31--67.}
+\label{tab:prompt}
+\begin{tabular}{lcc}
+\toprule
+Prompt content & v4 & v7 \\
+\midrule
+Tasks with generic entries & 22 / 21 & 2 / 2 \\
+Tasks with a ``General notes'' block & 13 / 23 & 3 / 0 \\
+Tasks with a code-pool fragment & 0 / 0 & 25 / 37 \\
+Lessons attached to checklist items & 56 / 64 & 32 / 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
+
+\section{Error Analysis}
+On tasks 31--67, whole-site blank pages or compile errors occurred in 6 (No Memory), 7 (v4) and 1 (v7) tasks, and pages with a missing Vue import in 9, 11 and 4 tasks. Ten of v7's 13 zero-score tasks are also zero for No Memory, suggesting that most remaining failures are genuinely hard tasks for this generator.
+
+Two v7 tasks returned the unmodified scaffold. A local diagnosis traced both to an example that was a complete \texttt{App.vue} file from another site; removing it, or reducing it to a verified fragment, restored real output on one task. This fix is not part of the frozen v7 run.
+
+\paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. The improvement is therefore functional; memory makes more sites work but does not make working sites look better.
+
+\section{Ablation: Checklist Only}
+\label{sec:ablation}
+To separate the effect of requirement decomposition from that of memory, we run v7 with memory writes disabled, on the same task order. \todo{Fill in: Checklist-only accuracy / appearance / zero-score; contribution of checklist vs memory.}
+
+\section{Robustness to Task Order}
+\label{sec:order-design}
+With memory, the order of tasks determines which experience is available, so a single order is not sufficient evidence. We therefore run Long Memory from an empty memory four times, each over all 101 tasks:
+\begin{enumerate}
+  \item the manifest (domain-block) order;
+  \item a stratified shuffle with seed 11;
+  \item a stratified shuffle with seed 29;
+  \item a cross-domain interleaved order.
+\end{enumerate}
+In each order, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first in an ABBA pattern, so that drift in infrastructure or evaluator load affects both arms equally. Results are reported per order as task-level paired differences with bootstrap \glspl{ci}, and by domain and position.
+
+\begin{table}[ht]
+\centering
+\caption{Task-order experiments. \todo{Fill in when complete.}}
+\label{tab:order}
+\begin{tabular}{lcccc}
+\toprule
+Order & NM acc. & LM acc. & Paired diff. (95\% \gls{ci}) & Zero-score NM / LM \\
+\midrule
+Manifest & -- & -- & -- & -- \\
+Shuffle (seed 11) & -- & -- & -- & -- \\
+Shuffle (seed 29) & -- & -- & -- & -- \\
+Interleaved & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\todo{Interpretation: stable gain in all orders (general benefit), gain only in domain blocks (curriculum effect), or worse when interleaved (cross-domain retrieval bottleneck).}
