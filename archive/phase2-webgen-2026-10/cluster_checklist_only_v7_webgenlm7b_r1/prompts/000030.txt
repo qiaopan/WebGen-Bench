@@ -1,0 +1,13 @@
+Please implement a technical website to display technical information and solutions. The website should have functionalities for browsing technical articles, searching technical information, and viewing solutions. Users should be able to browse technical articles, search technical information, view solutions, and communicate with other users.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a technical website to display technical information and solutions
+2. have functionalities for browsing technical articles
+3. searching technical information
+4. viewing solutions
+5. Users should be able to browse technical articles
+6. search technical information
+7. view solutions
+8. communicate with other users
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

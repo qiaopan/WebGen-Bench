@@ -1,0 +1,21 @@
+Please implement an adult vocabulary learning website that includes a variety of quizzes and word games, such as crossword puzzles, unjumble letters, finding synonyms and antonyms, flashcards, and fill-in-the-blank. The website should have a dashboard that displays a progress summary. A set of 10 new words should be taught every week, and users should be able to choose an avatar and play a simple game while waiting in the waiting room. The website should include a home page, 5 activity pages, a dashboard, and blog pages. Assign light gray to body backgrounds and dark red to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. adult vocabulary learning website
+2. a variety of quizzes and word games
+3. crossword puzzles
+4. unjumble letters
+5. finding synonyms and antonyms
+6. flashcards
+7. fill-in-the-blank
+8. dashboard that displays a progress summary
+9. 10 new words should be taught every week
+10. users should be able to choose an avatar
+11. play a simple game while waiting in the waiting room
+12. home page
+13. 5 activity pages
+14. dashboard
+15. blog pages
+16. light gray to body backgrounds and dark red to main components
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

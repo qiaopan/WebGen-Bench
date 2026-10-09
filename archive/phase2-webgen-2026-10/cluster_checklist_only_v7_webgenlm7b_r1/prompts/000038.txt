@@ -1,0 +1,9 @@
+Please implement a short-term apartment rental website for showcasing and renting apartments. The website should have functionalities for searching, filtering, and booking apartments. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records. Use linen as the screen background and maroon for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short-term apartment rental website for showcasing and renting apartments.
+2. The website should have functionalities for searching, filtering, and booking apartments.
+3. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records.
+4. Use linen as the screen background and maroon for component highlights.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

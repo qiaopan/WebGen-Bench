@@ -1,0 +1,14 @@
+Please implement a webpage to showcase team projects and skills, including team introduction, project showcase, skill showcase, and contact information. Users should be able to browse team information, view project cases, understand team skills, and contact the team through the contact information. Initialize the background color with whitesmoke and component color with dark cyan.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. team introduction
+2. project showcase
+3. skill showcase
+4. contact information
+5. browse team information
+6. view project cases
+7. understand team skills
+8. contact the team through the contact information
+9. whitesmoke and dark cyan
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

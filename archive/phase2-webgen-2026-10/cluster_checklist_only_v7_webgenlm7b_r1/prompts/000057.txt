@@ -1,0 +1,14 @@
+Please develop a student portal website for registration and management of student information. The website should have user registration and profile management features, allowing students to input and manage personal details, qualifications, and career preferences. The website should also have an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests. Additionally, the website should streamline the application process with an intuitive interface, allowing students to easily apply for programs. Training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs. Establish azure as the main background and midnight blue for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and profile management features
+2. students to input and manage personal details, qualifications, and career preferences
+3. advanced matching algorithm
+4. matches students with training providers based on criteria such as qualifications, location, field of study, and career interests
+5. streamline the application process with an intuitive interface
+6. students to easily apply for programs
+7. training providers should also be able to access student information based on predefined criteria
+8. enable direct communication and attraction of students to their skills development programs
+9. Establish azure as the main background and midnight blue for the controls
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

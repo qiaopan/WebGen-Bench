@@ -1,0 +1,15 @@
+Please implement a paper cup manufacturing system to manage inventory, production, and sales of paper cups. The system should have functionalities for managing raw materials, finished products, inventory, production, and sales. Users should be able to record and track the inventory, usage, and sales of raw materials and finished products, and generate detailed reports. The system should also have customer management capabilities, including recording customer information, sales history, and sales statistics. Assign light goldenrod to the background and olive drab to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. manage inventory, production, and sales of paper cups
+2. manage raw materials
+3. manage finished products
+4. record and track the inventory, usage, and sales of raw materials and finished products
+5. generate detailed reports
+6. customer management capabilities
+7. record customer information
+8. record sales history
+9. record sales statistics
+10. assign light goldenrod to the background and olive drab to the UI elements
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

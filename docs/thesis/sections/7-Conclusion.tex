@@ -4,7 +4,7 @@
 \section{Answers to the Research Questions}
 \paragraph{\ref{rq1}} Yes, in a single run over 101 tasks: v7 improves accuracy from 28.5\% to 40.0\% (paired gain 11.5 points, 95\% CI 6.0--16.9) and reduces zero-score tasks from 30 to 13 under the official protocol, without changing the generator or the evaluation. The gain is functional rather than visual. \todo{Task-order experiments.}
 
-\paragraph{\ref{rq2}} The small generator used verified code fragments and a requirement checklist; it largely ignored textual lessons, and generic textual lessons became harmful as they accumulated. Fragments must be partial: a complete file was copied as a finished answer. \todo{Add checklist-only ablation result.}
+\paragraph{\ref{rq2}} The small generator used verified code fragments; a requirement checklist alone reduced whole-site failures but added only 3.4 points of accuracy (not significant), while memory added a significant 8.1 points on top of it; it largely ignored textual lessons, and generic textual lessons became harmful as they accumulated. Fragments must be partial: a complete file was copied as a finished answer. \todo{Add checklist-only ablation result.}
 
 \paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. \todo{Domains adjacent vs mixed orders (two runs each).}
 

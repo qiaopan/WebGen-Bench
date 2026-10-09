@@ -1,0 +1,15 @@
+Please implement a website for downloading ringtones and wallpapers, providing services for downloading ringtones and wallpapers. The website should have the functionality to download ringtones and wallpapers, allowing users to browse and search for ringtones and wallpapers, select and download the desired content, navigate to the user profile to view the download history, add ringtones to the collection for future reference, and categorize the contents by selecting a category from the menu. The website should also have categorization and search functions to help users quickly find the ringtones and wallpapers they need. Style all pages with a light goldenrod background and olive drab components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a website for downloading ringtones and wallpapers
+2. provide services for downloading ringtones and wallpapers
+3. have the functionality to download ringtones and wallpapers
+4. allow users to browse and search for ringtones and wallpapers
+5. select and download the desired content
+6. navigate to the user profile to view the download history
+7. add ringtones to the collection for future reference
+8. categorize the contents by selecting a category from the menu
+9. have categorization and search functions to help users quickly find the ringtones and wallpapers they need
+10. style all pages with a light goldenrod background and olive drab components
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

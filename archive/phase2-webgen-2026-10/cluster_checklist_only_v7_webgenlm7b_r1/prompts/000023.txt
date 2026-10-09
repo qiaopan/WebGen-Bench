@@ -1,0 +1,16 @@
+Please implement a customer relationship management website for managing sales leads and reporting. The website should have functionalities for automated message sending, organizing and categorizing leads, updating lead information and status, updating settings and dropdown menus, and reporting. Users should be able to browse and manage sales leads, view reports, and receive best practice and integration advice. Define background as papaya whip; define components with dark orange.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer relationship management website for managing sales leads and reporting
+2. functionalities for automated message sending
+3. organizing and categorizing leads
+4. updating lead information and status
+5. updating settings and dropdown menus
+6. reporting
+7. browse and manage sales leads
+8. view reports
+9. receive best practice and integration advice
+10. background as papaya whip
+11. components with dark orange
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

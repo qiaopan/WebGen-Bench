@@ -1,0 +1,11 @@
+Please implement a customer support chatbot on the website that can provide customer support and handle customer interactions. The chatbot should be able to answer frequently asked questions, provide product information, and assist users in completing orders. Users should be able to interact with the chatbot through a chat interface to get the information and help they need. Implement styling with snow for the background and dim gray for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a customer support chatbot on the website that can provide customer support and handle customer interactions
+2. the chatbot should be able to answer frequently asked questions
+3. provide product information
+4. assist users in completing orders
+5. users should be able to interact with the chatbot through a chat interface to get the information and help they need
+6. implement styling with snow for the background and dim gray for components
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

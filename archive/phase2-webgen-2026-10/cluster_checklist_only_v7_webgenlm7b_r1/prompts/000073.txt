@@ -1,0 +1,9 @@
+Please implement a link tree website for displaying and managing links. The website should have functionalities for adding, editing, and deleting links. Users should be able to create and manage their own link tree, including adding new links, editing existing links, deleting unnecessary links, and sharing their link tree with others through link tree's shareable link. Set overall background to papaya whip, then style components with dark orange.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a link tree website for displaying and managing links.
+2. The website should have functionalities for adding, editing, and deleting links.
+3. Users should be able to create and manage their own link tree, including adding new links, editing existing links, deleting unnecessary links, and sharing their link tree with others through link tree's shareable link.
+4. Set overall background to papaya whip, then style components with dark orange.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

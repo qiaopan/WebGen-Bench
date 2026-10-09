@@ -1,0 +1,20 @@
+{
+  "protocol": "continual-domain-block-v1",
+  "manifest": "/data/qma258/webgen/data/experiment_splits/continual_domain_blocks/manifest.json",
+  "manifest_sha256": "1f3f5fac5c932e6dcfc9b589302415388173f4e4e6c1c2a0b78c5d9c48ab3971",
+  "memory_config_sha256": "4c21c0c8e354e1155093837a9ab80e7940196aa10bf0d2872a28eb432f27fb57",
+  "generator_model": "WebGen-LM-7B",
+  "memory_model": "qwen2.5-vl-72b-instruct-awq",
+  "embedding_model": "bge-m3",
+  "functional_evaluator_model": "qwen2.5-vl-32b-instruct",
+  "appearance_evaluator_model": "qwen2.5-vl-32b-instruct",
+  "post_task_reflection": true,
+  "memory_representation": "case_only",
+  "modes": [
+    "continual"
+  ],
+  "official_protocol": true,
+  "max_repair_attempts": 0,
+  "guidance_selfcheck": false,
+  "guidance_file_sha256": null
+}

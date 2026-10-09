@@ -1,0 +1,10 @@
+Please create a software solutions website to provide information to prospective customers. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information. Configure all backgrounds with misty rose and all components with firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please create a software solutions website to provide information to prospective customers.
+2. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc.
+3. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging.
+4. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information.
+5. Configure all backgrounds with misty rose and all components with firebrick.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

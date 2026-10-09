@@ -1,0 +1,17 @@
+Please implement a cross-platform HTML editor with live preview and code editing functionality. The editor should allow users to switch between HTML code and text editing modes and automatically convert to HTML. The editor should have project management capabilities, allowing users to organize multiple HTML documents, images, and other files. The editor should also have features such as syntax highlighting, saving template pages, and a basic user guide. Set the background color to honeydew and the component color to dark olive green.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. cross-platform HTML editor
+2. live preview
+3. code editing functionality
+4. switch between HTML code and text editing modes
+5. automatically convert to HTML
+6. project management capabilities
+7. organize multiple HTML documents, images, and other files
+8. syntax highlighting
+9. saving template pages
+10. basic user guide
+11. background color to honeydew
+12. component color to dark olive green
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

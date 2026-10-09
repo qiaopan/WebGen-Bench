@@ -1,0 +1,15 @@
+Please develop a domain leasing website for renting and managing domain names. The website should have functionalities for searching, leasing, renewing, and transferring domain names. Users should be able to search for, lease, renew, and transfer domain names, and view domain information and leasing records. The website should also have user management, order management, and payment management functions. Select old lace for layout background and rosy brown for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. searching for domain names
+2. leasing domain names
+3. renewing domain names
+4. transferring domain names
+5. viewing domain information
+6. viewing leasing records
+7. user management
+8. order management
+9. payment management
+10. old lace for layout background and rosy brown for component details
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
