@@ -1,0 +1,10 @@
+Please implement a health survey website for women to fill out and submit health information. The website should have functionalities for filling out the survey, and submitting information. Users can fill out the relevant survey, and submit their information. The system will automatically collect the information and provide data management, permission management, data review, and reporting functions. Use whitesmoke as the default background and dark cyan for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a health survey website for women to fill out and submit health information.
+2. The website should have functionalities for filling out the survey, and submitting information.
+3. Users can fill out the relevant survey, and submit their information.
+4. The system will automatically collect the information and provide data management, permission management, data review, and reporting functions.
+5. Use whitesmoke as the default background and dark cyan for component styling.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

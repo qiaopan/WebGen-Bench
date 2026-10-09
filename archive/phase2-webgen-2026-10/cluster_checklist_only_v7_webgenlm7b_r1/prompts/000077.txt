@@ -1,0 +1,14 @@
+Please implement a website that provides tool information for engineers. The website should have user registration and login functionality, and be able to display information about various tools, including tool name, description, function, price, etc. Users should be able to search and filter tools, view detailed tool information, and be able to comment and rate tools. Declare ivory as the global background color and forest green for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and login functionality
+2. display information about various tools
+3. tool name
+4. description
+5. price
+6. search and filter tools
+7. view detailed tool information
+8. comment and rate tools
+9. ivory as the global background color and forest green for all UI pieces
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

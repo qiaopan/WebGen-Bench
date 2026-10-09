@@ -1,0 +1,16 @@
+Please implement an advanced to-do list web application where users can create, edit, and delete to-do items. The application should have functionalities for adding new tasks, marking tasks as completed, deleting tasks, filtering tasks, and searching tasks. Users should be able to browse all to-do items, create new tasks, edit existing tasks, and delete unnecessary tasks. Set all pages to have a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create, edit, and delete to-do items
+2. adding new tasks
+3. marking tasks as completed
+4. deleting tasks
+5. filtering tasks
+6. searching tasks
+7. browse all to-do items
+8. create new tasks
+9. edit existing tasks
+10. delete unnecessary tasks
+11. lavender background and indigo components
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

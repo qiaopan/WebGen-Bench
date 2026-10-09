@@ -3,16 +3,17 @@
 <h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:52px;font-weight:700;line-height:1.2">提升来自需求拆解、代码，还是记忆的积累？</h2>
 <table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:26px">
 <tr><th style="width:34%;text-align:left">组别</th><th style="width:22%;text-align:right">前 30</th><th style="width:22%;text-align:right">后 71</th><th style="width:22%;text-align:right">全部</th></tr>
-<tr><td>No Memory</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
-<tr><td>只有清单（不注入经验）</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
-<tr><td>固定前缀（清单 + v7 最终代码，从第 1 题起，无记忆）</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
-<tr><td>v7（清单 + 记忆）</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td><td style="text-align:right">[__]</td></tr>
+<tr><td>No Memory</td><td style="text-align:right">26.0%</td><td style="text-align:right">29.5%</td><td style="text-align:right">28.5%</td></tr>
+<tr><td>只有清单（不注入经验）</td><td style="text-align:right">33.1%</td><td style="text-align:right">31.3%</td><td style="text-align:right">31.8%</td></tr>
+<tr><td>固定前缀（清单 + v7 最终代码，从第 1 题起，无记忆）</td><td style="text-align:right" colspan="3">排队中</td></tr>
+<tr><td>v7（清单 + 记忆）</td><td style="text-align:right">39.0%</td><td style="text-align:right">40.4%</td><td style="text-align:right">40.0%</td></tr>
 </table>
 <div style="display:flex;gap:32px">
 <p style="flex:1;font-size:24px;line-height:1.5;color:#4A5568">只有清单 − No Memory = 需求拆解</p>
 <p style="flex:1;font-size:24px;line-height:1.5;color:#4A5568">固定前缀 − 只有清单 = prompt 里有代码</p>
 <p style="flex:1;font-size:24px;line-height:1.5;color:#4A5568">v7 − 固定前缀 = 记忆的积累与选择</p>
 </div>
-<p style="font-size:26px;color:#6A7179">都用 v7 配置与同一顺序；只有清单、固定前缀都不读写记忆。固定前缀的代码是 v7 自己学到的，不是人写的。[待填：运行中]</p>
-<aside>消融回答“提升从哪来”，分三步拆开。只有清单：和 v7 配置完全相同，但不读写任何记忆，它减去 No Memory 是需求拆解的贡献。固定前缀：在只有清单的基础上，从第一题起就把 v7 最后学到的两段代码放进 prompt，仍然不读写记忆；它减去只有清单，是“prompt 里有代码”本身的作用。v7 减去固定前缀，才是记忆积累和按题选择的贡献。这里要强调，固定前缀里的代码不是我们写的，而是 v7 自己从失败和成功的网站里学到的。如果固定前缀和 v7 差不多，我们的贡献要说成“系统能自动发现有效的提示代码”；如果明显不如 v7，说明记忆的积累确实有作用。只有清单正在跑，固定前缀排在顺序实验之后。</aside>
+<p style="font-size:26px;color:#14213D;font-weight:700">按题配对：只有清单 − No Memory +3.4（CI −2.2～8.7，不显著）；v7 − 只有清单 +8.1（CI 2.9～13.2）。零分题 30 → 18 → 13。</p>
+<p style="font-size:22px;color:#6A7179">单次运行，101 题，manifest 顺序。固定前缀的代码是 v7 自己学到的，不是人写的。</p>
+<aside>消融回答“提升从哪来”，分三步拆开。只有清单：和 v7 配置完全相同，但不读写任何记忆，它减去 No Memory 是需求拆解的贡献。固定前缀：在只有清单的基础上，从第一题起就把 v7 最后学到的两段代码放进 prompt，仍然不读写记忆；它减去只有清单，是“prompt 里有代码”本身的作用。v7 减去固定前缀，才是记忆积累和按题选择的贡献。这里要强调，固定前缀里的代码不是我们写的，而是 v7 自己从失败和成功的网站里学到的。如果固定前缀和 v7 差不多，我们的贡献要说成“系统能自动发现有效的提示代码”；如果明显不如 v7，说明记忆的积累确实有作用。只有清单已经跑完 101 题：比 No Memory 高 3.4 个点，但置信区间跨零，不显著；它主要把零分题从 30 降到 18，减少整站做不出来，而且优势在第 31 题以后从 7 个点缩到不到 2 个点。在清单之上加记忆又高 8.1 个点，置信区间不跨零，后段比前段更大。所以主要贡献是记忆。注意清单由 72B 记忆模型拆出，准确说是更强的模型替小模型拆需求。固定前缀排在顺序实验之后。</aside>
 </section>

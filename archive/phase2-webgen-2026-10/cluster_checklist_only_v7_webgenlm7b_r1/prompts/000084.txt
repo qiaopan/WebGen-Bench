@@ -1,0 +1,16 @@
+Please implement a risk assessment website for conducting risk assessments and generating reports. The website should have functionalities for selecting risk assessment items, auto-populating data, generating charts, and creating reports. Users should be able to select risk assessment items, and the website will automatically fill in relevant data from a background database, generate charts, and create reports. The website should also have a subscription feature, allowing users to access the risk assessment tool. Define the background as alice blue and components as steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a risk assessment website for conducting risk assessments and generating reports
+2. functionalities for selecting risk assessment items
+3. auto-populating data
+4. generating charts
+5. creating reports
+6. users should be able to select risk assessment items
+7. website will automatically fill in relevant data from a background database
+8. generate charts
+9. create reports
+10. subscription feature, allowing users to access the risk assessment tool
+11. define the background as alice blue and components as steel blue
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

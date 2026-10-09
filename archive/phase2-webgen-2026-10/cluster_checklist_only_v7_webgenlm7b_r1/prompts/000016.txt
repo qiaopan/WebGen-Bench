@@ -1,0 +1,14 @@
+Please implement a website for a solar company to display company information and products. The website should have functionalities for company introduction, product showcase, news updates, and contact us. Users should be able to browse the company's history, mission, and values, view detailed product information, learn about the company's latest news and events, and contact the company through the contact page with name, email and message. Use lemon chiffon in the background layer and chocolate for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. company introduction
+2. product showcase
+3. news updates
+4. contact us
+5. browse the company's history, mission, and values
+6. view detailed product information
+7. learn about the company's latest news and events
+8. contact the company through the contact page with name, email and message
+9. lemon chiffon in the background layer and chocolate for the component layer
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,12 @@
+Please implement a solar dashboard to display real-time and historical solar data. The dashboard should have functionalities for real-time data display, historical data query, and chart analysis. Users should be able to view real-time data such as solar power generation, power consumption, and battery percentage, and query historical data to view trends. Configure the background color to honeydew, with components using dark olive green.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. solar dashboard
+2. real-time data display
+3. historical data query
+4. chart analysis
+5. real-time data such as solar power generation, power consumption, and battery percentage
+6. query historical data to view trends
+7. background color to honeydew, with components using dark olive green
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

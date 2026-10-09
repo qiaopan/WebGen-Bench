@@ -1,0 +1,14 @@
+Please implement a food distribution website for managing and distributing food. The website should have functionalities for food donation, food distribution, and volunteer management. Users should be able to browse food donation information, apply for food distribution, view volunteer information, and manage their own accounts. Use azure for the background and midnight blue for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. food distribution website
+2. functionalities for food donation
+3. functionalities for food distribution
+4. functionalities for volunteer management
+5. browse food donation information
+6. apply for food distribution
+7. view volunteer information
+8. manage their own accounts
+9. use azure for the background and midnight blue for components
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

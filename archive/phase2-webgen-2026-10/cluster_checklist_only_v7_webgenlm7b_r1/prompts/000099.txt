@@ -1,0 +1,16 @@
+Please implement a minimalistic bus and railway ticket booking platform where users can search and book bus and railway tickets, view real-time seat availability and prices, make secure payments, and receive booking confirmations via email or SMS. The platform should have user account management features, including user registration, login, booking history, and ticket printing options. Additionally, the platform should have a responsive design that adapts to both mobile and desktop devices. Configure all backgrounds with snow and all components with dim gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. search and book bus and railway tickets
+2. view real-time seat availability and prices
+3. make secure payments
+4. receive booking confirmations via email or SMS
+5. user account management features
+6. user registration
+7. login
+8. booking history
+9. ticket printing options
+10. responsive design that adapts to both mobile and desktop devices
+11. configure all backgrounds with snow and all components with dim gray
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

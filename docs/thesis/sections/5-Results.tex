@@ -98,7 +98,27 @@ Two ablations separate the contributions of the components, both with the v7 con
 \end{itemize}
 If the fixed prefix matches v7, the contribution of the method is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation.
 
-\todo{Fill in: accuracy / appearance / zero-score for No Memory, checklist only, fixed prefix and v7, first 30 and last 71 tasks.}
+\Cref{tab:ablation} reports the checklist-only ablation over all 101 tasks; the fixed-prefix run is queued.
+
+\begin{table}[ht]
+\centering
+\caption{Ablation over the 101 tasks in the manifest order (single runs). Accuracy is pooled over checks; appearance averages tasks with a grade.}
+\label{tab:ablation}
+\begin{tabular}{lccccc}
+\toprule
+ & Acc.\ 1--30 & Acc.\ 31--101 & Acc.\ all & Zero-score & Appearance \\
+\midrule
+No Memory & 26.0 & 29.5 & 28.5 & 30 & 3.25 \\
+Checklist only & 33.1 & 31.3 & 31.8 & 18 & 3.23 \\
+Fixed code prefix & \multicolumn{5}{c}{\todo{running}} \\
+v7 (checklist + memory) & 39.0 & 40.4 & 40.0 & 13 & 3.21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Paired by task, checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and v7 $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger and significant share, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred.
+
+\todo{Fill in fixed-prefix row and the two differences involving it.}
 
 \section{A Stronger Generator}
 \label{sec:stronger}
