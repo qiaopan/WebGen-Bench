@@ -32,9 +32,12 @@ OPTIONAL_TABLES_DDL = {
     source TEXT NOT NULL,
     source_task_id TEXT,
     support_tasks TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(support_tasks)),
-    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'retired')),
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'retired', 'superseded')),
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-    UNIQUE (agent_id, problem_key)
+    -- v8: a refreshed example is a new row; the old row becomes 'superseded' and points to it.
+    -- One non-superseded row per (agent_id, problem_key); databases made before v8 keep UNIQUE(agent_id, problem_key).
+    superseded_by TEXT,
+    superseded_at_task TEXT
 ) STRICT""",
     # One row per (task, injected code memory); recurred = the same breakage was still found in that task's site.
     "code_memory_uses": """CREATE TABLE IF NOT EXISTS code_memory_uses (

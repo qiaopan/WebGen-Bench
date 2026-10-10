@@ -300,6 +300,7 @@
   2. 缺 Vue import 条目随失败更新：按各 API 被漏 import 的次数重建示例（例如同时覆盖 `ref` 与 `computed`），v7 中该示例建好后不再变化。
 - **不改：** 需求清单、文字经验、反思、检索、v-model 编译错误（两组都有，未针对）。正在进行的 v7 顺序实验继续用冻结的 v7，不中途换代码。
 - **对比方式：** v8 只跑 Long Memory（种子 11），与同顺序的 v7、No Memory 按题配对。若脚手架消失、后段分数补回且无明显副作用，论文写"v8 修复了换顺序后暴露的脚手架问题"；改动 2 若无效，照实写为生成器随机笔误。
+- **改动 2 改为版本化（用户 10-10）：** 重建示例时不再覆盖原记录，而是新建一行（新 `code_id`，注入次数和效用从零开始），旧行标为 `superseded` 并记 `superseded_by`、`superseded_at_task`；检索只读 `active`，所以只注入最新版本。只改说明里的题数时仍原地更新。新库的 `code_memories` 去掉 UNIQUE(agent_id, problem_key)（旧库不变，v7 不会产生多版本）。符合"整合不覆盖原记忆、保留出处"的原则。本地用种子 11 的 67 个网站回放（记忆模型用桩函数）：第 12 题建缺 import 条目，第 35 题建缺包条目，第 43 题（000027）缺 import 条目升为第 2 版、旧版标为已取代，每类只有 1 行 active。
 - **参考文献（10-10 已核对出处；写论文时引用）：**
   - 改动 1（给做法片段、不给整份别站文件）：Agent Workflow Memory（Wang, Mao, Fried, Neubig，ICML 2025，arXiv:2409.07429）从轨迹中归纳细粒度的可复用子流程，并把例子特有的内容抽象掉（如把 "dry cat food" 换成 {product-name}）；Synapse（Zheng et al., ICLR 2024，arXiv:2306.07863）先做状态抽象，去掉与任务无关的部分再作示例；Shi et al., 2023（ICML，GSM-IC）无关上下文会分散模型；Metis（Dai et al., 2026）指出由单条轨迹固化的代码会过拟合并把缺陷传给所有调用者；Memory Transfer Learning（Kim et al., 2026）最具体的轨迹形式出现负迁移。
   - 改动 2（经验随新的失败更新）：ExpeL（Zhao et al., AAAI 2024）对洞察做 EDIT/UPVOTE/DOWNVOTE；Mem0（Chhikara et al., 2025）存储时 UPDATE；Dynamic Cheatsheet（Suzgun, Yuksekgonul, Bianchi, Jurafsky, Zou，EACL 2026，arXiv:2504.07952）推理时持续更新的记忆，保存可复用策略与代码片段；ACE: Agentic Context Engineering（arXiv:2510.04618，ICLR 2026）把上下文当作逐步更新的 playbook，用增量更新避免反复重写造成的细节流失（context collapse）。ACE 第一作者写论文前再核对。
