@@ -1,5 +1,7 @@
 # 持久决策记录（Durable Decisions）
 
+[English current-state guide](DECISIONS.en.md) | [中文完整记录](DECISIONS.md)
+
 ## CURRENT 决策
 
 ### 实验定位与公平性

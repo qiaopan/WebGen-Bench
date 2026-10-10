@@ -610,10 +610,11 @@ def _vue_api_explanation(what: str, n_tasks: int) -> str:
 
 
 def _refresh_vue_api(connection, llm, code_id: str, where: list[dict], good: list[dict], max_lines: int,
-                     want: dict[str, int], tasks: list[str], info: dict) -> None:
+                     want: dict[str, int], tasks: list[str], info: dict, current_task: str | None = None) -> None:
     """v8: when the stored example no longer imports every API the chain keeps missing, pick a new one from the
-    current good sites (same checks as at creation). The count in the explanation follows the support. The old
-    code is kept in the run log (the row is updated in place: one row per problem key)."""
+    current good sites (same checks as at creation). The count in the explanation follows the support (updated in
+    place). A new example is a new version: a new row (new code_id, so its uses and utility start fresh) and the
+    old row is marked 'superseded' with superseded_by / superseded_at_task; retrieval reads only active rows."""
     row = connection.execute("SELECT code, explanation FROM code_memories WHERE code_id=?", (code_id,)).fetchone()
     need = _needed_apis(want)
     what = "a component calls " + ", ".join(f"{a}()" for a in need) + " without importing it from 'vue' (that page fails when opened)"
@@ -642,9 +643,15 @@ def _refresh_vue_api(connection, llm, code_id: str, where: list[dict], good: lis
         info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "result": "no better example",
                                                "log": picked["log"]})
         return
-    connection.execute("UPDATE code_memories SET code=?, explanation=?, source_task_id=? WHERE code_id=?",
-                       (code, explanation, source_task, code_id))
-    info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "old_code": row[0], "new_code": code,
+    new_id = uuid.uuid4().hex
+    connection.execute(
+        "INSERT INTO code_memories (code_id,agent_id,problem_key,name,applies_when,explanation,code,source,"
+        "source_task_id,support_tasks,status) SELECT ?,agent_id,problem_key,name,applies_when,?,?,source,?,"
+        "support_tasks,status FROM code_memories WHERE code_id=?", (new_id, explanation, code, source_task, code_id))
+    connection.execute("UPDATE code_memories SET status='superseded', superseded_by=?, superseded_at_task=? "
+                       "WHERE code_id=?", (new_id, current_task, code_id))
+    info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "old_code_id": code_id,
+                                           "new_code_id": new_id, "old_code": row[0], "new_code": code,
                                            "source_task": source_task, "log": picked["log"]})
 
 
@@ -670,7 +677,7 @@ def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_roo
                    and s["facts"]["compile_errors"] == []), key=lambda s: -s["score"])
     info: dict = {"sites": len(sites), "good_sites": len(good), "added": [], "supported": [], "no_fix": []}
     existing = {row[0]: row[1] for row in connection.execute(
-        "SELECT problem_key, code_id FROM code_memories WHERE agent_id=?", (agent_id,))}
+        "SELECT problem_key, code_id FROM code_memories WHERE agent_id=? AND status!='superseded'", (agent_id,))}
     for key, where in seen.items():
         tasks = sorted({s["task_id"] for s in where})
         want: dict[str, int] = {}
@@ -682,7 +689,8 @@ def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_roo
                                (json.dumps(tasks), existing[key]))
             info["supported"].append(key)
             if CODE_POOL_REFRESH and key == "vue-api:any":
-                _refresh_vue_api(connection, llm, existing[key], where, good, max_lines, want, tasks, info)
+                _refresh_vue_api(connection, llm, existing[key], where, good, max_lines, want, tasks, info,
+                                 current_task)
             continue
         if len(tasks) < min_tasks:
             continue

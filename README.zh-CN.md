@@ -1,5 +1,7 @@
 # 让小模型越做越好：面向网站生成的跨任务长期记忆
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 **奥克兰大学（The University of Auckland）人工智能硕士（Master of Artificial Intelligence）毕业论文项目 · COMPSCI 792 Research Project**
 
 作者：Qiaopan Ma · 导师：Qian Liu · 2026
