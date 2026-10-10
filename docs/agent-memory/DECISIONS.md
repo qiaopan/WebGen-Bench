@@ -306,6 +306,12 @@
   - 改动 2（经验随新的失败更新）：ExpeL（Zhao et al., AAAI 2024）对洞察做 EDIT/UPVOTE/DOWNVOTE；Mem0（Chhikara et al., 2025）存储时 UPDATE；Dynamic Cheatsheet（Suzgun, Yuksekgonul, Bianchi, Jurafsky, Zou，EACL 2026，arXiv:2504.07952）推理时持续更新的记忆，保存可复用策略与代码片段；ACE: Agentic Context Engineering（arXiv:2510.04618，ICLR 2026）把上下文当作逐步更新的 playbook，用增量更新避免反复重写造成的细节流失（context collapse）。ACE 第一作者写论文前再核对。
 - **队列实现：** 成对运行行的 No Memory 位置写 `-` 表示只跑 Long Memory；切换脚本支持 `MARKER.env` 指定目标（为切回 7B 预留，当前未用）。
 
+### 2026-10-10：代码池的两个局限写入论文；改法留给 v9（用户决定，等 v8 结果再定）
+- **名额固定 2 个：** 同时适用的代码记忆超过 2 条时，排序靠后的永远注入不了。v7 两次运行都有 3 条（缺 Vue import、缺包 vue-router、v-model 编译错误），出现 3 条的题分别有 22 题（原顺序）和 11 题（种子 11），v-model 那条从未注入；种子 11 后段 000033、000077 正是败在"v-model 用在 prop 上"。缺包在 7B 上几乎只有 vue-router 达到 ≥2 题（各运行中其他包 chart.js、vue-chartjs、d3 均只出现 1 次），但换模型后多个包会互相挤名额。
+- **出现 2 次才建记忆：** 低频问题往往在记忆建好前就已经出完了（种子 11 中 vue-router、v-model-on-prop 各只出现 2 次）；收益主要来自高频问题（缺 Vue import 12 次）。这是从经验学习的冷启动局限。
+- **v9 候选（不进 v8，v8 只验证"片段修脚手架"这一处）：** ①名额按问题类型分配（每类最多 1 条，总长度设上限），只要适用都可注入；②所有缺包合成一条记忆、按总次数计数；③能被代码客观检测、导致整站崩溃的问题（缺包、编译错误）出现 1 次就建记忆，缺 Vue import 仍为 2 次。v8 结果出来后在本地小测，有效再上集群。
+- **论文：** 第 6 章局限新增一条（"Rare problems are learned late or not at all"）。
+
 ## SWE 阶段（SWE-bench，2026-10-04 起）
 
 代码在 `/Users/ma/Downloads/792/swe-bench`（`qiaopan/SWE-bench` 的 fork，`swebench/long_memory/`），方法说明见该仓库 `docs/long_memory_swe.md`。
