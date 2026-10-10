@@ -2,6 +2,8 @@
 
 # 当前交接（更新于 2026-10-05：WebGen 第二阶段进行中；SWE 阶段已于 2026-10-05 封版；第一阶段已于 2026-10-03 封版）
 
+[English current-state guide](HANDOFF.en.md) | [中文完整记录](HANDOFF.md)
+
 ## 2026-10-06 晚：v3 guidance 的具体做法保真（本地，未同步集群、未开始 Long Memory）
 
 - 在既有 v3 的源头去重、可执行性过滤、`hard_match` 和 hard cap 之上，`src/post_task_reflection.py` 现要求已证实的 Vue 交互/视图状态问题写出最小代码构造，而不是“ensure/正确配置”一类结论：例如页面切换应明确 `ref` + `v-if`，提交结果应明确 handler 更新 state + `v-if`，列表明确本地数组 + `v-for`。这只是反思格式的通用规则；不手写任何任务结论。
