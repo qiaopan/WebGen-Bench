@@ -65,6 +65,7 @@ run_nomem_tasks() {
 #   "X SCRIPT MARKER"  run SCRIPT once, e.g. a generator switch; done when MARKER exists. After three failures
 #     the filler halts (nothing after it runs on the wrong generator);
 #   "P ORDER_FILE LM_OUTPUT NM_OUTPUT [LM_MEMORY_CONFIG]"  both arms over the order in ORDER_FILE
+#     (NM_OUTPUT "-": Long Memory only, e.g. a new version compared with an existing No Memory run)
 #     (data/experiment_splits/task_orders/*.json), task by task; which arm runs first alternates by position
 #     (ABBA: position 0 L,N; 1 N,L; 2 L,N; ...). The order file is copied to OUTPUT/task-order.json.
 filler_next() {
@@ -98,13 +99,13 @@ for line in conf.read_text().splitlines() if conf.is_file() else []:
         order, lm_out, nm_out = f[1], f[2], f[3]
         lm_cfg = f[4] if len(f) > 4 else "-"
         ids = json.load(open(order))["task_ids"]
-        for out in (lm_out, nm_out):
+        for out in (lm_out, nm_out) if nm_out != "-" else (lm_out,):
             Path(out).mkdir(parents=True, exist_ok=True)
             if not (Path(out) / "task-order.json").exists():
                 shutil.copyfile(order, Path(out) / "task-order.json")
-        lm_done, nm_done = done(lm_out, "continual"), done(nm_out, "disabled")
+        lm_done, nm_done = done(lm_out, "continual"), done(nm_out, "disabled") if nm_out != "-" else None
         for pos, task in enumerate(ids):
-            arms = [("L", lm_out, lm_cfg, lm_done), ("N", nm_out, "-", nm_done)]
+            arms = [("L", lm_out, lm_cfg, lm_done)] + ([("N", nm_out, "-", nm_done)] if nm_out != "-" else [])
             for arm, out, cfg, fin in (arms if pos % 2 == 0 else arms[::-1]):
                 if todo(out, task, fin):
                     print(arm, out, task, cfg); sys.exit(0)

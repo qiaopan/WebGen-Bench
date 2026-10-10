@@ -4,13 +4,15 @@
 # $WG/queue/generator.env.next (WEBGEN_GENERATOR_WEIGHTS, WEBGEN_GENERATOR_API_MODEL,
 # WEBGEN_GENERATOR_QUANTIZATION, WEBGEN_GENERATOR_GPU_UTIL). Steps: stop the old generator and Bolt (Bolt caches
 # the model list), start the new generator on the same GPU and port, check it serves the new name, restart Bolt,
-# then install generator.env (so later service restarts keep it) and write MARKER. On failure, the old
+# then install generator.env (so later service restarts keep it) and write MARKER. If MARKER.env exists it is
+# the target instead of generator.env.next (so a second X line can switch back). On failure, the old
 # generator and Bolt are started again and the script exits 1.
 set -uo pipefail
 marker="$1"
 source /data/qma258/env.sh
 cd "$WG/webgen"
 next="$WG/queue/generator.env.next"
+[[ -f "$marker.env" ]] && next="$marker.env"
 [[ -f "$next" ]] || { echo "SWITCH_ABORT no $next"; exit 1; }
 old_env="$WG/queue/generator.env"
 SERVICE_LOG="$WG/logs/services-${SLURM_JOB_ID:-manual}"
