@@ -37,6 +37,11 @@
   3. **把任务顺序作为实验变量**（领域挨着 vs 打散、两组逐题 ABBA 配对），这在网站生成记忆中没有找到先例；持续学习文献（Evo-Memory、AgentCL）支持顺序会影响结论。
 - 建议标题方向：强调"形式取决于能力"，例如 *What Memory Can a Small Model Use? Code over Text for Cross-Task Website Generation*。
 
+## 4b. v8 两处改动的依据（10-10 核对出处）
+
+- **给做法片段、不给整份文件：** Agent Workflow Memory（Wang et al., ICML 2025）归纳细粒度子流程并抽象掉例子特有的内容（"dry cat food" → {product-name}）；Synapse（Zheng et al., ICLR 2024）状态抽象，去掉任务无关部分；Shi et al., 2023 无关上下文分散模型；Metis 单条轨迹固化的代码过拟合；MTL 具体轨迹负迁移。我们的观察：整份别站 `App.vue` 让 7B 交出脚手架（种子 11 后段 8 题），换成片段后 8/8 写出真实页面（只查代码）。
+- **经验随失败更新：** ExpeL（EDIT/UPVOTE/DOWNVOTE）、Mem0（UPDATE）、Dynamic Cheatsheet（Suzgun et al., EACL 2026，推理时持续更新、保存代码片段）、ACE（arXiv:2510.04618，ICLR 2026，增量更新避免 context collapse）。我们的观察：v7 的缺 import 示例建好后不再变，只示范 `ref`，而一半漏的是 `computed`。
+
 ## 5. 对论文的影响（10-08 已同步到论文与 PPT）
 
 - 第 2 章相关工作：加 Super Library Agent、Memory Transfer Learning、Evo-Memory/AgentCL；重写与 Metis 的对比（Metis 的流式迁移结果与我们相反）。
@@ -44,6 +49,11 @@
 - 参考文献：补上述条目，并核对全文。
 
 ## 来源
+
+- [Agent Workflow Memory（arXiv 2409.07429）](https://arxiv.org/abs/2409.07429)，[ICML 2025](https://proceedings.mlr.press/v267/wang25bx.html)
+- [Synapse（arXiv 2306.07863）](https://arxiv.org/pdf/2306.07863)
+- [Dynamic Cheatsheet（arXiv 2504.07952）](https://arxiv.org/abs/2504.07952v1)
+- [ACE: Agentic Context Engineering（arXiv 2510.04618）](https://arxiv.org/abs/2510.04618v2)
 
 - [Metis（arXiv 2606.24151）](https://arxiv.org/abs/2606.24151)，[HTML](https://arxiv.org/html/2606.24151)
 - [Super Library Agent（arXiv 2608.29310）](https://arxiv.org/abs/2608.29310)，[HTML](https://arxiv.org/html/2608.29310)

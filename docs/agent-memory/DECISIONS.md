@@ -295,6 +295,25 @@
 - **论文：** 写入发现：小模型生成器对文字经验的遵从度低，对代码示例的遵从度高。
 - **000056 对照：** No Memory 不加任何 guidance 时，自己写出了单页 `ref` + `v-if` 结构，0.50（集群评测）。Long Memory 原版白屏，0 分。人写的完整示例 0.43（本地评测），只是回到了 No Memory 的水平。说明模型本身有这个能力，示例起的是恢复作用，而不是增益。
 
+### 2026-10-10：v8 = v7 + 代码池两处改动，在种子 11 上完整运行（用户决定）
+- **起因：** 种子 11 顺序下 v7 后段出现 8 个脚手架，均在"缺包"代码记忆（整份别站 `App.vue`）开始注入之后；与 v7 已知的 000001/000011 是同一失败模式。说明 v7 的增益对任务顺序敏感，根因可定位。
+- **改动（`src/code_memory.py`，配置 `runtime.code_pool_refresh: true`，即 `config/long_memory_cluster_v8.json`；与 v7 只差这一项，开关关闭时行为与 v7 相同）：**
+  1. 缺包条目只存片段：记忆模型从高分网站的文件中挑关键行，代码核对逐字、≤15 行、不含 `<script>/<template>` 标签行、须含模板行；两次不通过则按规则摘取（去标签、去本站页面 import、去纯闭合标签）。
+  2. 缺 Vue import 条目随失败更新：按各 API 被漏 import 的次数重建示例（例如同时覆盖 `ref` 与 `computed`），v7 中该示例建好后不再变化。
+- **不改：** 需求清单、文字经验、反思、检索、v-model 编译错误（两组都有，未针对）。正在进行的 v7 顺序实验继续用冻结的 v7，不中途换代码。
+- **对比方式：** v8 只跑 Long Memory（种子 11），与同顺序的 v7、No Memory 按题配对。若脚手架消失、后段分数补回且无明显副作用，论文写"v8 修复了换顺序后暴露的脚手架问题"；改动 2 若无效，照实写为生成器随机笔误。
+- **改动 2 改为版本化（用户 10-10）：** 重建示例时不再覆盖原记录，而是新建一行（新 `code_id`，注入次数和效用从零开始），旧行标为 `superseded` 并记 `superseded_by`、`superseded_at_task`；检索只读 `active`，所以只注入最新版本。只改说明里的题数时仍原地更新。新库的 `code_memories` 去掉 UNIQUE(agent_id, problem_key)（旧库不变，v7 不会产生多版本）。符合"整合不覆盖原记忆、保留出处"的原则。本地用种子 11 的 67 个网站回放（记忆模型用桩函数）：第 12 题建缺 import 条目，第 35 题建缺包条目，第 43 题（000027）缺 import 条目升为第 2 版、旧版标为已取代，每类只有 1 行 active。
+- **参考文献（10-10 已核对出处；写论文时引用）：**
+  - 改动 1（给做法片段、不给整份别站文件）：Agent Workflow Memory（Wang, Mao, Fried, Neubig，ICML 2025，arXiv:2409.07429）从轨迹中归纳细粒度的可复用子流程，并把例子特有的内容抽象掉（如把 "dry cat food" 换成 {product-name}）；Synapse（Zheng et al., ICLR 2024，arXiv:2306.07863）先做状态抽象，去掉与任务无关的部分再作示例；Shi et al., 2023（ICML，GSM-IC）无关上下文会分散模型；Metis（Dai et al., 2026）指出由单条轨迹固化的代码会过拟合并把缺陷传给所有调用者；Memory Transfer Learning（Kim et al., 2026）最具体的轨迹形式出现负迁移。
+  - 改动 2（经验随新的失败更新）：ExpeL（Zhao et al., AAAI 2024）对洞察做 EDIT/UPVOTE/DOWNVOTE；Mem0（Chhikara et al., 2025）存储时 UPDATE；Dynamic Cheatsheet（Suzgun, Yuksekgonul, Bianchi, Jurafsky, Zou，EACL 2026，arXiv:2504.07952）推理时持续更新的记忆，保存可复用策略与代码片段；ACE: Agentic Context Engineering（arXiv:2510.04618，ICLR 2026）把上下文当作逐步更新的 playbook，用增量更新避免反复重写造成的细节流失（context collapse）。ACE 第一作者写论文前再核对。
+- **队列实现：** 成对运行行的 No Memory 位置写 `-` 表示只跑 Long Memory；切换脚本支持 `MARKER.env` 指定目标（为切回 7B 预留，当前未用）。
+
+### 2026-10-10：代码池的两个局限写入论文；改法留给 v9（用户决定，等 v8 结果再定）
+- **名额固定 2 个：** 同时适用的代码记忆超过 2 条时，排序靠后的永远注入不了。v7 两次运行都有 3 条（缺 Vue import、缺包 vue-router、v-model 编译错误），出现 3 条的题分别有 22 题（原顺序）和 11 题（种子 11），v-model 那条从未注入；种子 11 后段 000033、000077 正是败在"v-model 用在 prop 上"。缺包在 7B 上几乎只有 vue-router 达到 ≥2 题（各运行中其他包 chart.js、vue-chartjs、d3 均只出现 1 次），但换模型后多个包会互相挤名额。
+- **出现 2 次才建记忆：** 低频问题往往在记忆建好前就已经出完了（种子 11 中 vue-router、v-model-on-prop 各只出现 2 次）；收益主要来自高频问题（缺 Vue import 12 次）。这是从经验学习的冷启动局限。
+- **v9 候选（不进 v8，v8 只验证"片段修脚手架"这一处）：** ①名额按问题类型分配（每类最多 1 条，总长度设上限），只要适用都可注入；②所有缺包合成一条记忆、按总次数计数；③能被代码客观检测、导致整站崩溃的问题（缺包、编译错误）出现 1 次就建记忆，缺 Vue import 仍为 2 次。v8 结果出来后在本地小测，有效再上集群。
+- **论文：** 第 6 章局限新增一条（"Rare problems are learned late or not at all"）。
+
 ## SWE 阶段（SWE-bench，2026-10-04 起）
 
 代码在 `/Users/ma/Downloads/792/swe-bench`（`qiaopan/SWE-bench` 的 fork，`swebench/long_memory/`），方法说明见该仓库 `docs/long_memory_swe.md`。

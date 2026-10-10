@@ -176,6 +176,10 @@ v7 相对 No Memory 逐题配对平均 +11.5 个百分点（95% bootstrap CI 6.0
 - Liu et al., 2024. *Lost in the Middle: How Language Models Use Long Contexts.* TACL 12.
 - Wallace et al., 2024. *The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions.* arXiv:2404.13208.
 - Shi et al., 2023. *Large Language Models Can Be Easily Distracted by Irrelevant Context.* ICML 2023.
+- Wang et al., 2025. *Agent Workflow Memory.* ICML 2025, arXiv:2409.07429.（v8 改动 1 的依据）
+- Zheng et al., 2024. *Synapse: Trajectory-as-Exemplar Prompting with Memory for Computer Control.* ICLR 2024.（v8 改动 1）
+- Suzgun et al., 2026. *Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory.* EACL 2026, arXiv:2504.07952.（v8 改动 2）
+- *Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models.* ICLR 2026, arXiv:2510.04618.（v8 改动 2；作者待核对）
 
 待核对（写进论文前逐条确认）：
 

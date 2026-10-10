@@ -13,6 +13,25 @@
 
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
+### 待办清单（2026-10-10 更新；做完一项就划掉或删掉）
+1. **种子 11 跑完后（约 10-11 早上）：** 拉取两组结果（`scripts/archive_phase2_runs.py cluster_order_blocks11_longmem_v7 cluster_order_blocks11_nomem` 归档进 git）；做完整分析（配对差与 CI、前 30/后段、脚手架/编译错/缺包逐题统计）；填论文 `tab:order` 与 PPT `order-1`；按同步规则更新。
+2. **v8 种子 11 跑完后（约 10-12）：** 与同顺序 v7、No Memory 按题配对；检查 101 题中脚手架数、后段分数、v7 高分题有无变差、缺 import 题数、`code_memories` 的版本记录（`superseded_by`）与挑出的片段是否合理；写进论文第 5 章 v8 段与 PPT；再决定是否做 v9（候选见 DECISIONS"代码池的两个局限"）。
+3. **种子 29、47、交错跑完后：** 同第 1 项，填 `order-2..4` 与 `tab:order`；四个顺序都完成后统计各顺序脚手架数与"缺包示例来源网站"的关系。
+4. **固定前缀跑完后（约 10-16）：** 填论文 `tab:ablation` 固定前缀一行与 PPT 消融页。
+5. **约 10-16～17 切换 32B 时：** 查 worker 日志 `SWITCH_DONE/SWITCH_FAILED`、`nvidia-smi`、第一个 32B 任务；若 `FILLER_HALT` 要处理。32B 跑完后填 `sec:stronger` 与 PPT `stronger` 页；提醒用户删除 32B 权重（73 GB，由用户执行）。
+6. **本地另一会话的未提交改动**（中英文 README、三个交接文档的 `.en.md`）处理完后：切回最新 main，重新打包 `docs/thesis_overleaf.zip`。
+7. **组会（10-16）前：** 核对 PPT 渲染（参考文献页是否溢出）、参考文献逐条核对（ACE 作者待查）。
+8. **交论文（11-16）前：** 致谢、全文通读；删除任何集群输出目录前，先注释 `filler.conf` 中指向它的行。
+
+
+### 2026-10-10：种子 11 后段没有优势的原因；v8 验证与排队
+- **现象：** 种子 11（领域挨着）79 题时 v7 33.7% vs No Memory 28.3%（配对 +4.5，CI [−3.0, 11.7]）；同一批题在 manifest 顺序下 v7 41.0%、No Memory r1 29.0%。No Memory 两次很稳，v7 换顺序掉约 7 个点。第 31–67 题 v7 无优势（29.9% vs 31.4%）。
+- **原因：** 从第 36 题起代码池注入"缺包"条目，内容是一整份别站的 `App.vue`（30 行，来源为食物捐赠网站）；之后 v7 有 8 题交了原样 Vite 脚手架（No Memory 0 题），这 8 题 No Memory 35.8%、v7 2.5%；另 5 题是编译错（v-model 用在 prop/文件框）或缺包。其余 24 题 v7 45.0% vs No Memory 27.6%。manifest 顺序同样注入整份文件 76 次，只出 2 个脚手架（示例来自通用服务网站），差异原因推测为示例内容与当前题的相关度，单次运行，未证实。
+- **v8 小验证（只生成、只查代码，未评测）：** 8 个脚手架题用 v7 原 prompt，只把整份 `App.vue` 换成 v8 片段（72B 挑出的 `ref` 状态 + 导航按钮 + `v-if` 行），8/8 生成真实页面、无未声明的包。脚本 `scripts/cluster/diag_v8_fragment.py`，作为 worker 一次性任务运行，输出在集群 `outputs/experiment/diag_v8_fragment_seed11/`。
+- **v8 完整运行（用户决定提前）：** `filler.conf` 中种子 11 之后、种子 29 之前加 `P ... blocks_seed11.json cluster_order_blocks11_longmem_v8 - config/long_memory_cluster_v8.json`（只跑 Long Memory，与种子 11 的 No Memory、v7 按题比较）；原排在 32B 之后的"切回 7B + v8"两行已注释（备份 `filler.conf.bak-before-v8-early`）。预计种子 11 约 10-11 凌晨完成，v8 约 10-12 凌晨，其余顺延约一天，32B 约 10-19～20。
+- **跑完要看：** 101 题里还有无脚手架；后段分数是否补回；v7 做得好的题有无变差（页面数、是否用 router）；缺 import 题数是否少于 v7；每次建立/更新代码记忆时挑出的行（`key_lines` 日志）是否合理。
+- **注意：** 本地工作区有另一会话未提交的改动（README 中英文版、三个交接文档的 `.en.md`）；本条通过独立 worktree 提交，未动这些改动。
+
 ### 2026-10-09：清理后误重跑 v4（已修）
 - 10-08 删除 v4、v7 输出目录时没有注释 `filler.conf` 中对应的 L 行，补位脚本把 v4 当作未完成，从头重跑约 12 小时（61 题），消融停在 44/101。10-09 已注释这两行（备份 `filler.conf.bak-before-skip-done`）、停掉 v4 重跑，消融从第 45 题继续；重跑的 v4 目录（4 GB）由用户删除，不作参考。**规则：删除任何输出目录前，先注释 `filler.conf` 中指向它的行。**
 
