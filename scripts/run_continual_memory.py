@@ -457,6 +457,9 @@ def main() -> None:
     memory_log = JsonlRunLog(output / "memory-events.jsonl")
     completed = completed_keys(progress_path)
     settings = load_long_memory_settings(args.memory_config.resolve())
+    if settings.memory.code_pool_refresh:
+        import code_memory
+        code_memory.CODE_POOL_REFRESH = True
     # Generator routing lives inside the selected Bolt service.  Memory/reflection LLM and embedding
     # default to Azure; WEBGEN_MEMORY_* / WEBGEN_EMBEDDING_* point them at self-hosted servers
     # (cluster profile), where the embedding model is served separately from the memory LLM.
