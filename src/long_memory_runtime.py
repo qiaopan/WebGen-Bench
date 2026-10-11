@@ -107,6 +107,9 @@ class MemoryConfig:
     # imports, template compile errors) is answered with code from an earlier site that worked (src/code_memory.py).
     code_memory: bool = False
     code_memory_min_tasks: int = 2
+    # v9: support needed for a whole-site failure found by code (missing package, compile error); 0 = code_memory_min_tasks.
+    # These facts come from the compiler and package.json, not from the model, so one occurrence is enough evidence.
+    code_memory_min_tasks_site_break: int = 0
     # v5: common-pool lines without a concrete construction (ref, v-if, @click, ...) are dropped: the small
     # generator follows code, and generic lines ("ensure fields are labeled") filled the pool.
     common_pool_concrete_only: bool = False
@@ -127,6 +130,9 @@ class MemoryConfig:
     # v8: rebuild the vue-api example as misses accumulate and give missing-package entries as fragments
     # (code_memory.CODE_POOL_REFRESH; the env var WEBGEN_CODE_POOL_REFRESH=1 does the same).
     code_pool_refresh: bool = False
+    # v9: a refreshed missing-import example replaces the stored one only when it covers strictly more of the
+    # needed functions (v8 alternated between a ref-only and a computed-only example; code_memory.REFRESH_MONOTONIC).
+    code_pool_refresh_monotonic: bool = False
     retire_min_uses: int = 0
     retire_max_utility: float = 0.3
     # "grouped": appearance lessons come from the grouped, code-cited path (one case per same-fix group,

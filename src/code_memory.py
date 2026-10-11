@@ -336,6 +336,7 @@ VUE_API_KEY_LINES = os.environ.get("WEBGEN_VUE_API_KEY_LINES") == "1"  # diagnos
 # v8: rebuild the vue-api example when the APIs the chain keeps missing change. v7 built it once (task 6, ref only)
 # and never again, while half of its 22 support tasks later missed computed, which the example never showed.
 CODE_POOL_REFRESH = os.environ.get("WEBGEN_CODE_POOL_REFRESH") == "1"
+REFRESH_MONOTONIC = False  # v9: see _refresh_vue_api
 VUE_API_COVER_MAX = 3
 
 
@@ -639,7 +640,10 @@ def _refresh_vue_api(connection, llm, code_id: str, where: list[dict], good: lis
             source_task = ",".join(dict.fromkeys(p[1] for p in parts))
             picked["log"].append({"composed": [p[1] for p in parts]})
     covered = set(need) & _imported_in(code)
-    if not covered - _imported_in(row[0]):  # nothing new: keep the old example
+    old_covered = set(need) & _imported_in(row[0])
+    # v8 replaced the example whenever the new one covered any function the old one lacked, so a ref-only and a
+    # computed-only example kept replacing each other (seed 11, tasks 26-33). v9 replaces only on a strict gain.
+    if (not covered > old_covered) if REFRESH_MONOTONIC else (not covered - _imported_in(row[0])):
         info.setdefault("refresh", []).append({"key": "vue-api:any", "need": need, "result": "no better example",
                                                "log": picked["log"]})
         return
@@ -657,7 +661,7 @@ def _refresh_vue_api(connection, llm, code_id: str, where: list[dict], good: lis
 
 def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_root: Path, *, min_tasks: int = 2,
                      min_score: float = 0.5, max_lines: int = 40, current_task: str | None = None,
-                     scan_seconds: float = 600) -> dict:
+                     scan_seconds: float = 600, min_tasks_site_break: int = 0) -> dict:
     """After a task: refresh site facts, add a code memory for every breakage seen in >= min_tasks tasks of this
     chain that has none yet, extend support of existing ones, and mark whether the current task's injected code
     memories' breakage came back. ``chain``: [{task_id, trace_path, score}] for every task run so far."""
@@ -692,7 +696,7 @@ def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_roo
                 _refresh_vue_api(connection, llm, existing[key], where, good, max_lines, want, tasks, info,
                                  current_task)
             continue
-        if len(tasks) < min_tasks:
+        if len(tasks) < ((min_tasks_site_break or min_tasks) if severity(key) == 2 else min_tasks):
             continue
         fix = _fix_from_good_site(key, good, max_lines, want)
         source = "good_site"
@@ -709,6 +713,14 @@ def update_code_pool(connection, agent_id: str, llm, chain: list[dict], repo_roo
                 fix = (picked["code"], fix[1])
         if fix is None and key.startswith("compile:"):
             fix, source = _repair_with_model(llm, where[-1], where[-1]["keys"][key], where[-1]["site"]), "model_repair"
+            if fix is not None and min_tasks_site_break:
+                # v9: a repair that is only a file wrapper (e.g. "<script setup> / import / </script>" for a missing
+                # end tag) teaches nothing and reads as a finished empty component (the v6 scaffold failure).
+                body = [l for l in fix[0].splitlines() if l.strip() and not re.match(r"\s*</?(script|template|style)\b", l)
+                        and not re.match(r"\s*import\s", l)]
+                if len(body) < 2:
+                    info.setdefault("rejected", []).append({"key": key, "reason": "repair is only a wrapper"})
+                    fix = None
         if fix is None:
             info["no_fix"].append(key)
             continue

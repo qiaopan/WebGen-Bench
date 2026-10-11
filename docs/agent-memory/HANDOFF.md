@@ -13,9 +13,13 @@
 
 ## WebGen 第二阶段：学校 H200 集群（2026-10-05 开始）
 
+### 2026-10-11：v8 停止，v9 排队（详见 DECISIONS 同日条目）
+- 种子 11 两组 101 题已完成：No Memory 27.9%（零分 29）、v7 33.1%（零分 21），配对 +4.4（CI [−2.0, 10.5]），v7 有 19 个脚手架。按问题分类（种子 11）：No Memory 缺 vue-router 24 题（22 题零分）、缺 Vue import 19；v7 脚手架 19、缺 import 15、vue-router 2、v-model 编译错 3。
+- v8 停在 59/101（队列行已注释，备份 `filler.conf.bak-before-stop-v8`）；v9 已排在种子 29 前（备份 `filler.conf.bak-before-v9`），集群代码已与本地核对一致。诊断输出在集群 `outputs/experiment/diag_replay_code_pool_seed11/`。
+
 ### 待办清单（2026-10-10 更新；做完一项就划掉或删掉）
 1. **种子 11 跑完后（约 10-11 早上）：** 拉取两组结果（`scripts/archive_phase2_runs.py cluster_order_blocks11_longmem_v7 cluster_order_blocks11_nomem` 归档进 git）；做完整分析（配对差与 CI、前 30/后段、脚手架/编译错/缺包逐题统计）；填论文 `tab:order` 与 PPT `order-1`；按同步规则更新。
-2. **v8 种子 11 跑完后（约 10-12）：** 与同顺序 v7、No Memory 按题配对；检查 101 题中脚手架数、后段分数、v7 高分题有无变差、缺 import 题数、`code_memories` 的版本记录（`superseded_by`）与挑出的片段是否合理；写进论文第 5 章 v8 段与 PPT；再决定是否做 v9（候选见 DECISIONS"代码池的两个局限"）。
+2. **v9 种子 11 跑完后（约 10-12～13）：** 与同顺序 v7、No Memory（及 v8 的 61 题）按题配对；检查脚手架数、各代码记忆建立时间与版本记录、是否注入 v-model 条目、缺包/编译错题数；注意运行间波动，只把机制效果当结论；写进论文第 5 章与 PPT。
 3. **种子 29、47、交错跑完后：** 同第 1 项，填 `order-2..4` 与 `tab:order`；四个顺序都完成后统计各顺序脚手架数与"缺包示例来源网站"的关系。
 4. **固定前缀跑完后（约 10-16）：** 填论文 `tab:ablation` 固定前缀一行与 PPT 消融页。
 5. **约 10-16～17 切换 32B 时：** 查 worker 日志 `SWITCH_DONE/SWITCH_FAILED`、`nvidia-smi`、第一个 32B 任务；若 `FILLER_HALT` 要处理。32B 跑完后填 `sec:stronger` 与 PPT `stronger` 页；提醒用户删除 32B 权重（73 GB，由用户执行）。
