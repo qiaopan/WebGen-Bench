@@ -1025,6 +1025,7 @@ class ReflectionCaseMemory:
         try:
             return update_code_pool(self.connection, self.agent_id, self.llm, self._chain(),
                                     Path(__file__).resolve().parents[1], min_tasks=self.config.code_memory_min_tasks,
+                                    min_tasks_site_break=self.config.code_memory_min_tasks_site_break,
                                     current_task=task_id)
         except Exception as error:
             self.connection.rollback()  # no half-updated pool
@@ -1055,7 +1056,10 @@ class ReflectionCaseMemory:
             kept_rows = [] if not fixed else rows
             for r in ([] if fixed else rows):
                 other = [t for t in json.loads(r["support_tasks"] or "[]") if _other_task(t, self.statistics_task_id)]
-                if len(other) >= self.config.code_memory_min_tasks and \
+                from code_memory import severity
+                need = (self.config.code_memory_min_tasks_site_break or self.config.code_memory_min_tasks) \
+                    if severity(r["problem_key"]) == 2 else self.config.code_memory_min_tasks
+                if len(other) >= need and \
                         (not r["source_task_id"] or _other_task(r["source_task_id"], self.statistics_task_id)):
                     r["support_tasks"] = json.dumps(other)
                     r["explanation"] = re.sub(r", \d+ tasks\)", f", {len(other)} tasks)", r["explanation"])
@@ -1104,6 +1108,11 @@ class ReflectionCaseMemory:
                             key=lambda r: (-severity(r["problem_key"]),
                                            -utility.get(r["code_id"], {}).get("utility", 0.5),
                                            -len(json.loads(r["support_tasks"] or "[]"))))
+            if self.config.code_memory_min_tasks_site_break:
+                # v9: every missing-package entry shows the same remedy (do the job with what is installed), so one
+                # per task; the others would only take slots (a site missing chart.js and vue-chartjs made two).
+                first = next((r for r in ranked if r["problem_key"].startswith("import:")), None)
+                ranked = [r for r in ranked if not r["problem_key"].startswith("import:") or r is first]
             chosen, levels = [], set()
             for r in ranked:
                 if severity(r["problem_key"]) not in levels:

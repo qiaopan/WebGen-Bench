@@ -460,6 +460,7 @@ def main() -> None:
     if settings.memory.code_pool_refresh:
         import code_memory
         code_memory.CODE_POOL_REFRESH = True
+        code_memory.REFRESH_MONOTONIC = settings.memory.code_pool_refresh_monotonic
     # Generator routing lives inside the selected Bolt service.  Memory/reflection LLM and embedding
     # default to Azure; WEBGEN_MEMORY_* / WEBGEN_EMBEDDING_* point them at self-hosted servers
     # (cluster profile), where the embedding model is served separately from the memory LLM.
