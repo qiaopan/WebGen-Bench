@@ -110,6 +110,9 @@ class MemoryConfig:
     # v9: support needed for a whole-site failure found by code (missing package, compile error); 0 = code_memory_min_tasks.
     # These facts come from the compiler and package.json, not from the model, so one occurrence is enough evidence.
     code_memory_min_tasks_site_break: int = 0
+    # v9.1: compile-error entries apply to every Vue site, decided by code (the model's own applies_when, e.g.
+    # "props that need to be updated locally", never matched a requirement, so the v-model entry was never injected).
+    code_pool_compile_universal: bool = False
     # v5: common-pool lines without a concrete construction (ref, v-if, @click, ...) are dropped: the small
     # generator follows code, and generic lines ("ensure fields are labeled") filled the pool.
     common_pool_concrete_only: bool = False

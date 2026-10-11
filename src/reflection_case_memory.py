@@ -1088,6 +1088,8 @@ class ReflectionCaseMemory:
                 key = r["problem_key"]
                 if key.startswith("vue-api:"):
                     applies.add(r["code_id"]); decisions.append({"code_id": r["code_id"], "applies": True, "by": "code: universal"})
+                elif key.startswith("compile:") and self.config.code_pool_compile_universal:
+                    applies.add(r["code_id"]); decisions.append({"code_id": r["code_id"], "applies": True, "by": "code: compile error, any Vue site"})
                 elif key.startswith("import:") and multi:
                     applies.add(r["code_id"]); decisions.append({"code_id": r["code_id"], "applies": True, "by": "code: checklist >= 3"})
                 else:

@@ -17,6 +17,7 @@
 - 种子 11 两组 101 题已完成：No Memory 27.9%（零分 29）、v7 33.1%（零分 21），配对 +4.4（CI [−2.0, 10.5]），v7 有 19 个脚手架。按问题分类（种子 11）：No Memory 缺 vue-router 24 题（22 题零分）、缺 Vue import 19；v7 脚手架 19、缺 import 15、vue-router 2、v-model 编译错 3。
 - v8 停在 59/101（队列行已注释，备份 `filler.conf.bak-before-stop-v8`）；v9 已排在种子 29 前（备份 `filler.conf.bak-before-v9`），集群代码已与本地核对一致。诊断输出在集群 `outputs/experiment/diag_replay_code_pool_seed11/`。
 - 10-11 放行前做了 31 题生成验证（只查代码，见 DECISIONS 同日条目）：脚手架 0/31，v-model-on-prop 仍出现 3 次。v9 已于 10-11 放行，排在种子 29 当前这题之后。跑完后与 v8 比较只看机制（脚手架、router 白屏、v-model 编译错次数、代码记忆建立时间与版本数），总分只作参考（运行间波动约 5 个点）。
+- **10-12：v9 停在 45 题（用户决定），队列先跑种子 29。** 原因与 v9.1 修正见 DECISIONS 同日条目：v-model 记忆因 72B 写的适用条件永远不匹配而从未注入；v9.1 让编译错误类记忆由代码判定对所有 Vue 网站适用，生成检查 3/3 不再出现 v-model 编译错。v9.1 是否、何时在种子 11 上从头跑，待用户决定（不放进当前队列）。
 
 ### 待办清单（2026-10-10 更新；做完一项就划掉或删掉）
 1. **种子 11 跑完后（约 10-11 早上）：** 拉取两组结果（`scripts/archive_phase2_runs.py cluster_order_blocks11_longmem_v7 cluster_order_blocks11_nomem` 归档进 git）；做完整分析（配对差与 CI、前 30/后段、脚手架/编译错/缺包逐题统计）；填论文 `tab:order` 与 PPT `order-1`；按同步规则更新。
