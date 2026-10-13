@@ -1,0 +1,17 @@
+<section id="m-checklist" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">方法 ① · 需求清单</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">保证需求不被经验淹没</h2>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:32px;line-height:1.5">第一阶段发现：注入的经验一多，模型只做 guidance 提到的功能，漏掉需求里的其他功能。指令越多，同时遵守的概率越低（Harada et al., 2025）；信息在中间最容易被忽略（Liu et al., 2024）。</p>
+<p style="font-size:32px;line-height:1.5">做法：需求原文保留，记忆模型把它拆成逐条清单，经验原文挂在对应条目下面；需求优先、经验只是补充（Wallace et al., 2024）。</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:26px;color:#6A7179">示例（000033 问答网站）</p>
+<p style="font-size:28px;line-height:1.5">1. submitting questions<br>2. answering questions<br>&#160;&#160;&#160;Note: use @submit to update state…<br>3. viewing answers<br>4. rating the answers<br>5. beige, saddle brown</p>
+</div>
+</div>
+<p style="font-size:28px;color:#4A5568">代码检查：条目必须和需求有共同实词；覆盖率低于 60% 就重拆，再不行用需求句子兜底。</p>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：Curse of Instructions（Harada et al., 2025）；Lost in the Middle（Liu et al., 2024）；Instruction Hierarchy（Wallace et al., 2024）</p>
+<aside>方法一是需求清单。第一阶段我们发现，经验一多，模型只做经验里提到的功能，漏掉需求里的其他功能。文献也说，指令越多越难同时遵守，放在中间的信息最容易被忽略。所以我们保留需求原文，再让记忆模型拆成逐条清单，把经验原文挂在对应条目下面，并且声明需求优先、经验只是补充。代码会检查每个条目和需求有没有共同实词，覆盖率低于 60% 就重拆。因为清单本身就是一种 prompt 改写，我们专门做了“只有清单”的消融。</aside>
+</section>

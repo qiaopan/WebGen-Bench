@@ -1,0 +1,11 @@
+<section id="errors" data-section="结论与下一步" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">错误分析（v7，101 题）</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">剩下的零分题，大多 No Memory 也做不出来</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #2A78D6;padding:32px 0 0 0"><p style="font-size:80px;font-weight:700">30 → 13</p><p style="font-size:28px;color:#4A5568;line-height:1.4">零分题（No Memory → v7）</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #2A78D6;padding:32px 0 0 0"><p style="font-size:80px;font-weight:700">10 / 13</p><p style="font-size:28px;color:#4A5568;line-height:1.4">v7 零分题里 No Memory 也是 0 分</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #EB6834;padding:32px 0 0 0"><p style="font-size:80px;font-weight:700">3.25 vs 3.22</p><p style="font-size:28px;color:#4A5568;line-height:1.4">两组都有可用网站的 68 题外观分：没有差别</p></div>
+</div>
+<p style="font-size:28px;color:#4A5568;line-height:1.5">只有 3 题是 No Memory 有分、v7 为 0（000032、000009、000070）。提升在功能，不在外观。</p>
+<aside>错误分析。零分题从 30 降到 13。v7 剩下的 13 个零分题里，有 10 个 No Memory 也是 0 分，说明大多是这个 7B 模型本身做不出来的难题；只有 3 题是 No Memory 有分、v7 为 0。外观方面，只看两组都生成了可用网站的 68 题，外观分是 3.25 对 3.22，没有差别。所以我们的提升在功能，不在外观：记忆让更多网站能正常工作，但没有让能工作的网站更好看。</aside>
+</section>

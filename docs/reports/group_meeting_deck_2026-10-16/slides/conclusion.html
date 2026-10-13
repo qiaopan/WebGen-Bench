@@ -1,0 +1,25 @@
+<section id="conclusion" data-transition="fade" style="background:#14213D;color:#F4F1EA;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#8FB8EE;font-weight:700">结论</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:64px;font-weight:700;line-height:1.2">记忆的形式决定小模型能否用上它</h2>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:36px;font-weight:700;color:#8FB8EE">发现</h3>
+<ul style="font-size:28px;line-height:1.6;color:#C9D3E3">
+<li>文字经验：前期有效，后期因空话累积而输给基线</li>
+<li>代码片段经验（v7）：101 题 40.0% vs 28.5%，配对 +11.5（CI 6.0–16.9），零分 30 → 13，后 71 题仍稳定领先</li>
+<li>消融：需求拆解 +3.4（不显著），记忆 +8.1（显著）——主要贡献是记忆</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-size:36px;font-weight:700;color:#F2A97F">局限</h3>
+<ul style="font-size:28px;line-height:1.6;color:#C9D3E3">
+<li>提升只在功能：两组都有可用网站时外观 3.25 vs 3.22</li>
+<li>只用一种生成器（WebGen-LM-7B）、一种框架（Bolt + Vue）</li>
+<li>代码池接近"学到的固定前缀"；示例形式不对会反过来伤害生成</li>
+<li>单一任务顺序、每组单次运行（原论文同样是单次运行）；顺序鲁棒性正在验证</li>
+<li>外观评分用 32B 代替 GPT-4o</li>
+</ul>
+</div>
+</div>
+<aside>总结一下。核心发现是：记忆的形式决定小模型能不能用上它。文字经验前期有效，后期因为空话累积反而输给基线；代码片段经验让 101 题准确率从 28.5% 提到 40.0%，配对提升 11.5 个百分点，置信区间 6.0 到 16.9，零分题从 30 降到 13，而且后 71 题仍然稳定领先。消融说明主要贡献来自记忆，加记忆显著提高 8.1 个点，需求拆解的 3.4 个点不显著。局限有几点：提升只在功能，不在外观；只用了一种生成器和一种框架；代码池的效果接近学到的固定前缀，而且示例的形式不对，比如整份别站文件，反而会让模型直接交脚手架；所有结果都是单一任务顺序、每组单次运行，这和原论文一样，换任务顺序是否同样有效，我们正在用修好示例形式的版本验证。最后，外观评分用的是 32B 而不是 GPT-4o。</aside>
+</section>
