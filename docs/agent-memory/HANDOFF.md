@@ -24,7 +24,7 @@
 - PPT（artifact v36）：`order-1`、`order-2` 填好并配 gap 图，`order-3/4` 标运行中，新增 `order-fix`（脚手架原因与 v8/v9/v9.1），`conclusion` 填好消融和顺序结论。论文 `tab:order` 两行、第 5 章新增顺序结果与 `sec:fix`（v8/v9/v9.1），第 7 章 RQ3。README 新增顺序表。
 
 ### 待办清单（2026-10-13 重写；做完一项就删掉）
-集群队列（10-13 时）：种子 47（运行中，约 23/101，预计 10-14 中午）→ 交错（约 10-15 傍晚）→ v9.1 种子 11（只跑 Long Memory，约 10-16 晚）→ 固定前缀（约 10-17）→ 切换 32B → 32B manifest 成对（约 10-19～20）。
+**10-13 午后改队列（见 DECISIONS 同日“最终方法改为 v9.1”）：** v9.1 种子 11（约 10-14 中午）→ v9.1 种子 29 → v9.1 原顺序 → v9.1 种子 47 成对 → v9.1 交错成对（约 10-21）。下面第 1、2、5、6 项中的 v7 运行已关闭，改为对应的 v9.1 运行；第 4 项提前为最优先：种子 11 约 50 题时核对脚手架/v-model/注入，异常就停队列。
 1. **种子 47 跑完（10-14）：** 拉取（rsync 该两目录）→ `scripts/analyze_order_run.py cluster_order_blocks47_longmem_v7 cluster_order_blocks47_nomem --plot docs/reports/gap_order_seed47.png` → 上传图、填 PPT `order-3`、论文 `tab:order`、README 表 → 归档。
 2. **交错跑完（10-15 傍晚，组会前一晚）：** 同上，填 `order-4`；更新 `conclusion` 与论文第 5、7 章"两类顺序各 2 次"的结论；`order-fix` 表加两行脚手架数与注入起点。
 3. **组会（10-16 周五）前：** 核对 PPT 渲染（参考文献页是否溢出）、参考文献逐条核对（ACE 作者待查）、封面姓名/导师/日期。
