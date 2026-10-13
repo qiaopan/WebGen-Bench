@@ -1,0 +1,51 @@
+Please implement a news blog website for the shipping industry to publish news and company information. The website should have sections for news, company profiles, and events. Users should be able to browse news, company information, and events, and subscribe to newsletters. The website should have a backend management system that allows administrators to manage ad spaces. Implement styling with old lace for the background and rosy brown for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. news
+2. company profiles
+3. events
+4. browse news
+5. browse company information
+6. browse events
+7. subscribe to newsletters
+   Note from earlier websites: For the newsletter subscription: update `isAuthenticated` ref to show confirmation after `subscribe` method.
+8. backend management system
+9. manage ad spaces
+10. styling with old lace for the background and rosy brown for components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

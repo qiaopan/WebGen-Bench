@@ -1,0 +1,57 @@
+Please implement a customer support chatbot on the website that can provide customer support and handle customer interactions. The chatbot should be able to answer frequently asked questions, provide product information, and assist users in completing orders. Users should be able to interact with the chatbot through a chat interface to get the information and help they need. Implement styling with snow for the background and dim gray for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer support chatbot
+   Note from earlier websites: For the chatbot: implement a form with v-if for questions and responses.
+2. answer frequently asked questions
+3. provide product information
+   Note from earlier websites: For product info: use NLP in the chatbot for detailed answers.
+4. assist users in completing orders
+5. interact with the chatbot through a chat interface
+6. styling with snow for the background and dim gray for components
+
+General notes from earlier websites:
+- On every page: use a ref for current page and v-if to manage sections.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

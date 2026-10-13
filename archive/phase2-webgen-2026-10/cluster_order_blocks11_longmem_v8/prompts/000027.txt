@@ -1,0 +1,42 @@
+Please implement a community website for sharing promotions and discounts. The website should have functionalities for browsing promotions, sharing promotions, and searching promotions. Users should be able to browse and share promotions, and search for promotions of interest. The website should also have a management backend for managing users, promotions, and website settings. Use ivory for the outer layout and forest green for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a community website for sharing promotions and discounts.
+2. The website should have functionalities for browsing promotions,
+3. sharing promotions,
+4. and searching promotions.
+5. Users should be able to browse and share promotions,
+6. and search for promotions of interest.
+7. The website should also have a management backend for managing users, promotions, and website settings.
+8. Use ivory for the outer layout and forest green for UI blocks.
+
+General notes from earlier websites:
+- On every page: Ensure `currentView` state is correct; use `ref` plus `v-if` for `AuthView` rendering.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue component navigation. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">Home</button>
+      <button @click="currentView = 'about'" :class="{ active: currentView === 'about' }">About</button>
+      <button @click="currentView = 'products'" :class="{ active: currentView === 'products' }">Products</button>
+      <button @click="currentView = 'news'" :class="{ active: currentView === 'news' }">News</button>
+      <button @click="currentView = 'contact'" :class="{ active: currentView === 'contact' }">Contact</button>
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <AboutView v-if="currentView === 'about'" />
+      <ProductsView v-if="currentView === 'products'" />
+      <NewsView v-if="currentView === 'news'" />
+      <ContactView v-if="currentView === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

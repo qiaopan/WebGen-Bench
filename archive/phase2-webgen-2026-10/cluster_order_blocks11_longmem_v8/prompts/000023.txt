@@ -1,0 +1,48 @@
+Please implement a customer relationship management website for managing sales leads and reporting. The website should have functionalities for automated message sending, organizing and categorizing leads, updating lead information and status, updating settings and dropdown menus, and reporting. Users should be able to browse and manage sales leads, view reports, and receive best practice and integration advice. Define background as papaya whip; define components with dark orange.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. automated message sending
+2. organizing and categorizing leads
+3. updating lead information and status
+4. updating settings and dropdown menus
+5. reporting
+6. browse and manage sales leads
+7. view reports
+8. receive best practice and integration advice
+9. colours
+
+General notes from earlier websites:
+- For the lead details: in 'LeadManagement.vue', use v-if and ref to conditionally render fields and update lead info.
+- On every page: set background to papaya whip and components to dark orange.
+- For reporting: implement generateReport to update reportContent state correctly.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue component navigation. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">Home</button>
+      <button @click="currentView = 'about'" :class="{ active: currentView === 'about' }">About</button>
+      <button @click="currentView = 'products'" :class="{ active: currentView === 'products' }">Products</button>
+      <button @click="currentView = 'news'" :class="{ active: currentView === 'news' }">News</button>
+      <button @click="currentView = 'contact'" :class="{ active: currentView === 'contact' }">Contact</button>
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <AboutView v-if="currentView === 'about'" />
+      <ProductsView v-if="currentView === 'products'" />
+      <NewsView v-if="currentView === 'news'" />
+      <ContactView v-if="currentView === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+
+const totalVotes = computed(() => {
+  return props.poll.results.reduce((a, b) => a + b, 0)
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

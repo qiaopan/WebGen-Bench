@@ -1,0 +1,26 @@
+Please implement a web application for one-to-one coaching sessions to match coaches and users. The application should have functionalities such as personality assessment, user profiles, coaching and mentorship matching, scheduling and session management, and goal setting and progress tracking. Users should be able to complete a personality assessment, create and manage their profiles, search for and select suitable coaches, schedule coaching sessions, and set and track goals. Set the background to beige, and apply saddle brown to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web application for one-to-one coaching sessions
+2. match coaches and users
+3. personality assessment
+4. user profiles
+5. coaching and mentorship matching
+6. scheduling and session management
+7. goal setting and progress tracking
+8. complete a personality assessment
+9. create and manage their profiles
+10. search for and select suitable coaches
+11. schedule coaching sessions
+12. set and track goals
+13. background to beige
+14. apply saddle brown to components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

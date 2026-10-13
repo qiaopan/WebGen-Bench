@@ -1,0 +1,24 @@
+Please implement a detective agency case management app for managing cases and tracking work hours. The app should have functionalities for real-time reporting, data collection and storage, work hours tracking, estimated expense sheet generation, and service assignment sheet. Users should be able to browse case information, submit real-time reports, log work hours, and view estimated expense sheets and service assignment sheets. Apply beige as the background; style all components with saddle brown.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. real-time reporting
+   Note from earlier websites: For real-time reporting: Use `v-if` and `ref` to render `AuthView` based on `currentView` state.
+2. data collection and storage
+3. work hours tracking
+4. estimated expense sheet generation
+5. service assignment sheet
+6. browse case information
+7. submit real-time reports
+8. log work hours
+9. view estimated expense sheets and service assignment sheets
+10. apply beige as the background; style all components with saddle brown
+   Note from earlier websites: On every page: Apply beige background and saddle brown for all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

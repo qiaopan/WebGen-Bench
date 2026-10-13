@@ -1,0 +1,17 @@
+Please implement a social website for user registration, making friends, and sharing. The website should have a registration function, allowing users to create an account and log in. Users should be able to invite friends to join the website and vote on content. Users should be able to upload pictures and earn points. The website should have a personal homepage that displays user information and updates. Use light cyan as the default background and cadet blue for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. registration function
+2. invite friends to join the website
+   Note from earlier websites: For friend invitations: Update 'FriendInvitationView.vue' with v-if for required fields validation.
+3. vote on content
+4. upload pictures
+5. earn points
+6. personal homepage
+7. display user information and updates
+8. light cyan as the default background and cadet blue for component styling
+
+General notes from earlier websites:
+- For the login form: Implement a client-side @submit handler to log in the user upon form submission.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,19 @@
+Please implement a risk assessment website for conducting risk assessments and generating reports. The website should have functionalities for selecting risk assessment items, auto-populating data, generating charts, and creating reports. Users should be able to select risk assessment items, and the website will automatically fill in relevant data from a background database, generate charts, and create reports. The website should also have a subscription feature, allowing users to access the risk assessment tool. Define the background as alice blue and components as steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a risk assessment website for conducting risk assessments and generating reports.
+2. The website should have functionalities for selecting risk assessment items, auto-populating data, generating charts, and creating reports.
+3. Users should be able to select risk assessment items, and the website will automatically fill in relevant data from a background database, generate charts, and create reports.
+4. The website should also have a subscription feature, allowing users to access the risk assessment tool.
+5. Define the background as alice blue and components as steel blue.
+   Note from earlier websites: For the background: set the background color to alice blue using CSS.
+   Note from earlier websites: For the components: apply steel blue color to all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

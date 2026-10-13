@@ -1,0 +1,27 @@
+Please implement a paper cup manufacturing system to manage inventory, production, and sales of paper cups. The system should have functionalities for managing raw materials, finished products, inventory, production, and sales. Users should be able to record and track the inventory, usage, and sales of raw materials and finished products, and generate detailed reports. The system should also have customer management capabilities, including recording customer information, sales history, and sales statistics. Assign light goldenrod to the background and olive drab to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. manage inventory
+   Note from earlier websites: For the inventory management: Use `ref` state plus `v-if` to render components based on `currentView`.
+2. manage production
+3. manage sales
+4. manage raw materials
+5. manage finished products
+6. record and track inventory
+7. record and track usage
+8. record and track sales
+9. generate detailed reports
+10. customer management capabilities
+11. record customer information
+12. record sales history
+13. record sales statistics
+14. assign light goldenrod to the background and olive drab to the UI elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

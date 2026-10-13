@@ -1,0 +1,26 @@
+<section id="order-fix" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:96px 128px 140px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">打乱顺序暴露的问题 · 定位与修复</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:52px;font-weight:700;line-height:1.2">一段整份别站文件的代码示例，让模型直接交脚手架</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:26px">
+<tr><th style="width:28%;text-align:left">顺序</th><th style="width:24%;text-align:right">"缺包"示例开始注入</th><th style="width:24%;text-align:right">v7 脚手架</th><th style="width:24%;text-align:right">No Memory 脚手架</th></tr>
+<tr><td>原顺序</td><td style="text-align:right">—</td><td style="text-align:right">2</td><td style="text-align:right">—</td></tr>
+<tr><td>种子 11</td><td style="text-align:right">第 36 题</td><td style="text-align:right">19（全在之后）</td><td style="text-align:right">0</td></tr>
+<tr><td>种子 29</td><td style="text-align:right">第 19 题</td><td style="text-align:right">16（全在之后）</td><td style="text-align:right">0</td></tr>
+</table>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-size:28px;font-weight:700">v8：只给片段</h3>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">72B 挑关键行、代码核对。v7 交脚手架的题上 3.6% → 45.2%，脚手架消失</p>
+</div>
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-size:28px;font-weight:700">v9：修 v8 的副作用</h3>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">示例不再来回换版本；整站崩溃出现 1 次就建记忆；名额 3 个。31 题生成检查：脚手架 0/31</p>
+</div>
+<div style="flex:1;background:#FFF4EE;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:10px">
+<h3 style="font-size:28px;font-weight:700">v9.1：排队中</h3>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">v9 中 v-model 记忆因适用条件写偏从未注入；改为编译错误对所有 Vue 网站适用，3/3 题不再报错</p>
+</div>
+</div>
+<p style="font-size:22px;color:#6A7179">v8、v9 只看机制效果（脚手架、编译错误次数），不比总分：同一版本跑两次总分可差约 5 个点。主方法仍是冻结的 v7。</p>
+<aside>两种打乱顺序的总分都只领先约 4.5 个点，主要原因是同一个问题：脚手架。代码池里“缺包”这条记忆的示例是一整份别的网站的 App.vue，大约 30 行。种子 11 从第 36 题开始注入它，之后 v7 交了 19 个原封不动的 Vite 脚手架；种子 29 从第 19 题开始注入，之后交了 16 个；全部出现在注入之后，No Memory 两次都是 0。原顺序只出现 2 个，示例来自一个通用服务网站，推测和示例内容与当前题的相关度有关，没有证实。修复分三步。v8 只给片段：由 72B 从高分网站挑关键行，代码核对逐字、不超过 15 行。在 v7 交脚手架的题上从 3.6% 提到 45.2%。但 v8 的缺 import 示例在两个版本之间来回替换，所以停了。v9 修了这一点，并让整站崩溃的问题出现一次就建记忆、名额加到 3 个；正式运行前在 31 道相关题上做了生成检查，脚手架 0/31。正式运行到第 45 题时又发现：v-model 那条记忆的适用条件由 72B 写成“需求涉及需要本地更新的 props”，需求里从不写 props，所以从未注入。v9.1 改为编译错误对所有 Vue 网站都适用，3 道题检查都不再报错，正在排队，周五晚上跑完。这些版本只看机制效果，不比总分，因为同一版本跑两次总分就能差 5 个点。主方法仍是 v7。</aside>
+</section>

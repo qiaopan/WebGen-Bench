@@ -1,0 +1,49 @@
+Please implement a sports analytics website that provides basketball betting data and analysis. The website should have functionalities for data visualization, match prediction, and betting recommendations. Users should be able to browse data for basketball, view match history, team rankings, player performance, and make informed betting decisions based on the analysis results. Define the background as ghost white and components as slate gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. sports analytics website
+2. basketball betting data and analysis
+3. data visualization
+4. match prediction
+5. betting recommendations
+6. browse data for basketball
+7. view match history
+8. team rankings
+9. player performance
+   Note from earlier websites: For the 'showPlayerPerformance' function: update 'selectedPlayer' ref in 'PlayerPerformance.vue' correctly.
+10. make informed betting decisions based on the analysis results
+11. background as ghost white and components as slate gray
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

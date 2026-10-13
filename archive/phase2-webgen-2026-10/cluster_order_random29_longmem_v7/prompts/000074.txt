@@ -1,0 +1,50 @@
+Please create a biography website to display a person's life and achievements. The website should have functionalities to display basic information, life experiences, achievements, and honors. Users should be able to browse biographies, view detailed information, and search for related content. The website should have a search function, allowing users to quickly find relevant information. Assign snow as the background color and apply dim gray to all elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display basic information
+2. display life experiences
+3. display achievements
+4. display honors
+5. browse biographies
+6. view detailed information
+7. search for related content
+   Note from earlier websites: For the search function: use v-if to display search results from searchResults state.
+8. search function
+9. snow as the background color and apply dim gray to all elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

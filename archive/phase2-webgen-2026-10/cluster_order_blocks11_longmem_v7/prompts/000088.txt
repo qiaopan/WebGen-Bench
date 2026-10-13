@@ -1,0 +1,54 @@
+Please implement a species biological information database website for displaying and managing biological information data. The website should have functionalities for browsing, searching, and filtering. Users should be able to browse biological information data for different species, search for specific data, and filter data based on different criteria. Specify linen as the base color and maroon for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a species biological information database website for displaying and managing biological information data.
+2. The website should have functionalities for browsing, searching, and filtering.
+3. Users should be able to browse biological information data for different species
+   Note from earlier websites: On every page: use a ref for current page and v-if to manage section display.
+4. search for specific data
+5. and filter data based on different criteria.
+   Note from earlier websites: For the filter criteria: provide clear labels and selectable options for successful filtering.
+6. Specify linen as the base color and maroon for all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

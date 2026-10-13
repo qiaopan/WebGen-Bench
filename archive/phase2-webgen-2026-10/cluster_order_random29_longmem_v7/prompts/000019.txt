@@ -1,0 +1,24 @@
+Please create a software solutions website to provide information to prospective customers. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information. Configure all backgrounds with misty rose and all components with firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. content that introduces software solutions and staffing business
+2. product and service descriptions
+3. industry news and trends
+4. customer cases and success stories
+5. attract the attention of small to medium-sized businesses
+6. content should be easy to understand and engaging
+7. browse the website
+8. search for relevant information or product descriptions
+   Note from earlier websites: For the search bar: implement a handler using v-if to process queries and show relevant content.
+9. read articles and news
+10. contact the website owner for more information
+11. configure all backgrounds with misty rose and all components with firebrick
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

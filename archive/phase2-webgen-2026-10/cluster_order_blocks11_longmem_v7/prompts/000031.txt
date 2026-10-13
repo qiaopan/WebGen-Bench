@@ -1,0 +1,54 @@
+Please implement an anonymous campus discussion platform for students to communicate and discuss. The platform should have a discussion forum feature that allows students to anonymously post, reply to posts, and participate in discussions. Students should be able to browse and search posts, follow topics of interest, and receive notifications. The platform should ensure user privacy and security, protecting students' personal information. Configure your theme with honeydew as background and dark olive green as component color.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. discussion forum feature that allows students to anonymously post, reply to posts, and participate in discussions
+   Note from earlier websites: For the discussion forum: allow anonymous posting, replying, and browsing with ref for current page.
+2. browse and search posts
+3. follow topics of interest
+4. receive notifications
+5. ensure user privacy and security, protecting students' personal information
+   Note from earlier websites: On every page: use v-if to manage display of sections and ensure user privacy and security.
+6. configure your theme with honeydew as background and dark olive green as component color
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

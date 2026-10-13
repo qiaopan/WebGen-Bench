@@ -1,0 +1,18 @@
+Please implement a technical website to display technical information and solutions. The website should have functionalities for browsing technical articles, searching technical information, and viewing solutions. Users should be able to browse technical articles, search technical information, view solutions, and communicate with other users.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display technical information and solutions
+2. browse technical articles
+3. search technical information
+4. view solutions
+5. communicate with other users
+   Note from earlier websites: For the communication feature: use @submit in the message form to update state and show messages.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

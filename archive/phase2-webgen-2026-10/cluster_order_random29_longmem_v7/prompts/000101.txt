@@ -1,0 +1,44 @@
+Please implement a travel reimbursement and payment system for employee travel expenses. The system should have functionalities for booking tickets, hotels, and trains, generating settlements, submitting reimbursement applications, and more. Users should be able to book tickets, hotels, and trains, generate settlements report, submit reimbursement applications, and view reimbursement status. Use white for container backgrounds and navy for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a travel reimbursement and payment system for employee travel expenses.
+2. The system should have functionalities for booking tickets, hotels, and trains, generating settlements, submitting reimbursement applications, and more.
+3. Users should be able to book tickets, hotels, and trains, generate settlements report, submit reimbursement applications, and view reimbursement status.
+4. Use white for container backgrounds and navy for component visuals.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

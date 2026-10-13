@@ -1,0 +1,30 @@
+Please develop a construction management website for managing projects and documents. The website should have functionalities for document management, project scheduling, communication tools, estimating job costing, time tracking, and resource management. Users should be able to create and manage projects, schedule project timelines, communicate with team members, estimate project costs, track project progress, and manage resources. Assign light gray to the background and dark red to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. construction management website for managing projects and documents
+2. functionalities for document management
+3. project scheduling
+4. communication tools
+5. estimating job costing
+6. time tracking
+   Note from earlier websites: For the TimeTracker.vue: implement `submitHours` method to update time tracking and show success message.
+7. resource management
+8. Users should be able to create and manage projects
+9. schedule project timelines
+10. communicate with team members
+11. estimate project costs
+12. track project progress
+13. manage resources
+14. Assign light gray to the background and dark red to the UI elements
+
+General notes from earlier websites:
+- On every page: use a `ref` state plus `v-if` to conditionally render components based on `currentView`.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

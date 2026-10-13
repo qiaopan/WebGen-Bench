@@ -1,0 +1,51 @@
+Please implement a fitness tracking mini-program for users to record and manage their fitness activities. The mini-program should have functionalities such as a fitness leaderboard, exercise recording, fitness diary, and a fitness statistics homepage. Users should be able to browse and record their own exercises, view the leaderboard, write a fitness diary, and track their own fitness data. Apply white to the canvas background and navy to all visible components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. fitness tracking mini-program
+2. fitness leaderboard
+3. exercise recording
+4. fitness diary
+   Note from earlier websites: For the fitness diary: implement a submit handler using @submit to update entries and re-render the list.
+5. fitness statistics homepage
+6. browse and record their own exercises
+7. view the leaderboard
+8. write a fitness diary
+9. track their own fitness data
+10. white to the canvas background and navy to all visible components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

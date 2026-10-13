@@ -1,0 +1,55 @@
+Please implement a whistleblower secrets/awareness website to expose truths about business and society. The website should have an anonymous reporting feature, where users can submit their insights and evidence. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions. The website should have a search function, where users can search for specific topics and keywords. The website should also have a news and blog section, where the latest news and articles are published. Use a azure background and apply midnight blue to the UI components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a whistleblower secrets/awareness website to expose truths about business and society.
+2. The website should have an anonymous reporting feature, where users can submit their insights and evidence.
+   Note from earlier websites: For the anonymous reporting: implement the feature using v-if to manage visibility and ref for current page.
+3. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions.
+4. The website should have a search function, where users can search for specific topics and keywords.
+5. The website should also have a news and blog section, where the latest news and articles are published.
+   Note from earlier websites: For the news and blog: verify article accuracy for user cross-reference.
+6. Use a azure background and apply midnight blue to the UI components.
+   Note from earlier websites: On every page: ensure UI components are styled midnight blue for direct visibility.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

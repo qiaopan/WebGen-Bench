@@ -1,0 +1,46 @@
+Please implement a website that provides tool information for engineers. The website should have user registration and login functionality, and be able to display information about various tools, including tool name, description, function, price, etc. Users should be able to search and filter tools, view detailed tool information, and be able to comment and rate tools. Declare ivory as the global background color and forest green for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and login functionality
+2. display information about various tools
+3. tool name
+4. description
+5. price
+6. search and filter tools
+   Note from earlier websites: For the search: implement a method in Vue to filter tools and update search results.
+7. view detailed tool information
+   Note from earlier websites: For tool cards: implement a `@click` event to update the current view.
+8. comment and rate tools
+9. ivory as the global background color and forest green for all UI pieces
+   Note from earlier websites: On every page: use `v-if` with `ref` to conditionally render components based on state.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue component navigation. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">Home</button>
+      <button @click="currentView = 'about'" :class="{ active: currentView === 'about' }">About</button>
+      <button @click="currentView = 'products'" :class="{ active: currentView === 'products' }">Products</button>
+      <button @click="currentView = 'news'" :class="{ active: currentView === 'news' }">News</button>
+      <button @click="currentView = 'contact'" :class="{ active: currentView === 'contact' }">Contact</button>
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <AboutView v-if="currentView === 'about'" />
+      <ProductsView v-if="currentView === 'products'" />
+      <NewsView v-if="currentView === 'news'" />
+      <ContactView v-if="currentView === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+
+const totalVotes = computed(() => {
+  return props.poll.results.reduce((a, b) => a + b, 0)
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,16 @@
+Please implement a website called "World of Imagination" to showcase and inspire users' imagination. The website should have functionalities for showcasing user-created content, sharing ideas, discussing, and interacting. Users should be able to browse others' creative works, share their own ideas via the share ideas form, participate in discussions, and interact with other users. Choose azure mist for the background; set all component colors to dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website called "World of Imagination" to showcase and inspire users' imagination.
+2. The website should have functionalities for showcasing user-created content, sharing ideas, discussing, and interacting.
+3. Users should be able to browse others' creative works, share their own ideas via the share ideas form, participate in discussions, and interact with other users.
+   Note from earlier websites: For the share ideas form: Use `ref` state and `v-if` to render components based on `currentView`.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

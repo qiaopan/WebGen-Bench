@@ -1,0 +1,47 @@
+Please implement a website for a credit repair company to generate leads. The website should have a form-filling function, allowing users to input personal information and credit status. The website should also have a credit score inquiry function and an introduction to credit repair services. Users can browse the website, learn about credit repair services, and fill out the form to submit lead information. Set old lace as the body background and use rosy brown for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for a credit repair company to generate leads.
+2. The website should have a form-filling function, allowing users to input personal information and credit status.
+   Note from earlier websites: For the form-filling function: use @submit in the Vue component to update state and show a confirmation.
+3. The website should also have a credit score inquiry function
+4. an introduction to credit repair services.
+5. Users can browse the website, learn about credit repair services, and fill out the form to submit lead information.
+6. Set old lace as the body background and use rosy brown for the UI.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

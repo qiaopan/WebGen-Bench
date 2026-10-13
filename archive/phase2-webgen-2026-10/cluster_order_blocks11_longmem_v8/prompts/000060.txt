@@ -1,0 +1,21 @@
+Please implement an adult vocabulary learning website that includes a variety of quizzes and word games, such as crossword puzzles, unjumble letters, finding synonyms and antonyms, flashcards, and fill-in-the-blank. The website should have a dashboard that displays a progress summary. A set of 10 new words should be taught every week, and users should be able to choose an avatar and play a simple game while waiting in the waiting room. The website should include a home page, 5 activity pages, a dashboard, and blog pages. Assign light gray to body backgrounds and dark red to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an adult vocabulary learning website that includes a variety of quizzes and word games, such as crossword puzzles, unjumble letters, finding synonyms and antonyms, flashcards, and fill-in-the-blank.
+2. The website should have a dashboard that displays a progress summary.
+3. A set of 10 new words should be taught every week, and users should be able to choose an avatar and play a simple game while waiting in the waiting room.
+4. The website should include a home page, 5 activity pages, a dashboard, and blog pages.
+5. Assign light gray to body backgrounds and dark red to main components.
+
+General notes from earlier websites:
+- For the dashboard: show a progress summary using `v-if` based on `currentView` state.
+- On every page: assign light gray to body backgrounds and dark red to main components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

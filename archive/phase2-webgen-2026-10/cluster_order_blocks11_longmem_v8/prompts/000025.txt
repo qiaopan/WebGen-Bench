@@ -1,0 +1,47 @@
+Please implement a web application for an insurance industry automation system to manage insurance business. The system should have functionalities for customer management, policy management, and claims management. Users should be able to browse customer information, policy information, and claims information, and perform corresponding operations. The system should also have data analysis and reporting capabilities, generating various reports and charts. Apply theme using whitesmoke as background and dark cyan for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer management
+2. policy management
+3. claims management
+4. browse customer information
+5. browse policy information
+6. browse claims information
+7. perform corresponding operations
+8. data analysis and reporting capabilities
+9. generating various reports and charts
+10. whitesmoke as background and dark cyan for elements
+
+General notes from earlier websites:
+- For the AuthView: set `currentView` state correctly, use `ref` and `v-if` for conditional rendering.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue component navigation. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">Home</button>
+      <button @click="currentView = 'about'" :class="{ active: currentView === 'about' }">About</button>
+      <button @click="currentView = 'products'" :class="{ active: currentView === 'products' }">Products</button>
+      <button @click="currentView = 'news'" :class="{ active: currentView === 'news' }">News</button>
+      <button @click="currentView = 'contact'" :class="{ active: currentView === 'contact' }">Contact</button>
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <AboutView v-if="currentView === 'about'" />
+      <ProductsView v-if="currentView === 'products'" />
+      <NewsView v-if="currentView === 'news'" />
+      <ContactView v-if="currentView === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+
+const totalVotes = computed(() => {
+  return props.poll.results.reduce((a, b) => a + b, 0)
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

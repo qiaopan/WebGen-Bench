@@ -1,0 +1,52 @@
+Please develop a domain leasing website for renting and managing domain names. The website should have functionalities for searching, leasing, renewing, and transferring domain names. Users should be able to search for, lease, renew, and transfer domain names, and view domain information and leasing records. The website should also have user management, order management, and payment management functions. Select old lace for layout background and rosy brown for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. searching domain names
+2. leasing domain names
+3. renewing domain names
+4. transferring domain names
+   Note from earlier websites: For the transfer form: use `v-if` to conditionally render the form from g0.
+5. view domain information
+   Note from earlier websites: For the domain information: use `ref` and `v-if` to conditionally render detailed view from g1.
+6. view leasing records
+7. user management
+8. order management
+9. payment management
+10. old lace for layout background and rosy brown for component details
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

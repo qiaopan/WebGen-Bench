@@ -1,0 +1,21 @@
+Please implement a website for The All-In Bourbon Bar to showcase its products and services. The website should have functionalities for displaying menus, introducing the membership-only private poker room, and showcasing events and promotions. Users should be able to browse the website, view menus, learn about the private poker room, view events and promotions, and make online reservations or purchases. Use peach puff for container backgrounds and indian red for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for The All-In Bourbon Bar to showcase its products and services.
+2. The website should have functionalities for displaying menus.
+3. Introducing the membership-only private poker room.
+4. Showcasing events and promotions.
+5. Users should be able to browse the website, view menus, learn about the private poker room, view events and promotions, and make online reservations or purchases.
+6. Use peach puff for container backgrounds and indian red for component visuals.
+
+General notes from earlier websites:
+- On every page: Ensure `currentView` state is correct; use `ref` plus `v-if` for `AuthView` rendering.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

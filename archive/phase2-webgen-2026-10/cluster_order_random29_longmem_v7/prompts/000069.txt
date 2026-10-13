@@ -1,0 +1,50 @@
+Please implement a health blog website for publishing health-related articles and promoting healthy lifestyles. The website should have functionalities for publishing articles, commenting, searching, and categorizing. Users should be able to browse and search articles, post comments, and follow specific topics. Choose misty rose for global background and firebrick for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a health blog website for publishing health-related articles and promoting healthy lifestyles.
+2. The website should have functionalities for publishing articles
+3. commenting
+4. searching
+   Note from earlier websites: For the search method: update searchResults state and display results using v-if.
+5. categorizing
+6. Users should be able to browse and search articles
+7. post comments
+8. follow specific topics
+9. Choose misty rose for global background and firebrick for all components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

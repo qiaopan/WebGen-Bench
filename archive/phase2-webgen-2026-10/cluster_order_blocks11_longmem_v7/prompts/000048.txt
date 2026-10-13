@@ -1,0 +1,52 @@
+Please implement a time attendance system to record employee attendance. The system should have functionalities for employee clocking in and out, and viewing attendance records. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time. Administrators should be able to view all employees' attendance records, perform statistics, and analysis. Specify papaya whip as the base color and dark orange for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a time attendance system to record employee attendance.
+2. The system should have functionalities for employee clocking in and out, and viewing attendance records.
+   Note from earlier websites: For employee clocking: use ref and v-if to manage clock in/out visibility.
+3. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time.
+4. Administrators should be able to view all employees' attendance records, perform statistics, and analysis.
+5. Specify papaya whip as the base color and dark orange for all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

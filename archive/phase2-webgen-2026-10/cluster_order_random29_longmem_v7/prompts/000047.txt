@@ -1,0 +1,59 @@
+Please implement an e-government system for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. The system should have functionalities for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. Users should be able to browse related information, submit applications, approve, query status, and perform related operations. The system should also include functions such as leave, middle-level cadres leaving Shenzhen, attendance, and "five powers" management, which can design and circulate corresponding forms and processes. Implement light pink for the page background and medium violet red for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement an e-government system for office management
+2. implement an e-government system for infrastructure management
+3. implement an e-government system for procurement management
+4. implement an e-government system for personnel management
+5. implement an e-government system for financial management
+6. implement an e-government system for decision-making management
+7. Users should be able to browse related information
+8. Users should be able to submit applications
+9. Users should be able to approve
+10. Users should be able to query status
+11. Users should be able to perform related operations
+12. The system should also include functions such as leave
+13. The system should also include functions such as middle-level cadres leaving Shenzhen
+14. The system should also include functions such as attendance
+15. The system should also include functions such as "five powers" management
+   Note from earlier websites: For the 'five powers management': use @click on the submit button to show a confirmation message.
+16. which can design and circulate corresponding forms and processes
+17. Implement light pink for the page background and medium violet red for the elements
+   Note from earlier websites: For the page background: set light pink and medium violet red for elements.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

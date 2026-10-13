@@ -1,0 +1,47 @@
+Please implement a sports analytics website that provides basketball betting data and analysis. The website should have functionalities for data visualization, match prediction, and betting recommendations. Users should be able to browse data for basketball, view match history, team rankings, player performance, and make informed betting decisions based on the analysis results. Define the background as ghost white and components as slate gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a sports analytics website that provides basketball betting data and analysis.
+2. The website should have functionalities for data visualization, match prediction, and betting recommendations.
+3. Users should be able to browse data for basketball, view match history, team rankings, player performance, and make informed betting decisions based on the analysis results.
+4. Define the background as ghost white and components as slate gray.
+
+General notes from earlier websites:
+- For data visualization: Use `ref` and `v-if` to conditionally render selected visualization details.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

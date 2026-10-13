@@ -1,0 +1,44 @@
+Please implement a blue-collar job site that connects blue-collar workers with employers. The website should allow users to create profiles, including name, contact information, skills and qualifications, email address, and photos. Users can browse and search job listings, including construction workers, plumbers, electricians, and more. Apply ivory for the layout background and forest green for interactive elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a blue-collar job site that connects blue-collar workers with employers.
+2. The website should allow users to create profiles, including name, contact information, skills and qualifications, email address, and photos.
+3. Users can browse and search job listings, including construction workers, plumbers, electricians, and more.
+4. Apply ivory for the layout background and forest green for interactive elements.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

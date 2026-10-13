@@ -1,0 +1,51 @@
+Please implement a webpage to showcase team projects and skills, including team introduction, project showcase, skill showcase, and contact information. Users should be able to browse team information, view project cases, understand team skills, and contact the team through the contact information. Initialize the background color with whitesmoke and component color with dark cyan.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. team introduction
+   Note from earlier websites: For team and skill details: use `ref` and `v-if` to show selected information.
+2. project showcase
+3. skill showcase
+4. contact information
+   Note from earlier websites: For the contact form: update state on submit in 'ContactInformation.vue'.
+5. browse team information
+6. view project cases
+7. understand team skills
+8. contact the team through the contact information
+9. initialize the background color with whitesmoke and component color with dark cyan
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 13 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

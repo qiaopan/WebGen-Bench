@@ -1,0 +1,49 @@
+Please implement a website for the Global Institute of Information Security to display courses and provide online enrollment functionality. The website should have functionalities such as course catalog, chatbot integration, contact form, and certification pathways. Users should be able to browse courses, view course details, enroll online, and contact the institute. Style all pages with a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. course catalog
+2. chatbot integration
+3. contact form
+   Note from earlier websites: For the booking form: Implement a submit handler in 'OnlineEnrollment.vue' and 'ContactPage.vue'.
+4. browse courses
+5. view course details
+6. enroll online
+7. contact the institute
+8. lavender background and indigo components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
