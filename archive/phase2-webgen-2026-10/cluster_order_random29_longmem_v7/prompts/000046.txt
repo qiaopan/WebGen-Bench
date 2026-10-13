@@ -1,0 +1,59 @@
+Please implement a hospital management website for managing hospital finances, reports, inventory, and patient information. The website should have financial management functionality, including collecting patient fees and managing hospital finances. The reporting functionality should include inventory reports, patient reports, and financial reports. Employees should be able to submit daily reports to superiors, including detailed information about daily activities. Pharmacy management should include inventory management of medicines. Patient electronic files should include patient name, date of visit, diagnosis, and comments. The website should also have claim formulation, laboratory management, and theater management. Configure the background color to peach puff, with components using indian red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. financial management functionality
+2. collecting patient fees
+3. managing hospital finances
+4. inventory reports
+5. patient reports
+6. financial reports
+7. daily reports
+   Note from earlier websites: For daily report form: ensure the submit button uses @click to call the report handler function.
+8. detailed information about daily activities
+9. inventory management of medicines
+10. patient electronic files
+11. patient name
+12. date of visit
+13. diagnosis
+14. comments
+15. claim formulation
+16. laboratory management
+17. theater management
+18. peach puff, with components using indian red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

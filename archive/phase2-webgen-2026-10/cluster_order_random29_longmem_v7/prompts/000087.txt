@@ -1,0 +1,54 @@
+Please implement an entertainment directory website to display band information and advertisements. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos. Additionally, the website should allow advertisers to register, log in, and upload their ad content. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements. Implement floral white for the page background and dark goldenrod for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display band information
+2. display advertisements
+3. band registration and login functionality
+   Note from earlier websites: For the band login form: bind email and password fields to state using `v-model`.
+4. input their bio
+5. provide picture links
+6. provide audio sample links
+7. provide direct links to YouTube videos
+8. advertisers to register, log in, and upload their ad content
+9. browse band information
+10. listen to audio samples
+11. watch videos
+12. view advertisements
+13. floral white for the page background and dark goldenrod for the elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

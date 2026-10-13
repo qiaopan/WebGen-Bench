@@ -1,0 +1,62 @@
+Please implement an advanced to-do list web application where users can create, edit, and delete to-do items. The application should have functionalities for adding new tasks, marking tasks as completed, deleting tasks, filtering tasks, and searching tasks. Users should be able to browse all to-do items, create new tasks, edit existing tasks, and delete unnecessary tasks. Set all pages to have a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create, edit, and delete to-do items
+2. adding new tasks
+3. marking tasks as completed
+4. deleting tasks
+5. filtering tasks
+   Note from earlier websites: For TaskList: implement filter controls with v-if to update tasks.
+6. searching tasks
+7. browse all to-do items
+8. create new tasks
+9. edit existing tasks
+10. delete unnecessary tasks
+11. lavender background and indigo components
+   Note from earlier websites: On every page: use a ref for the current page and v-if to manage sections.
+
+General notes from earlier websites:
+- For the booking form: add v-focus to the first input field for immediate interaction.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

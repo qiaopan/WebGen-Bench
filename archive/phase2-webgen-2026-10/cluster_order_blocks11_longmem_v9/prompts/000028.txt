@@ -1,0 +1,53 @@
+Please implement a fishing contest website to manage and display fishing contest information. The website should have functionalities for posting contest announcements, displaying contest results, and showcasing contest photos. Users should be able to browse contest information, register for contests, and view contest results. Set primary background to mint cream and elements to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. posting contest announcements
+   Note from earlier websites: For contest announcements: use @submit to show a confirmation message.
+2. displaying contest results
+3. showcasing contest photos
+4. browse contest information
+5. register for contests
+   Note from earlier websites: For contest registration: use @submit to check details and show a confirmation on success.
+6. view contest results
+7. set primary background to mint cream and elements to teal
+   Note from earlier websites: On every page: ensure all elements are styled in teal for consistency.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

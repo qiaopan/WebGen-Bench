@@ -1,0 +1,49 @@
+Please implement a short-term apartment rental website for showcasing and renting apartments. The website should have functionalities for searching, filtering, and booking apartments. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records. Use linen as the screen background and maroon for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short-term apartment rental website for showcasing and renting apartments.
+2. The website should have functionalities for searching, filtering, and booking apartments.
+   Note from earlier websites: For the search method: update searchResults state and display matching apartments using v-if.
+3. Users should be able to browse different types of apartments,
+4. search and filter apartments that meet their criteria,
+   Note from earlier websites: On every page: increase interaction limit for testers and use unique filter identifiers.
+5. book selected apartments,
+6. and view booking records.
+7. Use linen as the screen background and maroon for component highlights.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

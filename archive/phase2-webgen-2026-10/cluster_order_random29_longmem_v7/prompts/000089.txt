@@ -1,0 +1,26 @@
+Please implement a startup article publishing mini-program to display entrepreneurial experiences and stories. The mini-program should have functions for browsing articles, searching, collecting, and sharing. Users should be able to browse articles in different categories, search for articles of interest, collect favorite articles, and share articles on other platforms. The mini-program should also have user registration and login functions, allowing users to manage their collections and reading history. Style the layout with old lace in the background and rosy brown for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. startup article publishing mini-program
+2. display entrepreneurial experiences and stories
+3. functions for browsing articles
+4. searching
+5. collecting
+6. sharing
+7. browse articles in different categories
+8. search for articles of interest
+9. collect favorite articles
+10. share articles on other platforms
+11. user registration and login functions
+   Note from earlier websites: For the login form: bind email and password fields to state using `v-model`.
+12. manage their collections and reading history
+13. style the layout with old lace in the background and rosy brown for the interface
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

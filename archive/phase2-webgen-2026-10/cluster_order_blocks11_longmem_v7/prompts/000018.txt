@@ -1,0 +1,21 @@
+Please implement a house cleaning service website that provides cleaning services. The website should have functionalities for booking services, service inquiry, and contact us. Users should be able to browse the website, understand the details of the cleaning services, book cleaning services, check service status, and contact customer service staff by phone number and email address. Set the background to azure mist, and apply dark slate blue to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a house cleaning service website that provides cleaning services.
+2. The website should have functionalities for booking services, service inquiry, and contact us.
+3. Users should be able to browse the website, understand the details of the cleaning services, book cleaning services, check service status, and contact customer service staff by phone number and email address.
+4. Set the background to azure mist, and apply dark slate blue to components.
+5. For the booking form: use v-if in App.vue to conditionally render ContactView.
+   Note from earlier websites: For the booking form: use v-if in App.vue to conditionally render ContactView.
+
+General notes from earlier websites:
+- On every page: use a ref and v-if to manage display of different sections.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

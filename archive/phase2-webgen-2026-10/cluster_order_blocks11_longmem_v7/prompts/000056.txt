@@ -1,0 +1,26 @@
+Please implement an online learning platform for data science that provides Python data science courses. The platform should have functionalities for browsing courses, learning courses, submitting assignments, and querying grades. Users should be able to browse and select Python data science courses of interest, learn course content, submit assignments, and query their own learning grades. Use honeydew in the background layer and dark olive green for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online learning platform for data science
+2. Python data science courses
+3. browsing courses
+   Note from earlier websites: On every page: use a ref for the current page and v-if to manage sections.
+4. learning courses
+5. submitting assignments
+   Note from earlier websites: For the assignment: in 'src/views/AssignmentPage.vue', close alert after confirmation.
+6. querying grades
+   Note from earlier websites: For the grade query: search grades array for user ID and display if found.
+7. browse and select Python data science courses of interest
+8. learn course content
+9. submit assignments
+10. query their own learning grades
+11. honeydew in the background layer and dark olive green for the component layer
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

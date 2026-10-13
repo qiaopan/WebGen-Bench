@@ -1,0 +1,52 @@
+Please implement an agriculture-related website for displaying and managing agricultural information. The website should have functionalities for browsing agricultural news, viewing farm product information, and checking weather forecasts. Users should be able to browse agricultural-related news, view different types of farm product information, check local weather forecasts, and perform searches and filters. Apply theme using light cyan as background and cadet blue for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement an agriculture-related website
+2. displaying and managing agricultural information
+3. browsing agricultural news
+4. viewing farm product information
+   Note from earlier websites: For the ProductList: use @click to update selectedProduct state and render ProductDetail conditionally.
+5. checking weather forecasts
+6. browse agricultural-related news
+7. view different types of farm product information
+8. check local weather forecasts
+9. perform searches and filters
+10. apply theme using light cyan as background and cadet blue for elements
+   Note from earlier websites: On every page: apply media queries for light cyan and cadet blue elements across screen sizes.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

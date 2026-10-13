@@ -1,0 +1,42 @@
+Please implement a smart matrimonial website for users to find partners. The website should have user registration and login functionality, allowing users to create profiles, including uploading photos and filling out personal information. The website should have advanced search and filtering options, enabling users to find suitable partners based on different criteria. The website should also have messaging and chat functionality, allowing users to communicate with each other. Design the site using lemon chiffon as the background and chocolate for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and login functionality
+2. create profiles, including uploading photos and filling out personal information
+3. advanced search and filtering options
+4. messaging and chat functionality
+5. lemon chiffon as the background and chocolate for content blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,67 @@
+Please develop a domain leasing website for renting and managing domain names. The website should have functionalities for searching, leasing, renewing, and transferring domain names. Users should be able to search for, lease, renew, and transfer domain names, and view domain information and leasing records. The website should also have user management, order management, and payment management functions. Select old lace for layout background and rosy brown for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. searching domain names
+   Note from earlier websites: For the search feature: implement a search bar using v-if to toggle results display.
+2. leasing domain names
+3. renewing domain names
+4. transferring domain names
+5. viewing domain information
+6. viewing leasing records
+7. user management
+8. order management
+9. payment management
+10. old lace for layout background and rosy brown for component details
+11. searching domain names
+   Note from earlier websites: On every page: use ref for current page to manage section display.
+12. leasing domain names
+13. renewing domain names
+14. transferring domain names
+15. viewing domain information
+16. viewing leasing records
+17. user management
+18. order management
+19. payment management
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

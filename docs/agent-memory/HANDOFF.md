@@ -19,16 +19,21 @@
 - 10-11 放行前做了 31 题生成验证（只查代码，见 DECISIONS 同日条目）：脚手架 0/31，v-model-on-prop 仍出现 3 次。v9 已于 10-11 放行，排在种子 29 当前这题之后。跑完后与 v8 比较只看机制（脚手架、router 白屏、v-model 编译错次数、代码记忆建立时间与版本数），总分只作参考（运行间波动约 5 个点）。
 - **10-12：v9 停在 45 题（用户决定），队列先跑种子 29。** 原因与 v9.1 修正见 DECISIONS 同日条目：v-model 记忆因 72B 写的适用条件永远不匹配而从未注入；v9.1 让编译错误类记忆由代码判定对所有 Vue 网站适用，生成检查 3/3 不再出现 v-model 编译错。10-13 用户决定：v9.1 种子 11（只跑 Long Memory，输出 `cluster_order_blocks11_longmem_v9_1`）排在交错顺序之后、固定前缀之前（备份 `filler.conf.bak-before-v91`），以保证 10-16 组会前四个顺序实验都完成；预计种子 29 10-13 早、种子 47 10-14 中午、交错 10-15 傍晚、v9.1 约 10-16 晚。
 
-### 待办清单（2026-10-10 更新；做完一项就划掉或删掉）
-1. **种子 11 跑完后（约 10-11 早上）：** 拉取两组结果（`scripts/archive_phase2_runs.py cluster_order_blocks11_longmem_v7 cluster_order_blocks11_nomem` 归档进 git）；做完整分析（配对差与 CI、前 30/后段、脚手架/编译错/缺包逐题统计）；填论文 `tab:order` 与 PPT `order-1`；按同步规则更新。
-2. **v9 种子 11 跑完后（约 10-12～13）：** 与同顺序 v7、No Memory（及 v8 的 61 题）按题配对；检查脚手架数、各代码记忆建立时间与版本记录、是否注入 v-model 条目、缺包/编译错题数；注意运行间波动，只把机制效果当结论；写进论文第 5 章与 PPT。
-3. **种子 29、47、交错跑完后：** 同第 1 项，填 `order-2..4` 与 `tab:order`；四个顺序都完成后统计各顺序脚手架数与"缺包示例来源网站"的关系。
-4. **固定前缀跑完后（约 10-16）：** 填论文 `tab:ablation` 固定前缀一行与 PPT 消融页。
-5. **约 10-16～17 切换 32B 时：** 查 worker 日志 `SWITCH_DONE/SWITCH_FAILED`、`nvidia-smi`、第一个 32B 任务；若 `FILLER_HALT` 要处理。32B 跑完后填 `sec:stronger` 与 PPT `stronger` 页；提醒用户删除 32B 权重（73 GB，由用户执行）。
-6. **本地另一会话的未提交改动**（中英文 README、三个交接文档的 `.en.md`）处理完后：切回最新 main，重新打包 `docs/thesis_overleaf.zip`。
-7. **组会（10-16）前：** 核对 PPT 渲染（参考文献页是否溢出）、参考文献逐条核对（ACE 作者待查）。
-8. **交论文（11-16）前：** 致谢、全文通读；删除任何集群输出目录前，先注释 `filler.conf` 中指向它的行。
+### 2026-10-13：种子 29 跑完；PPT/论文同步
+- 种子 29（随机）101 题：No Memory 28.6% / v7 32.6%，配对 +4.5（CI [−2.2, 11.3]），零分 29 / 21；前 30 题 31.6 / 29.5，第 31–101 题 27.3 / 33.9。v7 有 16 个脚手架（No Memory 0），全部在"缺包"整文件示例第 19 题开始注入之后；种子 11 为 19 个、第 36 题起。种子 11、29 及 v8、v9（停止）已归档进 git（`archive/phase2-webgen-2026-10/cluster_order_*`）。分析脚本 `scripts/analyze_order_run.py`（配对差、CI、零分、脚手架数、gap 图）。
+- PPT（artifact v36）：`order-1`、`order-2` 填好并配 gap 图，`order-3/4` 标运行中，新增 `order-fix`（脚手架原因与 v8/v9/v9.1），`conclusion` 填好消融和顺序结论。论文 `tab:order` 两行、第 5 章新增顺序结果与 `sec:fix`（v8/v9/v9.1），第 7 章 RQ3。README 新增顺序表。
 
+### 待办清单（2026-10-13 重写；做完一项就删掉）
+集群队列（10-13 时）：种子 47（运行中，约 23/101，预计 10-14 中午）→ 交错（约 10-15 傍晚）→ v9.1 种子 11（只跑 Long Memory，约 10-16 晚）→ 固定前缀（约 10-17）→ 切换 32B → 32B manifest 成对（约 10-19～20）。
+1. **种子 47 跑完（10-14）：** 拉取（rsync 该两目录）→ `scripts/analyze_order_run.py cluster_order_blocks47_longmem_v7 cluster_order_blocks47_nomem --plot docs/reports/gap_order_seed47.png` → 上传图、填 PPT `order-3`、论文 `tab:order`、README 表 → 归档。
+2. **交错跑完（10-15 傍晚，组会前一晚）：** 同上，填 `order-4`；更新 `conclusion` 与论文第 5、7 章"两类顺序各 2 次"的结论；`order-fix` 表加两行脚手架数与注入起点。
+3. **组会（10-16 周五）前：** 核对 PPT 渲染（参考文献页是否溢出）、参考文献逐条核对（ACE 作者待查）、封面姓名/导师/日期。
+4. **v9.1 跑完（约 10-16 晚）：** 与同顺序 v7、No Memory、v8（61 题）、v9（45 题）按题配对；只看机制：脚手架、vue-router 白屏、v-model 编译错次数，代码记忆建立时间与版本数；填论文 `sec:fix` 的 todo 与 PPT `order-fix`。总分只作参考（运行间波动约 5 个点）。若效果明显且 32B 后作业有余量（约 10 月底），可加 v9.1 种子 29（只跑 Long Memory），由用户决定。
+5. **固定前缀跑完（约 10-17）：** 填 `tab:ablation` 固定前缀行与 PPT `abl`。
+6. **切换 32B 时（约 10-17）：** 查 worker 日志 `SWITCH_DONE/SWITCH_FAILED`、`nvidia-smi`、第一个 32B 任务；若 `FILLER_HALT` 要处理。跑完后填 `sec:stronger` 与 PPT `stronger`；提醒用户删除 32B 权重（73 GB，由用户执行）。
+7. **作业 23385 约 11-05 到期**；之前把所有运行拉回本地并归档。删除任何集群输出目录前，先注释 `filler.conf` 中指向它的行。
+8. **本地另一会话的未提交改动**（中英文 README、`.en.md`）处理完后：切回最新 main，重新打包 `docs/thesis_overleaf.zip`（本机无 TeX，论文在 Overleaf 编译）。
+9. **交论文（11-16）前：** 致谢、全文通读、清掉所有 `\todo`。
 
 ### 2026-10-10：种子 11 后段没有优势的原因；v8 验证与排队
 - **现象：** 种子 11（领域挨着）79 题时 v7 33.7% vs No Memory 28.3%（配对 +4.5，CI [−3.0, 11.7]）；同一批题在 manifest 顺序下 v7 41.0%、No Memory r1 29.0%。No Memory 两次很稳，v7 换顺序掉约 7 个点。第 31–67 题 v7 无优势（29.9% vs 31.4%）。

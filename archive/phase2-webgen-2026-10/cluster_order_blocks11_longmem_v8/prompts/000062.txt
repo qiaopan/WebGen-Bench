@@ -1,0 +1,22 @@
+Please implement a DMV practice test website to help users practice for their driver's license exam. The website should have features such as a practice question bank, simulated exams, and error analysis. Users should be able to select practice questions, take simulated exams, and view error analysis and exam scores. Set page background to floral white; color all components with dark goldenrod.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. DMV practice test website
+2. practice question bank
+   Note from earlier websites: For the practice question bank: Use `ref` state and `v-if` to render `AuthView` based on `currentView`.
+3. simulated exams
+4. error analysis
+5. exam scores
+6. select practice questions
+7. take simulated exams
+8. view error analysis and exam scores
+9. set page background to floral white; color all components with dark goldenrod
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

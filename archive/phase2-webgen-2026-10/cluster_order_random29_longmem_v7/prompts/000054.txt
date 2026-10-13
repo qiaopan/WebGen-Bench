@@ -1,0 +1,25 @@
+Please implement a high-performance sports recruitment platform that connects athletes and sports organizations. The platform should have functionalities for athlete registration, job posting, job application, and message notification. Users should be able to log in, browse job listings, apply for jobs of interest, and receive relevant notifications. Sports organizations should be able to post jobs, and communicate with athletes. Set ghost white as the body background and use slate gray for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. high-performance sports recruitment platform
+2. athlete registration
+3. job posting
+   Note from earlier websites: For the job posting form: in 'JobPosting.vue', use @submit to update state and show confirmation.
+4. job application
+   Note from earlier websites: For the job application form: in 'JobApplication.vue', use @submit to update state and show confirmation.
+5. message notification
+6. browse job listings
+7. apply for jobs of interest
+8. receive relevant notifications
+9. sports organizations should be able to post jobs
+10. communicate with athletes
+11. ghost white as the body background and use slate gray for the UI
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

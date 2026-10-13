@@ -1,0 +1,23 @@
+Please implement a text-based strategy browser game where players can choose a race, manage resources, upgrade, and battle. The game should have multiple pages, including the base page, ranking page, store, train page, workers page, upgrades page, bank page, messages page, and reports page. Players can choose from four races: Humans, Dragonborns, Elves, and Dwarfs, each with unique attributes. Players can manage resources, including gold, iron, wood, and wheat, and can upgrade their city, workers, and soldiers. Design the site using seashell as the background and crimson for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. text-based strategy browser game
+2. base page
+   Note from earlier websites: On every page: ensure all interactive features manage state with a ref.
+3. ranking page
+4. store
+5. train page
+6. workers page
+7. upgrades page
+8. bank page
+9. messages page
+10. reports page
+11. choose from four races: Humans, Dragonborns, Elves, and Dwarfs, each with unique attributes
+12. manage resources, including gold, iron, wood, and wheat
+13. upgrade their city, workers, and soldiers
+14. seashell as the background and crimson for content blocks
+
+General notes from earlier websites:
+- For the main application: use a ref for current view and state, update on child events.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

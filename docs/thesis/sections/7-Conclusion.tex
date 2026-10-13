@@ -6,7 +6,7 @@
 
 \paragraph{\ref{rq2}} The small generator used verified code fragments; a requirement checklist alone reduced whole-site failures but added only 3.4 points of accuracy (not significant), while memory added a significant 8.1 points on top of it; it largely ignored textual lessons, and generic textual lessons became harmful as they accumulated. Fragments must be partial: a complete file was copied as a finished answer. \todo{Add checklist-only ablation result.}
 
-\paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. \todo{Domains adjacent vs mixed orders (two runs each).}
+\paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. In two shuffled orders the gain falls to about 4.5 points and is no longer significant, but it is the same with domains adjacent (seed 11) and mixed (seed 29), so it is not a curriculum effect; most of the loss traces to one code memory whose whole-file example made the generator return the scaffold. \todo{Seed 47 and interleaved order.}
 
 \section{Future Work}
 Beyond the fixed-prefix ablation (\Cref{sec:ablation}) and the stronger generator (\Cref{sec:stronger}), one experiment would address the main remaining question:

@@ -1,0 +1,20 @@
+Please implement a whistleblower secrets/awareness website to expose truths about business and society. The website should have an anonymous reporting feature, where users can submit their insights and evidence. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions. The website should have a search function, where users can search for specific topics and keywords. The website should also have a news and blog section, where the latest news and articles are published. Use a azure background and apply midnight blue to the UI components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a whistleblower secrets/awareness website to expose truths about business and society.
+2. The website should have an anonymous reporting feature, where users can submit their insights and evidence.
+   Note from earlier websites: For the anonymous reporting: use v-if to toggle visibility based on user action.
+3. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions.
+4. The website should have a search function, where users can search for specific topics and keywords.
+   Note from earlier websites: For the search function: implement a search bar with a handler for queries.
+5. The website should also have a news and blog section, where the latest news and articles are published.
+6. Use a azure background and apply midnight blue to the UI components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

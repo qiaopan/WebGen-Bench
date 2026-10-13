@@ -1,0 +1,51 @@
+Please implement an advanced to-do list web application where users can create, edit, and delete to-do items. The application should have functionalities for adding new tasks, marking tasks as completed, deleting tasks, filtering tasks, and searching tasks. Users should be able to browse all to-do items, create new tasks, edit existing tasks, and delete unnecessary tasks. Set all pages to have a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create, edit, and delete to-do items
+2. adding new tasks
+3. marking tasks as completed
+4. deleting tasks
+5. filtering tasks
+   Note from earlier websites: For the filter options: use unique v-if identifiers for each filter to update the list.
+6. browse all to-do items
+7. create new tasks
+8. edit existing tasks
+9. delete unnecessary tasks
+10. lavender background and indigo components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

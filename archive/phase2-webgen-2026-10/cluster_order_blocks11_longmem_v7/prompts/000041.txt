@@ -1,0 +1,57 @@
+Please implement an online trading website for bidding and trading. The website should have functionalities for bidding and trading, allowing users to browse trading opportunities, place orders, manage their trading accounts, and view their trading history. Set the background color to lemon chiffon and the component color to chocolate.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an online trading website for bidding and trading.
+2. The website should have functionalities for bidding and trading,
+3. allowing users to browse trading opportunities,
+   Note from earlier websites: For the trading opportunities: use `v-for` to display the list with current status.
+4. place orders,
+5. manage their trading accounts,
+6. and view their trading history.
+7. Set the background color to lemon chiffon and the component color to chocolate.
+   Note from earlier websites: For the background: set color to 'lemon chiffon' and component to 'chocolate' in CSS.
+8. On every page: use a ref with v-if to manage display of different sections.
+   Note from earlier websites: On every page: use a ref with v-if to manage display of different sections.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

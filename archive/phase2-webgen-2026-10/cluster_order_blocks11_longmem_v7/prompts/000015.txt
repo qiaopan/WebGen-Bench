@@ -1,0 +1,29 @@
+Please implement a website for a clinical office to display office information and services. The website should have basic pages, including a homepage, about us, services, and contact us. Users should be able to browse the website, learn about the office's information, view the services provided, and contact the office through the contact page. The website should also have a simple navigation menu to help users quickly find the information they need. Style all pages with a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for a clinical office
+2. display office information and services
+3. basic pages
+4. homepage
+   Note from earlier websites: On every page: use a ref for current page and 'v-if' to manage sections.
+5. about us
+6. services
+7. contact us
+   Note from earlier websites: For the ContactView: import and render it with 'v-if' when 'contact' view is selected.
+8. Users should be able to browse the website
+9. learn about the office's information
+10. view the services provided
+11. contact the office through the contact page
+12. simple navigation menu
+13. help users quickly find the information they need
+14. Style all pages with a light cyan background and cadet blue components
+   Note from earlier websites: For component styles: ensure all match cadet blue as specified.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

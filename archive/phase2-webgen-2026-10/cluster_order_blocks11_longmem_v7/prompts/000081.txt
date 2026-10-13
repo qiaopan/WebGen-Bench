@@ -1,0 +1,58 @@
+Please implement a cross-platform HTML editor with live preview and code editing functionality. The editor should allow users to switch between HTML code and text editing modes and automatically convert to HTML. The editor should have project management capabilities, allowing users to organize multiple HTML documents, images, and other files. The editor should also have features such as syntax highlighting, saving template pages, and a basic user guide. Set the background color to honeydew and the component color to dark olive green.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. cross-platform HTML editor
+   Note from earlier websites: On every page: use a ref and v-if to manage display of sections correctly.
+2. live preview and code editing functionality
+   Note from earlier websites: For the editor: implement live preview and code editing with HTML-text switching.
+3. switch between HTML code and text editing modes
+4. automatically convert to HTML
+5. project management capabilities
+6. organize multiple HTML documents, images, and other files
+7. syntax highlighting
+8. saving template pages
+9. basic user guide
+10. background color to honeydew and the component color to dark olive green
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

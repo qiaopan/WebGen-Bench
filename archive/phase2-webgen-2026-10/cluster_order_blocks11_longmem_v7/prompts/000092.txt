@@ -1,0 +1,17 @@
+Please implement a skill sharing platform for showcasing personal skills and connecting with others. The platform should allow users to create profiles, add skills and certifications, and search for other users based on their qualifications. Users should be able to browse other users' profiles, view their skills and certifications, and contact them. The platform should also have a search feature that allows users to find other users based on their skills and certifications. Apply cornsilk for the layout background and peru for interactive elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a skill sharing platform for showcasing personal skills and connecting with others.
+2. The platform should allow users to create profiles
+3. add skills and certifications
+4. search for other users based on their qualifications
+5. Users should be able to browse other users' profiles
+6. view their skills and certifications
+7. contact them
+8. The platform should also have a search feature that allows users to find other users based on their skills and certifications
+   Note from earlier websites: For the search feature: use a ref for current page and v-if to manage content display.
+
+General notes from earlier websites:
+- On every page: apply cornsilk for layout background and peru for interactive elements.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -69,10 +69,20 @@ Each cell reports functional accuracy / appearance / zero-score tasks. The learn
 
 The checklist-only ablation is complete: No Memory / checklist-only / v7 achieve 28.5% / 31.8% / 40.0%. Checklist-only has a paired +3.4pp versus No Memory (CI includes zero), while v7 has +8.1pp versus checklist-only. Thus, the checklist helps, but the larger gain comes from memory.
 
+### Task order (in progress)
+
+| Order | No Memory | v7 | Paired diff. (95% CI) | Zero-score NM / v7 |
+|---|---:|---:|---:|---:|
+| Manifest (domains adjacent, not paired in time) | 28.5% | 40.0% | +11.5 [6.0, 16.9] | 30 / 13 |
+| Seed 11 (shuffled blocks, domains adjacent) | 27.9% | 33.1% | +4.4 [−1.9, 10.6] | 29 / 21 |
+| Seed 29 (random, domains mixed) | 28.6% | 32.6% | +4.5 [−2.2, 11.3] | 29 / 21 |
+
+Seed 47 and the interleaved order are running. In both shuffled orders the gain shrinks and is not significant, but it is the same with domains adjacent and mixed. Most of the loss comes from Vite scaffold outputs (19 and 16 tasks, none for No Memory), all after a missing-package code memory whose example was a whole `App.vue` from another site began to be injected. Fixes are tested on seed 11 only (v8: fragment examples, v9/v9.1: further code-pool fixes; see `docs/agent-memory/DECISIONS.md`); the other experiments keep the frozen v7. Gap curves: [`docs/reports/gap_order_seed11.png`](docs/reports/gap_order_seed11.png), [`docs/reports/gap_order_seed29.png`](docs/reports/gap_order_seed29.png).
+
 ## Current limitations and experiments
 
 - The main v7 result is one run in the original domain-block order.
-- The ongoing order-robustness experiment runs Long Memory and No Memory task-by-task in ABBA order under shuffled schedules.
+- Order robustness: Long Memory and No Memory run task-by-task in ABBA order under shuffled schedules; two of four orders are done (see above). Two runs of the same Long Memory version can differ by about five points in total accuracy.
 - The generator and framework are currently fixed to WebGen-LM-7B and Bolt.diy.
 - A fixed-prefix ablation separates accumulated memory from a code prefix present from task one.
 - A stronger generator comparison is planned with WebGen-LM-32B under the same Bolt, memory, and evaluation pipeline.

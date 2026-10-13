@@ -1,0 +1,56 @@
+Please implement a fishing contest website to manage and display fishing contest information. The website should have functionalities for posting contest announcements, displaying contest results, and showcasing contest photos. Users should be able to browse contest information, register for contests, and view contest results. Set primary background to mint cream and elements to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. posting contest announcements
+2. displaying contest results
+   Note from earlier websites: For contest results: use `v-if` to search and display results for the entered contest ID.
+3. showcasing contest photos
+4. browse contest information
+   Note from earlier websites: On every page: use a ref and `v-if` to manage display of different sections.
+5. register for contests
+   Note from earlier websites: For registration: close alert after showing confirmation in 'ContestRegistrationPage.vue'.
+6. view contest results
+7. set primary background to mint cream and elements to teal
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

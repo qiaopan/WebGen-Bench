@@ -1,0 +1,47 @@
+Please implement a cross-platform HTML editor with live preview and code editing functionality. The editor should allow users to switch between HTML code and text editing modes and automatically convert to HTML. The editor should have project management capabilities, allowing users to organize multiple HTML documents, images, and other files. The editor should also have features such as syntax highlighting, saving template pages, and a basic user guide. Set the background color to honeydew and the component color to dark olive green.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. cross-platform HTML editor
+2. live preview
+   Note from earlier websites: For the live preview: Use `v-if` and `ref` to conditionally render `AuthView` based on `currentView` state.
+3. code editing functionality
+4. switch between HTML code and text editing modes
+5. automatically convert to HTML
+6. project management capabilities
+7. organize multiple HTML documents, images, and other files
+8. syntax highlighting
+9. saving template pages
+10. basic user guide
+11. Set the background color to honeydew and the component color to dark olive green
+   Note from earlier websites: On every page: Set background to honeydew and component color to dark olive green.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue component navigation. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">Home</button>
+      <button @click="currentView = 'about'" :class="{ active: currentView === 'about' }">About</button>
+      <button @click="currentView = 'products'" :class="{ active: currentView === 'products' }">Products</button>
+      <button @click="currentView = 'news'" :class="{ active: currentView === 'news' }">News</button>
+      <button @click="currentView = 'contact'" :class="{ active: currentView === 'contact' }">Contact</button>
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <AboutView v-if="currentView === 'about'" />
+      <ProductsView v-if="currentView === 'products'" />
+      <NewsView v-if="currentView === 'news'" />
+      <ContactView v-if="currentView === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+
+const totalVotes = computed(() => {
+  return props.poll.results.reduce((a, b) => a + b, 0)
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

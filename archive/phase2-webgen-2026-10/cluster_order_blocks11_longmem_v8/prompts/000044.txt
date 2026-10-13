@@ -1,0 +1,20 @@
+Please implement a supply chain traceability website for tracking and verifying the origin and circulation of products with the unique product IDs. The website should have functionalities for product registration, tracking, inquiry, and verification. Users should be able to register products, track the circulation path of products, query the current status of products, and verify the authenticity of products. The website should also have data statistics and analysis functions to help users understand the operation of the supply chain. Define the background as misty rose and components as firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a supply chain traceability website for tracking and verifying the origin and circulation of products with the unique product IDs.
+2. The website should have functionalities for product registration, tracking, inquiry, and verification.
+3. Users should be able to register products, track the circulation path of products, query the current status of products, and verify the authenticity of products.
+4. The website should also have data statistics and analysis functions to help users understand the operation of the supply chain.
+5. Define the background as misty rose and components as firebrick.
+
+General notes from earlier websites:
+- For product registration: Use `ref` state and `v-if` to conditionally render `AuthView` for secure product entry.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

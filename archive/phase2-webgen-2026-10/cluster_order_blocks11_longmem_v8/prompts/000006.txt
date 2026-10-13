@@ -1,0 +1,16 @@
+Please implement a solar dashboard to display real-time and historical solar data. The dashboard should have functionalities for real-time data display, historical data query, and chart analysis. Users should be able to view real-time data such as solar power generation, power consumption, and battery percentage, and query historical data to view trends. Configure the background color to honeydew, with components using dark olive green.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a solar dashboard to display real-time and historical solar data.
+2. The dashboard should have functionalities for real-time data display, historical data query, and chart analysis.
+3. Users should be able to view real-time data such as solar power generation, power consumption, and battery percentage,
+   Note from earlier websites: For real-time data: Use `v-if` and `ref` to render components based on `currentView` state.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

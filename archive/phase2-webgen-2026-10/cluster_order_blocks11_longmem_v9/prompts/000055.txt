@@ -1,0 +1,54 @@
+Please implement a website for the Global Institute of Information Security to display courses and provide online enrollment functionality. The website should have functionalities such as course catalog, chatbot integration, contact form, and certification pathways. Users should be able to browse courses, view course details, enroll online, and contact the institute. Style all pages with a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. course catalog
+2. chatbot integration
+3. contact form
+   Note from earlier websites: For the contact form: implement @submit handler to show confirmation on success.
+4. certification pathways
+5. browse courses
+6. view course details
+7. enroll online
+   Note from earlier websites: For the enrollment form: implement @submit handler to show confirmation on success.
+8. contact the institute
+9. lavender background and indigo components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

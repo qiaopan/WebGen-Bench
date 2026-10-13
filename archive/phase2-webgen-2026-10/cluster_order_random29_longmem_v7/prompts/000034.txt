@@ -1,0 +1,54 @@
+Please implement a real estate website to display property information and provide search functionality. The website should have features such as property listings, property details, search, and filtering. Users should be able to browse property listings, view property details, use the search function to find specific properties, and filter properties based on certain conditions. Assign alice blue as the background color and apply steel blue to all elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. real estate website
+2. display property information
+3. provide search functionality
+4. property listings
+   Note from earlier websites: For property listings: implement a Vue component with search and filter.
+5. property details
+6. search
+7. filtering
+   Note from earlier websites: For the filtering feature: use unique v-if identifiers for filter elements.
+8. browse property listings
+9. view property details
+10. use the search function to find specific properties
+11. filter properties based on certain conditions
+12. assign alice blue as the background color and apply steel blue to all elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

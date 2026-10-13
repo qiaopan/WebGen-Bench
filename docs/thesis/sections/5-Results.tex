@@ -141,20 +141,38 @@ In every order, Long Memory and No Memory are run as pairs on each task, alterna
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments (single run of each arm per order). \todo{Fill in when complete.}}
+\caption{Task-order experiments (single run of each arm per order). \todo{Fill in seed 47 and interleaved when complete.}}
 \label{tab:order}
 \begin{tabular}{llcccc}
 \toprule
 Kind & Order & NM acc. & LM acc. & Paired diff. (95\% \gls{ci}) & Zero NM / LM \\
 \midrule
 Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & $+11.5$ [6.0, 16.9] & 30 / 13 \\
-Adjacent & Shuffled blocks (seed 11) & -- & -- & -- & -- \\
+Adjacent & Shuffled blocks (seed 11) & 27.9 & 33.1 & $+4.4$ [$-1.9$, 10.6] & 29 / 21 \\
 Adjacent & Shuffled blocks (seed 47) & -- & -- & -- & -- \\
-Mixed & Random (seed 29) & -- & -- & -- & -- \\
+Mixed & Random (seed 29) & 28.6 & 32.6 & $+4.5$ [$-2.2$, 11.3] & 29 / 21 \\
 Mixed & Interleaved & -- & -- & -- & -- \\
 \bottomrule
 \multicolumn{6}{l}{\footnotesize \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.}
 \end{tabular}
 \end{table}
 
-\todo{Interpretation: a gain in both kinds of order indicates a general benefit; a gain only with adjacent domains indicates a curriculum effect; a clearly smaller gain in the interleaved order points to cross-domain retrieval as a bottleneck.}
+The first two shuffled orders give almost the same result (\Cref{tab:order}): Long Memory leads by about 4.5 points, with zero-score tasks reduced from 29 to 21, but neither confidence interval excludes zero, and the gain is far smaller than in the manifest order. No Memory is stable across its three runs (27.9--28.6\%), so the change is on the Long Memory side. Mixing domains does not remove the gain: the random order (seed 29) matches the shuffled-blocks order (seed 11), and from task 31 onwards Long Memory leads by 6.6 points in the random order (33.9\% vs 27.3\%). A curriculum effect from same-domain neighbours is therefore not the main source of the benefit.
+
+Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}). Long Memory returned the unmodified Vite scaffold on 19 tasks in seed 11 and 16 in seed 29, against none for No Memory in either order and two in the manifest order. Every scaffold occurred after the missing-package code memory, whose example was a complete \texttt{App.vue} of another site, began to be injected (task 36 in seed 11, task 19 in seed 29). This is the failure the v8 change targets (\Cref{sec:fix}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/gap_order_seed11.png}\\[4pt]
+\includegraphics[width=\textwidth]{figures/gap_order_seed29.png}
+\caption{Rolling 10-task mean of the per-task accuracy gap (v7 minus No Memory) by execution order, for seed 11 (domains adjacent, top) and seed 29 (random, bottom). The drop after task 45 in seed 11 coincides with the scaffold outputs.}
+\label{fig:order-gap}
+\end{figure}
+
+\todo{Seed 47 and interleaved order: whether the gain holds in both kinds of order and whether the interleaved order is clearly worse.}
+
+\subsection{Fixing the Exposed Failure}
+\label{sec:fix}
+We tested the fix on seed 11 without changing the frozen v7 used for all other experiments. v8 stores only a verified fragment for missing-package entries and rebuilds the missing-import example as new failures accrue. On the 61 tasks v8 completed, it removed all scaffolds; on the seven tasks where v7 had returned the scaffold its accuracy rose from 3.6\% to 45.2\%. On the other 54 tasks v8 scored 31.8\% against 36.9\% for v7, but 51 of these 54 prompts already differed before the code pool (the memory model decomposes requirements and writes reflections differently in each run, so the two memory chains diverge from the first task); two runs of the same Long Memory version can therefore differ by about five points in total accuracy. We therefore judge versions by mechanism counts rather than total accuracy.
+
+v8 was stopped because its missing-import example alternated between two versions. v9 replaces the example only when the new one covers strictly more of the needed functions, creates a code memory for whole-site failures (missing package, compile error) after one occurrence, raises the slot limit from two to three, injects at most one missing-package entry per task, and rejects repair examples that reduce to a bare wrapper. A generation check on 31 seed-11 tasks (the 19 scaffold tasks, four whole-site failures and eight high-scoring tasks, code inspected without evaluation) produced no scaffold. The full v9 run was stopped after 45 tasks (36.1\% vs 37.9\% for v7 on those tasks, paired difference $-3.0$, 95\% CI [$-11.3$, 5.8]): its v-model code memory was never injected, because the memory model wrote the condition as requirements ``with props that need to be updated locally'', which no requirement states. v9.1 treats compile-error entries, like missing imports, as applicable to every Vue site; on the three tasks v9 lost to this error, regeneration no longer produced it. \todo{v9.1 full run on seed 11.}

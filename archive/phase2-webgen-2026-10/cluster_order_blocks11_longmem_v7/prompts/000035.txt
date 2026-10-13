@@ -1,0 +1,57 @@
+Please implement a cryptocurrency escrow system for secure cryptocurrency transactions. Buyers should be able to browse and select sellers' cryptocurrency products, conduct transactions, and deposit cryptocurrencies into an escrow account. Sellers should be able to view and manage their products and transaction records. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities. Initialize the background color with light gray and component color with dark red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a cryptocurrency escrow system for secure cryptocurrency transactions.
+   Note from earlier websites: For the escrow system: implement transaction confirmation, cryptocurrency release, and dispute resolution.
+2. Buyers should be able to browse and select sellers' cryptocurrency products
+3. conduct transactions
+4. and deposit cryptocurrencies into an escrow account.
+5. Sellers should be able to view and manage their products and transaction records.
+6. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities.
+7. Initialize the background color with light gray and component color with dark red.
+
+General notes from earlier websites:
+- On every page: use a ref for current page and v-if to manage display of different sections.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

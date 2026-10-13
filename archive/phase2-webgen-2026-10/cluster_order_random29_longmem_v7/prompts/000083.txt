@@ -1,0 +1,54 @@
+Please implement a detective agency case management app for managing cases and tracking work hours. The app should have functionalities for real-time reporting, data collection and storage, work hours tracking, estimated expense sheet generation, and service assignment sheet. Users should be able to browse case information, submit real-time reports, log work hours, and view estimated expense sheets and service assignment sheets. Apply beige as the background; style all components with saddle brown.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. detective agency case management app
+2. managing cases
+3. tracking work hours
+4. real-time reporting
+5. data collection and storage
+6. work hours tracking
+7. estimated expense sheet generation
+8. service assignment sheet
+9. browse case information
+10. submit real-time reports
+11. log work hours
+12. view estimated expense sheets
+13. view service assignment sheets
+14. beige as the background; style all components with saddle brown
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

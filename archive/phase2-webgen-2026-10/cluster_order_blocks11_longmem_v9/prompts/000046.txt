@@ -1,0 +1,64 @@
+Please implement a hospital management website for managing hospital finances, reports, inventory, and patient information. The website should have financial management functionality, including collecting patient fees and managing hospital finances. The reporting functionality should include inventory reports, patient reports, and financial reports. Employees should be able to submit daily reports to superiors, including detailed information about daily activities. Pharmacy management should include inventory management of medicines. Patient electronic files should include patient name, date of visit, diagnosis, and comments. The website should also have claim formulation, laboratory management, and theater management. Configure the background color to peach puff, with components using indian red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. financial management functionality
+2. collecting patient fees
+3. managing hospital finances
+4. inventory reports
+5. patient reports
+6. financial reports
+7. employees should be able to submit daily reports to superiors
+   Note from earlier websites: For daily reports: implement a submit handler with @submit to show a confirmation message.
+8. detailed information about daily activities
+9. pharmacy management
+10. inventory management of medicines
+11. patient electronic files
+12. patient name
+13. date of visit
+14. diagnosis
+15. comments
+16. claim formulation
+17. laboratory management
+18. theater management
+19. configure the background color to peach puff, with components using indian red
+   Note from earlier websites: On every page: set the background color to peach puff using the style attribute.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

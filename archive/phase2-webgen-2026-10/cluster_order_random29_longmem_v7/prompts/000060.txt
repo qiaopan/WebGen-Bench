@@ -1,0 +1,56 @@
+Please implement an adult vocabulary learning website that includes a variety of quizzes and word games, such as crossword puzzles, unjumble letters, finding synonyms and antonyms, flashcards, and fill-in-the-blank. The website should have a dashboard that displays a progress summary. A set of 10 new words should be taught every week, and users should be able to choose an avatar and play a simple game while waiting in the waiting room. The website should include a home page, 5 activity pages, a dashboard, and blog pages. Assign light gray to body backgrounds and dark red to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. adult vocabulary learning website
+2. a variety of quizzes and word games
+3. crossword puzzles
+4. unjumble letters
+5. finding synonyms and antonyms
+6. flashcards
+7. fill-in-the-blank
+8. a dashboard that displays a progress summary
+9. 10 new words taught every week
+10. users should be able to choose an avatar
+11. play a simple game while waiting in the waiting room
+12. a home page
+13. 5 activity pages
+14. a dashboard
+15. blog pages
+16. light gray to body backgrounds and dark red to main components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,48 @@
+Please implement a personal portfolio website to showcase design works. The website should have functionalities for showcasing works about the designer, and contact information. Users should be able to browse the designer's portfolio, learn about the designer's background and experience, and get in touch with the designer through contact information. Configure your theme with peach puff as background and indian red as component color.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a personal portfolio website to showcase design works.
+2. The website should have functionalities for showcasing works about the designer, and contact information.
+3. Users should be able to browse the designer's portfolio, learn about the designer's background and experience, and get in touch with the designer through contact information.
+4. Configure your theme with peach puff as background and indian red as component color.
+
+General notes from earlier websites:
+- For the contact form: use `v-if` in 'ContactPage.vue' to show a confirmation after submission.
+- For the theme: set peach puff background and indian red component color.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

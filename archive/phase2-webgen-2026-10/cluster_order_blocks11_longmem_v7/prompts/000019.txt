@@ -1,0 +1,20 @@
+Please create a software solutions website to provide information to prospective customers. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information. Configure all backgrounds with misty rose and all components with firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please create a software solutions website to provide information to prospective customers.
+2. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc.
+3. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging.
+4. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information.
+   Note from earlier websites: For the search handler: implement it in the parent component using `v-for` to render search results.
+   Note from earlier websites: For the 'ContactView': use 'v-if' in 'App.vue' to conditionally render based on view state.
+5. Configure all backgrounds with misty rose and all components with firebrick.
+   Note from earlier websites: On every page: ensure all backgrounds are misty rose and components firebrick to maintain consistent styling.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

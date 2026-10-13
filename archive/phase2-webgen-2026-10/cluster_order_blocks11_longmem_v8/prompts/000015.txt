@@ -1,0 +1,24 @@
+Please implement a website for a clinical office to display office information and services. The website should have basic pages, including a homepage, about us, services, and contact us. Users should be able to browse the website, learn about the office's information, view the services provided, and contact the office through the contact page. The website should also have a simple navigation menu to help users quickly find the information they need. Style all pages with a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. homepage
+2. about us
+3. services
+4. contact us
+5. simple navigation menu
+   Note from earlier websites: For the navigation: in `App.vue`, include links to all basic pages for easy access.
+6. light cyan background and cadet blue components
+7. browse the website
+   Note from earlier websites: On every page: use `v-if` with `ref` to conditionally render `AuthView` based on `currentView`.
+8. learn about the office's information
+9. view the services provided
+10. contact the office through the contact page
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

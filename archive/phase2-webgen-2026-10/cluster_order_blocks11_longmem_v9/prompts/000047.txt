@@ -1,0 +1,62 @@
+Please implement an e-government system for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. The system should have functionalities for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. Users should be able to browse related information, submit applications, approve, query status, and perform related operations. The system should also include functions such as leave, middle-level cadres leaving Shenzhen, attendance, and "five powers" management, which can design and circulate corresponding forms and processes. Implement light pink for the page background and medium violet red for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. office management
+2. infrastructure management
+3. procurement management
+4. personnel management
+5. financial management
+6. decision-making management
+7. browse related information
+8. submit applications
+   Note from earlier websites: For the application form: Use `v-if` and a ref to show a confirmation on successful submission.
+9. approve
+10. query status
+11. perform related operations
+12. leave
+13. middle-level cadres leaving Shenzhen
+14. attendance
+15. "five powers" management
+   Note from earlier websites: For five powers management: Implement a form submission handler with a visible confirmation.
+16. design and circulate corresponding forms and processes
+17. light pink for the page background and medium violet red for the elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

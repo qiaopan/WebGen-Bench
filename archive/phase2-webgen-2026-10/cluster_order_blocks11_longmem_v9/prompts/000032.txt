@@ -1,0 +1,54 @@
+Please implement a whistleblower secrets/awareness website to expose truths about business and society. The website should have an anonymous reporting feature, where users can submit their insights and evidence. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions. The website should have a search function, where users can search for specific topics and keywords. The website should also have a news and blog section, where the latest news and articles are published. Use a azure background and apply midnight blue to the UI components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a whistleblower secrets/awareness website to expose truths about business and society.
+2. The website should have an anonymous reporting feature, where users can submit their insights and evidence.
+   Note from earlier websites: For the anonymous reporting: Implement a submit handler with a confirmation message using @submit.
+3. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions.
+4. The website should have a search function, where users can search for specific topics and keywords.
+5. The website should also have a news and blog section, where the latest news and articles are published.
+6. Use a azure background and apply midnight blue to the UI components.
+   Note from earlier websites: For the UI components: Apply midnight blue and add a dynamic element visible on page render.
+
+General notes from earlier websites:
+- On every page: Use a ref for state and v-if for conditional rendering to avoid common pitfalls.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

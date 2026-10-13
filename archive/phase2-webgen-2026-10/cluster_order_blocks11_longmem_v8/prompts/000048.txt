@@ -1,0 +1,40 @@
+Please implement a time attendance system to record employee attendance. The system should have functionalities for employee clocking in and out, and viewing attendance records. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time. Administrators should be able to view all employees' attendance records, perform statistics, and analysis. Specify papaya whip as the base color and dark orange for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a time attendance system to record employee attendance.
+2. The system should have functionalities for employee clocking in and out, and viewing attendance records.
+3. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time.
+   Note from earlier websites: For employee clocking: Use `v-if` and `ref` to render clock in/out based on `currentView` state.
+4. Administrators should be able to view all employees' attendance records, perform statistics, and analysis.
+5. Specify papaya whip as the base color and dark orange for all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue component navigation. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">Home</button>
+      <button @click="currentView = 'about'" :class="{ active: currentView === 'about' }">About</button>
+      <button @click="currentView = 'products'" :class="{ active: currentView === 'products' }">Products</button>
+      <button @click="currentView = 'news'" :class="{ active: currentView === 'news' }">News</button>
+      <button @click="currentView = 'contact'" :class="{ active: currentView === 'contact' }">Contact</button>
+    <main class="main-content">
+      <HomeView v-if="currentView === 'home'" />
+      <AboutView v-if="currentView === 'about'" />
+      <ProductsView v-if="currentView === 'products'" />
+      <NewsView v-if="currentView === 'news'" />
+      <ContactView v-if="currentView === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+
+const totalVotes = computed(() => {
+  return props.poll.results.reduce((a, b) => a + b, 0)
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,19 @@
+Please implement a website for a solar company to display company information and products. The website should have functionalities for company introduction, product showcase, news updates, and contact us. Users should be able to browse the company's history, mission, and values, view detailed product information, learn about the company's latest news and events, and contact the company through the contact page with name, email and message. Use lemon chiffon in the background layer and chocolate for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for a solar company to display company information and products.
+2. The website should have functionalities for company introduction, product showcase, news updates, and contact us.
+3. Users should be able to browse the company's history, mission, and values, view detailed product information, learn about the company's latest news and events, and contact the company through the contact page with name, email and message.
+4. Use lemon chiffon in the background layer and chocolate for the component layer.
+
+General notes from earlier websites:
+- For the contact us: use `v-if` with `ref` to conditionally render the form based on user interaction.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activePrize = ref<number | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

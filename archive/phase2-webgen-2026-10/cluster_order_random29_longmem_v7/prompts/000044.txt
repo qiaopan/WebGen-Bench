@@ -1,0 +1,53 @@
+Please implement a supply chain traceability website for tracking and verifying the origin and circulation of products with the unique product IDs. The website should have functionalities for product registration, tracking, inquiry, and verification. Users should be able to register products, track the circulation path of products, query the current status of products, and verify the authenticity of products. The website should also have data statistics and analysis functions to help users understand the operation of the supply chain. Define the background as misty rose and components as firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. supply chain traceability website for tracking and verifying the origin and circulation of products with the unique product IDs
+2. functionalities for product registration
+   Note from earlier websites: For product registration: use @click in DataAnalysisOptions to update selectedAnalysis and render AnalysisResults.
+3. tracking
+4. inquiry
+5. verification
+6. Users should be able to register products
+7. track the circulation path of products
+8. query the current status of products
+9. verify the authenticity of products
+10. data statistics and analysis functions
+11. help users understand the operation of the supply chain
+12. Define the background as misty rose and components as firebrick
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

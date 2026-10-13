@@ -1,0 +1,48 @@
+Please implement a modern diagram maker website for creating and editing diagrams. The website should have functionalities for creating new diagrams, editing existing diagrams, adding and removing diagram elements, and adjusting layout and style. Users should be able to choose from different diagram types, such as flowcharts, organizational charts, and mind maps, and use a drag-and-drop interface to add and arrange diagram elements. Select ghost white for layout background and slate gray for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. modern diagram maker website
+2. creating new diagrams
+3. editing existing diagrams
+4. adding and removing diagram elements
+5. adjusting layout and style
+6. different diagram types
+7. drag-and-drop interface
+8. ghost white for layout background and slate gray for component details
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,45 @@
+Please implement a time attendance system to record employee attendance. The system should have functionalities for employee clocking in and out, and viewing attendance records. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time. Administrators should be able to view all employees' attendance records, perform statistics, and analysis. Specify papaya whip as the base color and dark orange for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a time attendance system to record employee attendance.
+2. The system should have functionalities for employee clocking in and out, and viewing attendance records.
+3. Employees should be able to clock in and out, and view their own attendance records, including attendance time and absence time.
+4. Administrators should be able to view all employees' attendance records, perform statistics, and analysis.
+5. Specify papaya whip as the base color and dark orange for all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import SurveyForm from './components/SurveyForm.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
+
+const activeTab = ref('survey')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Women's Health Survey</h1>
+      <nav>
+        <button @click="activeTab = 'survey'">Take Survey</button>
+        <button @click="activeTab = 'admin'">Admin Dashboard</button>
+      </nav>
+    </header>
+
+    <main>
+      <SurveyForm v-if="activeTab === 'survey'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,13 @@
+Please implement a wheel of fortune website where users can spin the wheel to win prizes. The website should have functionalities for spinning the wheel, displaying prizes, and recording user winning records. Users should be able to spin the wheel, view the prize list, view their own winning records. Use light gray as the default background and dark red for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a wheel of fortune website where users can spin the wheel to win prizes.
+2. The website should have functionalities for spinning the wheel, displaying prizes, and recording user winning records.
+3. Users should be able to spin the wheel, view the prize list, view their own winning records.
+4. Use light gray as the default background and dark red for component styling.
+
+General notes from earlier websites:
+- For the wheel spin: use a ref to manage the current state and update on user actions.
+- On every page: ensure light gray background and dark red for components.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

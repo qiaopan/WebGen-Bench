@@ -1,0 +1,15 @@
+Please implement a chess web application where users can play chess online. The application should have functionalities for creating new games, joining existing games, moving pieces, undoing moves, and resigning. Users should be able to click buttons to choose from different board themes and difficulty levels, and view game history and statistics. Style the layout with alice blue in the background and steel blue for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. users can play chess online
+2. creating new games
+   Note from earlier websites: For the ChessBoard.vue: add a button in the template section to call `createNewGame`.
+3. joining existing games
+4. moving pieces
+5. undoing moves
+6. resigning
+7. click buttons to choose from different board themes and difficulty levels
+8. view game history and statistics
+9. alice blue in the background and steel blue for the interface
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

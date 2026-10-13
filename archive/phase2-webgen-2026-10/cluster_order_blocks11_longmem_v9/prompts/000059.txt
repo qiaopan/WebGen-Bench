@@ -1,0 +1,53 @@
+Please implement a virtual study group website where users can create or join study groups, share resources, and collaborate on projects. The website should have functionalities for creating and joining groups, sharing resources, and collaborating on projects. Users should be able to join groups, download resources, and participate in project discussions. The website should also have a personal center where users can view their personal information. Configure all backgrounds with alice blue and all components with steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create or join study groups
+2. share resources
+   Note from earlier websites: For the resource upload form: implement @submit handler to show confirmation on success.
+3. collaborate on projects
+4. join groups
+5. download resources
+6. participate in project discussions
+7. personal center where users can view their personal information
+8. configure all backgrounds with alice blue and all components with steel blue
+   Note from earlier websites: On every page: set all backgrounds to alice blue using CSS.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

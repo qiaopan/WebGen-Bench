@@ -1,0 +1,59 @@
+Please implement a real-time culinary guide application to display restaurant and recipe information. The application should have functionalities for browsing restaurants, searching recipes, viewing reviews and ratings, and more. Users should be able to browse nearby restaurants, search for specific recipes, view other users' reviews and ratings, and add their own reviews and ratings. Color the background using lemon chiffon and set component styles to chocolate.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. real-time culinary guide application
+2. display restaurant and recipe information
+3. browse restaurants
+   Note from earlier websites: On every page: use a ref for current page to avoid UI feature missing.
+4. search recipes
+   Note from earlier websites: For the search bar: implement g0 with v-if to manage display of different sections.
+5. view reviews and ratings
+6. browse nearby restaurants
+7. search for specific recipes
+8. view other users' reviews and ratings
+9. add their own reviews and ratings
+10. color the background using lemon chiffon and set component styles to chocolate
+   Note from earlier websites: For the background: set g1 and g2 using 'lemon chiffon' and 'chocolate' colors.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from './pages/FoodDonationPage.vue'
+import FoodDistributionPage from './pages/FoodDistributionPage.vue'
+import VolunteerPage from './pages/VolunteerPage.vue'
+import AccountPage from './pages/AccountPage.vue'
+
+const activeTab = ref('donation')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      <nav>
+        <button @click="activeTab = 'donation'">Food Donation</button>
+        <button @click="activeTab = 'distribution'">Food Distribution</button>
+        <button @click="activeTab = 'volunteer'">Volunteer</button>
+        <button @click="activeTab = 'account'">Account</button>
+      </nav>
+    </header>
+
+    <main>
+      <FoodDonationPage v-if="activeTab === 'donation'" />
+      <FoodDistributionPage v-if="activeTab === 'distribution'" />
+      <VolunteerPage v-if="activeTab === 'volunteer'" />
+      <AccountPage v-if="activeTab === 'account'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
