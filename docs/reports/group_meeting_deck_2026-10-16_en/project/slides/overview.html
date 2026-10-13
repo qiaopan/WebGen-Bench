@@ -1,0 +1,19 @@
+<section id="overview" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">The big picture</p>
+<h2 style="font-family:Georgia, serif;font-size:56px;font-weight:700;line-height:1.15">The official pipeline, and what Long Memory adds</h2>
+<p style="position:absolute;left:128px;top:272px;width:900px;font-size:26px;font-weight:700;color:#6A7179">WebGen-Bench baseline (No Memory)</p>
+<div style="position:absolute;height:150px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;padding:20px;background:#FFFFFF;border:2px solid #A9B6C8;left:128px;top:330px;width:320px"><p style="font-size:28px;font-weight:700">Website request</p><p style="font-size:24px;color:#4A5568">text from the user</p></div>
+<div style="position:absolute;height:150px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;padding:20px;background:#FFFFFF;border:2px solid #A9B6C8;left:548px;top:330px;width:320px"><p style="font-size:28px;font-weight:700">Generator</p><p style="font-size:20px;color:#4A5568">Bolt.diy agent + WebGen-LM-7B</p></div>
+<div style="position:absolute;height:150px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;padding:20px;background:#FFFFFF;border:2px solid #A9B6C8;left:968px;top:330px;width:320px"><p style="font-size:28px;font-weight:700">Testers</p><p style="font-size:20px;color:#4A5568">WebVoyager + Qwen2.5-VL-32B; screenshot grader</p></div>
+<div style="position:absolute;height:150px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;padding:20px;background:#FFFFFF;border:2px solid #A9B6C8;left:1388px;top:330px;width:276px"><p style="font-size:28px;font-weight:700">Score</p><p style="font-size:24px;color:#4A5568">pass / partial / fail</p></div>
+<x-connector x1="448" y1="405" x2="548" y2="405" head="end" style="color:#14213D;border-width:3px"></x-connector>
+<x-connector x1="868" y1="405" x2="968" y2="405" head="end" style="color:#14213D;border-width:3px"></x-connector>
+<x-connector x1="1288" y1="405" x2="1388" y2="405" head="end" style="color:#14213D;border-width:3px"></x-connector>
+<div style="position:absolute;left:700px;top:690px;width:380px;height:150px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;padding:20px;background:#DCE8F8;border:3px solid #2A78D6"><p style="font-size:30px;font-weight:700;color:#1F5FAF">Memory bank</p><p style="font-size:20px;color:#14213D">Qwen2.5-VL-72B + bge-m3</p></div>
+<x-connector x1="1128" y1="480" x2="1080" y2="765" route="vh" head="end" style="color:#2A78D6;border-width:4px"></x-connector>
+<x-connector x1="700" y1="765" x2="288" y2="480" route="hv" head="end" style="color:#2A78D6;border-width:4px"></x-connector>
+<p style="position:absolute;left:1160px;top:560px;width:500px;font-size:26px;color:#1F5FAF;font-weight:700">After each task: reflect on the test, find code errors, save short fixes</p>
+<p style="position:absolute;left:320px;top:540px;width:360px;font-size:26px;color:#1F5FAF;font-weight:700">Before the next task: add a checklist and code examples</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:26px;color:#4A5568">Same generator, same tester, same rules. Long Memory (blue) only changes the text the generator reads.</p>
+<aside>This is the big picture. The top row is the official baseline: the request goes to the Bolt.diy agent with WebGen-LM-7B. Then the WebVoyager agent with Qwen 32B clicks and checks the features, and the same model grades a screenshot for appearance. Long Memory adds the blue loop. After each task, Qwen 72B saves short fixes in a memory bank. Before the next task, it adds a checklist and code examples. Everything else stays the same.</aside>
+</section>

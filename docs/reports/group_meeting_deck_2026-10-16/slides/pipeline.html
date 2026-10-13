@@ -13,6 +13,6 @@
 <div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:30px;font-weight:700">⑤ 反思入库</h3><p style="font-size:24px;color:#4A5568;line-height:1.4">去重、效用、写代码池（Zhao et al., 2024）</p></div>
 </div>
 <p style="font-size:28px;color:#4A5568;line-height:1.5">留一任务（leave-one-task-out）：检索永远排除当前任务自己的记录，评测结果不回流到同一题。</p>
-<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：ExpeL（Zhao et al., 2024）、ReasoningBank（2025）：从成功和失败轨迹中提炼可复用经验</p>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：ExpeL（Zhao et al., 2024）、ReasoningBank（Ouyang et al., 2026）：从成功和失败轨迹中提炼可复用经验</p>
 <aside>方法分五步。第一，记忆模型把需求逐条拆成清单。第二，检索功能经验，挂到对应的清单条目下面；通用池只保留有具体写法的条目。第三，代码池最多给两段代码片段。第四，7B 模型只生成一次，用官方评测。第五，反思入库，同时做去重、更新效用、更新代码池。第五步的产物会被下一题的第二、三步读到，这就是跨任务。另外我们严格做 leave-one-task-out，检索永远排除当前任务自己的记录，评测结果也不会回流到同一题。</aside>
 </section>
