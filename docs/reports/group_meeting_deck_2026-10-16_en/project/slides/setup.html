@@ -1,0 +1,13 @@
+<section id="setup" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">Setup</p>
+<h2 style="font-family:Georgia, serif;font-size:60px;font-weight:700;line-height:1.15">Official rules, and our baseline matches the paper</h2>
+<table style="font-family:Arial, sans-serif;color:#14213D;font-size:26px">
+<tr><th style="width:6%;text-align:left">#</th><th style="width:24%;text-align:left">Step</th><th style="width:30%;text-align:left">Agent / tool</th><th style="width:40%;text-align:left">Model (LLM)</th></tr>
+<tr><td>1</td><td>Build website</td><td>Bolt.diy (coding agent)</td><td>WebGen-LM-7B, one try, no repair</td></tr>
+<tr><td>2</td><td>Test features</td><td>WebVoyager (GUI agent)</td><td>Qwen2.5-VL-32B</td></tr>
+<tr><td>3</td><td>Grade appearance</td><td>Screenshot grader (one call)</td><td>Qwen2.5-VL-32B (paper: GPT-4o)</td></tr>
+<tr><td>4</td><td>Write and pick memory</td><td>Our Long Memory module</td><td>Qwen2.5-VL-72B-AWQ + bge-m3 embedding</td></tr>
+</table>
+<p style="font-size:26px;color:#4A5568">Score = (pass + 0.5 × partial) / checks · No Memory baseline 28.5% (paper: 28.4%)</p>
+<aside>Here is the setup, step by step. One: the Bolt.diy agent with WebGen-LM-7B builds the website, with one try and no repair. Two: the WebVoyager agent with Qwen 32B tests the features. Three: Qwen 32B also grades a screenshot for appearance; the paper used GPT-4o. Four: our memory module uses Qwen 72B and the bge-m3 embedding. Accuracy counts a partial pass as one half. Our No Memory baseline is 28.5 percent, and the paper reports 28.4 percent.</aside>
+</section>

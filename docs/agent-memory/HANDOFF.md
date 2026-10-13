@@ -35,6 +35,11 @@
 8. **本地另一会话的未提交改动**（中英文 README、`.en.md`）处理完后：切回最新 main，重新打包 `docs/thesis_overleaf.zip`（本机无 TeX，论文在 Overleaf 编译）。
 9. **交论文（11-16）前：** 致谢、全文通读、清掉所有 `\todo`。
 
+### 2026-10-13：周五（10-16）英文汇报版与参考文献核对
+- 英文 10 分钟版 PPT：https://claude.ai/artifact/BWDmn48YPwAzEiL8KbKXx1 ，源文件 `docs/reports/group_meeting_deck_2026-10-16_en/`（13 页；只用 Arial/Georgia，避免导出 .pptx 乱码；讲稿约 550 词，基本照念页面文字）。学习曲线改为 No Memory / 只有清单 / v4 / v7 四条线，消融页改为柱状图（配对差与 CI）；画图脚本 `plot4.py`。
+- 第 3、4 页按流程顺序写明 agent 与模型：Bolt.diy + WebGen-LM-7B 生成 → WebVoyager + Qwen2.5-VL-32B 功能评测 → 截图单次调用 + Qwen2.5-VL-32B 外观评分（论文为 GPT-4o）→ 记忆模块 Qwen2.5-VL-72B-AWQ + bge-m3。
+- 参考文献已联网核对：ReasoningBank 为 Ouyang et al., ICLR 2026（arXiv:2509.25140）；ACE 为 Zhang et al., ICLR 2026；WebVoyager 补全作者；论文 bib 与两份中文 PPT 同步更正。Mem0 的 arXiv 号（2504.19413）未联网核对。
+
 ### 2026-10-10：种子 11 后段没有优势的原因；v8 验证与排队
 - **现象：** 种子 11（领域挨着）79 题时 v7 33.7% vs No Memory 28.3%（配对 +4.5，CI [−3.0, 11.7]）；同一批题在 manifest 顺序下 v7 41.0%、No Memory r1 29.0%。No Memory 两次很稳，v7 换顺序掉约 7 个点。第 31–67 题 v7 无优势（29.9% vs 31.4%）。
 - **原因：** 从第 36 题起代码池注入"缺包"条目，内容是一整份别站的 `App.vue`（30 行，来源为食物捐赠网站）；之后 v7 有 8 题交了原样 Vite 脚手架（No Memory 0 题），这 8 题 No Memory 35.8%、v7 2.5%；另 5 题是编译错（v-model 用在 prop/文件框）或缺包。其余 24 题 v7 45.0% vs No Memory 27.6%。manifest 顺序同样注入整份文件 76 次，只出 2 个脚手架（示例来自通用服务网站），差异原因推测为示例内容与当前题的相关度，单次运行，未证实。
