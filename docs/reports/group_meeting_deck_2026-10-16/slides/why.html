@@ -1,0 +1,28 @@
+<section id="why" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:104px 128px 150px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">提升从哪里来（101 题）</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:52px;font-weight:700;line-height:1.2">代码错误被压住，空话变少</h2>
+<div style="display:flex;gap:40px;align-items:start">
+<table style="flex:1;font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:23px">
+<tr><th style="width:34%;text-align:left">网站代码问题（题数）</th><th style="text-align:right">No Mem</th><th style="text-align:right">v4</th><th style="text-align:right">v7</th></tr>
+<tr><td colspan="4" style="color:#6A7179;font-size:20px">整站白屏 / 编译错（未声明的包或 Vue 编译错误）</td></tr>
+<tr><td>第 1–30 题</td><td style="text-align:right">11</td><td style="text-align:right">2</td><td style="text-align:right">4</td></tr>
+<tr><td>第 31–60 题</td><td style="text-align:right">5</td><td style="text-align:right">5</td><td style="text-align:right"><b>1</b></td></tr>
+<tr><td>第 61–101 题</td><td style="text-align:right">10</td><td style="text-align:right">12</td><td style="text-align:right"><b>3</b></td></tr>
+<tr><td><b>全部</b></td><td style="text-align:right">26</td><td style="text-align:right">19</td><td style="text-align:right"><b>8</b></td></tr>
+<tr><td colspan="4" style="color:#6A7179;font-size:20px">某页用了 Vue 函数却没 import</td></tr>
+<tr><td>1–30 / 31–60 / 61–101</td><td style="text-align:right">7/7/9</td><td style="text-align:right">14/10/7</td><td style="text-align:right">12/<b>4</b>/<b>6</b></td></tr>
+<tr><td><b>全部</b></td><td style="text-align:right">23</td><td style="text-align:right">31</td><td style="text-align:right">22</td></tr>
+</table>
+<table style="flex:1;font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:23px">
+<tr><th style="width:52%;text-align:left">prompt 内容（1–30 / 31–60 / 61–101）</th><th style="text-align:right">v4</th><th style="text-align:right">v7</th></tr>
+<tr><td>含无代码写法条目的题数</td><td style="text-align:right">23/25/28</td><td style="text-align:right">12/<b>4</b>/11</td></tr>
+<tr><td>"General notes" 块（题数）</td><td style="text-align:right">13/16/27</td><td style="text-align:right">3/<b>0</b>/8</td></tr>
+<tr><td>带代码池片段（题数）</td><td style="text-align:right">0/0/0</td><td style="text-align:right">25/30/41</td></tr>
+<tr><td>挂到清单下的经验（条）</td><td style="text-align:right">56/53/81</td><td style="text-align:right">32/16/41</td></tr>
+<tr><td>其中无代码写法（条，全部）</td><td style="text-align:right">102 / 190</td><td style="text-align:right">31 / 89</td></tr>
+</table>
+</div>
+<p style="font-size:24px;color:#4A5568;line-height:1.5">前 30 题 v4、v7 相近：代码池要等问题在 2 题出现才启用（Dai et al., 2026）。之后 v7 整站白屏明显少于两组；单页缺 import 三组相近（23 / 31 / 22），是 7B 的随机笔误。以上是相关性，各部分贡献要靠消融确认。</p>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:48px;font-size:20px;color:#6A7179">代码问题用 @vue/compiler-sfc 3.5.43 逐个编译生成的网站得出；"无代码写法"= 条目里没有 @click、v-if、v-for、v-model、ref、import、反引号代码等写法。</p>
+<aside>提升从哪里来？我们用 Vue 编译器把三组 303 个网站逐个检查。左表最重要的是整站白屏或编译错：No Memory 26 题，v4 19 题，v7 只有 8 题，后段 v7 只有 3 题，对比 10 题和 12 题。但单页缺 import 三组差不多，v7 22 题、No Memory 23 题，这个后面单独讲。右表是 prompt 内容：v7 的无代码空话条目比 v4 少得多，代码池片段在启用后几乎每题都有。需要强调，这是相关性，各部分的贡献要靠消融来确认。</aside>
+</section>

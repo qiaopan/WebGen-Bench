@@ -1,0 +1,19 @@
+<section id="m-codepool" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">方法 ② · 代码池</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">从自己做对的网站里摘代码</h2>
+<div style="display:flex;gap:40px">
+<ol style="flex:1;font-size:30px;line-height:1.6;color:#14213D">
+<li><b>代码检测问题</b>：未声明的包、编译错误、用了 Vue API 却没 import</li>
+<li><b>反复出现才固化</b>：同一问题在 ≥2 个任务出现，入库前编译验证（Dai et al., 2026）</li>
+<li><b>找写法</b>：本链里得分 ≥0.5、能编译的网站，成功经验提供写法（ReasoningBank, 2025）</li>
+<li><b>只给片段</b>：记忆模型挑关键行，代码核对逐字、≤15 行、不含整份文件标签</li>
+<li><b>独立名额</b>：最多 2 段，带名称和适用条件，像技能库一样按条件取用（Wang et al., 2023；Wang et al., 2025）</li>
+</ol>
+<div style="flex:1;background:#14213D;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#8FB8EE">注入示例（缺 import）</p>
+<p style="font-family:'Courier New', monospace;font-size:28px;line-height:1.5;color:#F4F1EA">import { ref } from 'vue'<br>const bookingId = ref('')</p>
+</div>
+</div>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：Metis（Dai et al., 2026）反复出现才固化、编译验证；Voyager（Wang et al., 2023）代码技能库；AWM（Wang et al., 2025）带用途描述的工作流</p>
+<aside>方法二是代码池，这是 v7 和 v4 最大的区别。先用代码而不是模型来检测问题：未声明的包、编译错误、用了 Vue 函数却没 import。同一问题在至少两道题出现以后才固化成代码记忆，这一点参考 Metis。写法从本链自己得分 0.5 以上、能编译的网站里摘，记忆模型挑关键行，代码再核对必须逐字来自原文件、不超过 15 行、不带整份文件的标签。右边就是 v7 实际注入的缺 import 示例。v6 的教训是，一行 import 包在 script 标签里，看起来像写完的空组件，模型就直接交回模板。</aside>
+</section>

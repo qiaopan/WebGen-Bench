@@ -1,0 +1,12 @@
+<section id="m-hygiene" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">方法 ③ · 记忆卫生</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">不让空话越攒越多</h2>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:32px">
+<div style="background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">只留具体写法</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">通用池条目没有代码形状（@click、v-if、import…）就丢掉</p></div>
+<div style="background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">效用与退役</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">效用 =（使用 − 复现 + 1）/（使用 + 2）；注入 ≥5 次且 &lt;0.3 停止注入（案例效用，Zhou et al., 2025；投票，Zhao et al., 2024）</p></div>
+<div style="background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">源头去重</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">同一根因、同一修法只存一条，新的记为支持（存储前判断，Chhikara et al., 2025）</p></div>
+<div style="background:#FFFFFF;border:1px solid #DDE3EC;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:34px;font-weight:700">结论不手写</h3><p style="font-size:28px;line-height:1.5;color:#4A5568">规则只教排查方法（科学调试，Zeller；Chen et al., 2023），经验由反思和代码统计产生</p></div>
+</div>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：ExpeL（Zhao et al., 2024）经验增删投票；Mem0（Chhikara et al., 2025）存储前去重；Memento（Zhou et al., 2025）案例效用</p>
+<aside>方法三是记忆卫生，目的是不让空话越攒越多。第一，通用池里没有代码写法的条目直接丢掉。第二，每条经验记录效用：注入以后同一问题又出现，就扣分；注入 5 次以上、效用低于 0.3 就停止注入，参考 Memento 的案例效用和 ExpeL 的投票。第三，存储前去重，同一根因、同一修法只存一条，新的记为支持，参考 Mem0。第四，结论不手写：规则只教排查方法，经验由反思和代码统计产生。</aside>
+</section>

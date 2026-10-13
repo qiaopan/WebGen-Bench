@@ -1,0 +1,19 @@
+<section id="ch2" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#EB6834;font-weight:700">挑战 2 · 经验越攒越"空"</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">文字记忆（v4）前期有效，后期反而输给 No Memory</h2>
+<div style="display:flex;gap:48px;align-items:start">
+<table style="flex:1;font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:32px">
+<tr><th style="width:40%;text-align:left">准确率</th><th style="width:30%;text-align:right">No Memory</th><th style="width:30%;text-align:right">v4</th></tr>
+<tr><td>前 30 题</td><td style="text-align:right">26.0%</td><td style="text-align:right">39.3%</td></tr>
+<tr><td>后 71 题</td><td style="text-align:right">29.5%</td><td style="text-align:right;color:#C2410C">27.8%</td></tr>
+<tr><td>全部 101 题</td><td style="text-align:right">28.5%</td><td style="text-align:right">30.9%</td></tr>
+</table>
+<div style="flex:1;background:#FFF4EE;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:34px;font-weight:700">原因：空泛条目挤占 prompt</h3>
+<p style="font-size:28px;line-height:1.5;color:#4A5568">"确保所有表单字段有正确标签"一类空话，在 v4 中越来越多：不含代码写法的条目共 102 条，出现在 76/101 题；"General notes"块前 30 题 13 次，后 71 题 43 次。</p>
+<p style="font-size:28px;line-height:1.5;color:#4A5568">无关内容会分散模型注意力（Shi et al., 2023），上下文变长本身也会降低表现（Du et al., 2025）。效用打分只排序、不淘汰（ExpeL 式投票，Zhao et al., 2024），空话很少被扣分，一直留在名额里。</p>
+</div>
+</div>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：Shi et al., 2023（无关内容分散注意力）；Du et al., 2025（上下文变长本身就降低表现）</p>
+<aside>第二个挑战：文字经验越攒越空。v4 是纯文字记忆加需求清单，前 30 题从 26.0% 提到 39.3%，看起来很好；但后 71 题只有 27.8%，反而低于 No Memory 的 29.5%。原因是像“确保所有表单字段有正确标签”这种没有具体写法的条目越来越多，v4 一共注入了 102 条这样的条目，覆盖 76 道题；通用的 General notes 块也从前 30 题的 13 次涨到后 71 题的 43 次。文献里也说，无关内容会分散注意力，上下文变长本身就会降低表现。</aside>
+</section>
