@@ -24,9 +24,9 @@ We use all 101 WebGen-Bench tasks. They come from 20 application domains with tw
 \label{fig:pipeline}
 \end{figure}
 
-\section{How One Task Is Generated and Scored}
+\section{The Baseline: How One Task Is Generated and Scored}
 \label{sec:walkthrough}
-This section follows one task, 000006, through the unmodified system:
+The baseline is the unmodified WebGen-Bench pipeline~\cite{lu2025webgenbench}, which we call \emph{No Memory}. We follow one task, 000006, through its four steps:
 
 \noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
@@ -36,7 +36,13 @@ dark olive green.
 \end{lstlisting}
 \end{minipage}
 
-Under No Memory this text is the entire prompt. Bolt.diy, an open-source browser-based coding agent, opens a Vite + Vue + TypeScript starter whose \texttt{package.json} declares only \texttt{vue}, writes every file of the generator's single reply into it, installs dependencies and starts the server. Each task has on average six hidden test cases (here, for example, ``Verify the display of real-time solar power generation data''). A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} takes one case at a time, acts on screenshots in which interactive elements carry numbered boxes, and answers YES, PARTIAL or NO within a fixed step budget. A vision model grades a full-page screenshot from 1 to 5. Both are models acting as judges, which have known biases~\cite{zheng2023judge}; their raw transcripts are kept.
+\begin{enumerate}
+  \item \textbf{Prompt.} The requirement text above is the entire prompt; nothing else is added.
+  \item \textbf{Generation.} Bolt.diy, an open-source browser-based coding agent, opens a Vite + Vue + TypeScript starter project whose \texttt{package.json} declares only \texttt{vue}. The generator answers once; Bolt.diy writes every file in the reply into the project, installs the dependencies and starts the development server. There is no build check, no error feedback and no second attempt.
+  \item \textbf{Functional testing.} Each task has hidden test cases provided with the benchmark, on average six (647 in total); here, for example, ``Verify the display of real-time solar power generation data'', with an expected result. A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} receives one test case at a time, sees a screenshot in which every clickable element carries a numbered box, clicks or types, and after at most 15 steps answers YES (the expected result is met), PARTIAL (met in part) or NO. If the site does not start, every test case of the task is marked \emph{start failed}.
+  \item \textbf{Appearance grading.} A vision model receives a full-page screenshot of the landing page and the requirement and grades it from 1 to 5 on rendering, content relevance, layout harmony and modernness.
+\end{enumerate}
+Both the tester and the grader are models acting as judges, which have known biases~\cite{zheng2023judge}; their raw transcripts are kept. Memory changes only step 1: it adds text after the requirement (\Cref{chap:method}); steps 2--4 are identical in every arm.
 
 \Cref{fig:walkthrough} shows what the tester saw for this task in two runs. Under No Memory the model imported the chart library \texttt{vue-chartjs}, which the template does not declare; Vite cannot resolve the import, the page shows only the error overlay, and all test cases fail. With the final memory the generator built the three requested views without the undeclared package, and all test cases passed.
 
@@ -79,11 +85,14 @@ Embeddings & bge-m3~\cite{chen2024bgem3} \\
 The memory model is deliberately different from the evaluator, so that reflection cannot copy the evaluator's grading behaviour. vLLM applies the model repository's generation configuration by default; WebGen-LM-7B ships with a repetition penalty that Bolt.diy never sends, so we disable it for the generator to match the paper's setting.
 
 \section{Metrics}
-For each task with $n$ test cases, of which $p$ pass and $q$ are partial,
+\label{sec:metrics}
+We use the benchmark's own metrics. Over all test cases of an arm, \emph{Yes}, \emph{Partial}, \emph{No} and \emph{Start failed} are the percentages of the 647 cases with each outcome, and
 \begin{equation}
-\text{accuracy} = \frac{p + 0.5\,q}{n}.
+\text{accuracy} = \text{Yes} + 0.5 \times \text{Partial},
 \end{equation}
-We report accuracy over all test cases, the mean appearance score (1--5), and the number of \emph{zero-score} tasks. Because test cases within a task are not independent, comparisons are paired by task rather than by test case: for two arms we report the mean per-task difference in accuracy with a 95\% percentile bootstrap \gls{ci} obtained by resampling tasks~\cite{efron1993bootstrap}, together with the numbers of tasks won, lost and tied. This interval is conditional on the observed runs: it reflects which tasks happened to be in the benchmark, but not the variation between repeated runs of the same memory chain (about five points, \Cref{sec:fix}), nor the dependence between tasks that a memory creates. We therefore say that an interval ``excludes zero'' rather than calling a gain significant. Accuracy pools test cases (micro); the learning curves average tasks (macro).
+so a partially met case counts half and a site that never starts counts zero for all its cases. This is the official accuracy, pooled over test cases; for a single task the same formula gives its \emph{task accuracy} $(p + 0.5\,q)/n$ for $p$ passed and $q$ partial cases out of $n$. A \emph{zero-score} task is one where every case fails, usually because the page is blank. \emph{Appearance} is the mean 1--5 grade; in the main table tasks without a working site count as 0.
+
+Because cases within a task are not independent, we compare arms task by task: the mean per-task difference in task accuracy, with a 95\% percentile bootstrap \gls{ci} from resampling the 101 tasks~\cite{efron1993bootstrap}, and the numbers of tasks won, lost and tied. The interval reflects which tasks are in the benchmark, not the variation between repeated runs of a memory chain (about five points, \Cref{sec:fix}), so we say an interval ``excludes zero'' rather than calling a gain significant. Learning curves average task accuracy.
 
 \section{Experimental Design}
 \label{sec:design}
