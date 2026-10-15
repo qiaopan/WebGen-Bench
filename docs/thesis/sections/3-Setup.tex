@@ -88,7 +88,7 @@ For each task with $n$ test cases, of which $p$ pass and $q$ are partial,
 \begin{equation}
 \text{accuracy} = \frac{p + 0.5\,q}{n}.
 \end{equation}
-We report accuracy over all test cases, the mean appearance score (1--5), and the number of \emph{zero-score} tasks. Because test cases within a task are not independent, comparisons are paired by task rather than by test case: for two arms we report the mean per-task difference in accuracy with a 95\% percentile bootstrap \gls{ci} obtained by resampling tasks~\cite{efron1993bootstrap}, together with the numbers of tasks won, lost and tied.
+We report accuracy over all test cases, the mean appearance score (1--5), and the number of \emph{zero-score} tasks. Because test cases within a task are not independent, comparisons are paired by task rather than by test case: for two arms we report the mean per-task difference in accuracy with a 95\% percentile bootstrap \gls{ci} obtained by resampling tasks~\cite{efron1993bootstrap}, together with the numbers of tasks won, lost and tied. This interval is conditional on the observed runs: it reflects which tasks happened to be in the benchmark, but not the variation between repeated runs of the same memory chain (about five points, \Cref{sec:fix}), nor the dependence between tasks that a memory creates. We therefore say that an interval ``excludes zero'' rather than calling a gain significant. Accuracy pools test cases (micro); the learning curves average tasks (macro). \todo{Planned (existing data, no new run): add task-macro and domain-macro accuracy and a domain-cluster bootstrap for the final comparison.}
 
 \section{Experimental Design}
 \label{sec:design}
