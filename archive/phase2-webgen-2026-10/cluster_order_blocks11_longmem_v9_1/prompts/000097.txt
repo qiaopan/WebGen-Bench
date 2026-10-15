@@ -1,0 +1,65 @@
+Please implement a travel and camping website and web app for Europe, showcasing tourist attractions and campsites across the continent. The website should have functionalities for searching, booking, and reviewing. Users should be able to browse tourist attractions and campsites in different countries and cities, book attractions and campsites of interest, and review the attractions and campsites they have visited. Establish light pink as the main background and medium violet red for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. travel and camping website and web app for Europe
+2. showcasing tourist attractions and campsites across the continent
+3. functionalities for searching
+4. booking
+5. reviewing
+6. browse tourist attractions and campsites in different countries and cities
+7. book attractions and campsites of interest
+8. review the attractions and campsites they have visited
+9. light pink as the main background and medium violet red for the controls
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 3 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,70 @@
+Please implement an entertainment directory website to display band information and advertisements. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos. Additionally, the website should allow advertisers to register, log in, and upload their ad content. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements. Implement floral white for the page background and dark goldenrod for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display band information and advertisements
+2. band registration and login functionality
+   Note from earlier websites: For the band login form: bind form inputs to reactive variables using ref for login credentials capture.
+3. allow band members to input their bio
+4. provide picture links and audio sample links
+5. provide direct links to YouTube videos
+6. allow advertisers to register, log in, and upload their ad content
+7. users should be able to browse band information
+8. listen to audio samples
+9. watch videos
+10. view advertisements
+11. floral white for the page background and dark goldenrod for the elements
+12. all form inputs have clear labels for visual distinction using v-if
+   Note from earlier websites: On every page: ensure all form inputs have clear labels for visual distinction using v-if.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 23 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 4 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

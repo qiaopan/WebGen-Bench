@@ -1,0 +1,54 @@
+Please implement a community website for sharing promotions and discounts. The website should have functionalities for browsing promotions, sharing promotions, and searching promotions. Users should be able to browse and share promotions, and search for promotions of interest. The website should also have a management backend for managing users, promotions, and website settings. Use ivory for the outer layout and forest green for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. community website for sharing promotions and discounts
+2. functionalities for browsing promotions
+3. functionalities for sharing promotions
+   Note from earlier websites: For the share button: implement a client-side @click handler to set 'showPromotionForm' state.
+4. functionalities for searching promotions
+   Note from earlier websites: On every page: ensure searchQuery state updates correctly and PromotionSearchResults filters results.
+5. users should be able to browse and share promotions
+6. users should be able to search for promotions of interest
+7. management backend for managing users, promotions, and website settings
+8. ivory for the outer layout and forest green for UI blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file input. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 2 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label for="evidence">Evidence (Optional)</label>
+        <input type="file" id="evidence" @change="formData.evidence = $event.target.files[0]">
+      </div>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 27 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const currentQuestionData = computed(() => {
+  return props.contest.questions[currentQuestion.value]
+})
+
+import { ref } from 'vue'
+const showSuccess = ref(false)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

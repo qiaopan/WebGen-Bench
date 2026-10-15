@@ -1,0 +1,64 @@
+Please implement an internship portal website that connects students with companies offering internship opportunities. The website should have a student panel and a company panel, where students can browse and apply for internships, and companies can post internship positions. The website should also be optimized for speed, navigation, user interface, and user experience. Choose mint cream for the background; set all component colors to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an internship portal website that connects students with companies offering internship opportunities.
+2. The website should have a student panel and a company panel
+3. where students can browse and apply for internships
+4. and companies can post internship positions
+5. The website should also be optimized for speed, navigation, user interface, and user experience
+6. Choose mint cream for the background; set all component colors to teal
+7. For the internship forms: use `v-if` to show confirmation messages after submit handlers update state.
+   Note from earlier websites: For the internship forms: use `v-if` to show confirmation messages after submit handlers update state.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 4 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

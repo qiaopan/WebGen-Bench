@@ -6,7 +6,7 @@ gap plot. Accuracy = (passed + 0.5 partial) / checks, appearance row excluded, p
 import argparse, json, random, sys
 from pathlib import Path
 ap = argparse.ArgumentParser(); ap.add_argument("lm"); ap.add_argument("nm")
-ap.add_argument("--plot"); ap.add_argument("--title", default=""); ap.add_argument("--extra", nargs="*", default=[])
+ap.add_argument("--plot"); ap.add_argument("--title", default=""); ap.add_argument("--label", default="Long Memory (v7) − No Memory"); ap.add_argument("--extra", nargs="*", default=[])
 a = ap.parse_args()
 E = Path("outputs/experiment")
 def scores(d):
@@ -47,7 +47,7 @@ if a.plot:
     g = [100 * x for x in d]; y = [sum(g[i - 9:i + 1]) / 10 for i in range(9, len(g))]  # full windows only
     fig, ax = plt.subplots(figsize=(11, 4.6))
     ax.axhline(0, color="#555", linewidth=1, linestyle="--"); ax.axvline(30, color="#bbb", linewidth=1)
-    ax.plot(range(10, len(g) + 1), y, color="#2a78d6", linewidth=2, label="Long Memory (v7) − No Memory")
+    ax.plot(range(10, len(g) + 1), y, color="#2a78d6", linewidth=2, label=a.label)
     ax.text(len(g) + 1, y[-1], f"{y[-1]:+.1f}", color="#2a78d6", va="center", fontsize=9)
     ax.set_xlabel("execution order (task position)"); ax.set_ylabel("rolling-10 accuracy gap (points)")
     ax.set_title(a.title, fontsize=11); ax.legend(loc="lower right", frameon=False)

@@ -1,0 +1,52 @@
+Please implement a modern diagram maker website for creating and editing diagrams. The website should have functionalities for creating new diagrams, editing existing diagrams, adding and removing diagram elements, and adjusting layout and style. Users should be able to choose from different diagram types, such as flowcharts, organizational charts, and mind maps, and use a drag-and-drop interface to add and arrange diagram elements. Select ghost white for layout background and slate gray for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. modern diagram maker website
+2. creating new diagrams
+3. editing existing diagrams
+4. adding and removing diagram elements
+5. adjusting layout and style
+6. different diagram types
+7. drag-and-drop interface
+8. ghost white for layout background and slate gray for component details
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file input. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 2 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label for="evidence">Evidence (Optional)</label>
+        <input type="file" id="evidence" @change="formData.evidence = $event.target.files[0]">
+      </div>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 25 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const currentQuestionData = computed(() => {
+  return props.contest.questions[currentQuestion.value]
+})
+
+import { ref } from 'vue'
+const showSuccess = ref(false)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

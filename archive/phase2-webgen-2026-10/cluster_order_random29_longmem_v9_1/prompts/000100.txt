@@ -1,0 +1,58 @@
+Please implement a golf travel package booking website that sells golf travel packages. The website should have functionalities for customer request handling, booking confirmation, online quotes, customer relationship management, and supplier management. Users can initiate requests through the website homepage form submission, and the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions. Customers can confirm bookings online, and the system will generate digital vouchers and invoices. Assign whitesmoke to body backgrounds and dark cyan to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. golf travel package booking website that sells golf travel packages
+2. functionalities for customer request handling
+3. booking confirmation
+4. online quotes
+5. customer relationship management
+6. supplier management
+7. Users can initiate requests through the website homepage form submission
+   Note from earlier websites: For the homepage form: use `ref` and `v-if` to show a confirmation after form submission.
+8. the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions
+9. Customers can confirm bookings online
+10. the system will generate digital vouchers and invoices
+11. Assign whitesmoke to body backgrounds and dark cyan to main components
+   Note from earlier websites: On every page: set body background to whitesmoke for consistent design.
+   Note from earlier websites: For main components: apply dark cyan to enhance readability and separation.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file input. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label for="evidence">Evidence (Optional)</label>
+        <input type="file" id="evidence" @change="formData.evidence = $event.target.files[0]">
+      </div>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const currentQuestionData = computed(() => {
+  return props.contest.questions[currentQuestion.value]
+})
+
+import { ref } from 'vue'
+const showSuccess = ref(false)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

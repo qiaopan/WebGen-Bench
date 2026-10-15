@@ -1,0 +1,10 @@
+Please implement a 2048 game website for users to play the 2048 game. The website should have functionalities for starting a new game, moving tiles, merging tiles, game over, and reviving. Users should be able to start a new game, move tiles up, down, left, or right, merge identical tiles, and win the game by achieving the 2048 result. If the game is over, users can choose to revive and continue playing. Choose linen for the background; set all component colors to maroon.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a 2048 game website for users to play the 2048 game.
+2. The website should have functionalities for starting a new game, moving tiles, merging tiles, game over, and reviving.
+3. Users should be able to start a new game, move tiles up, down, left, or right, merge identical tiles, and win the game by achieving the 2048 result.
+4. If the game is over, users can choose to revive and continue playing.
+5. Choose linen for the background; set all component colors to maroon.
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

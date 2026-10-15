@@ -1,0 +1,50 @@
+Please develop a children's recycling game website to educate kids on proper waste recycling. The game should include competitive elements such as a leaderboard to keep kids engaged and motivated. The game should use a cartoon-style visual design to make it visually appealing to children. Kids should be able to play the game, receive feedback, learn how to correctly sort waste into the corresponding containers, and receive rewards and recognition through the game. Use seashell for container backgrounds and crimson for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please develop a children's recycling game website to educate kids on proper waste recycling.
+2. The game should include competitive elements such as a leaderboard to keep kids engaged and motivated.
+   Note from earlier websites: For the Leaderboard: use v-for to render rankings and scores in the Leaderboard component template.
+3. The game should use a cartoon-style visual design to make it visually appealing to children.
+4. Kids should be able to play the game, receive feedback, learn how to correctly sort waste into the corresponding containers, and receive rewards and recognition through the game.
+5. Use seashell for container backgrounds and crimson for component visuals.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file input. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label for="evidence">Evidence (Optional)</label>
+        <input type="file" id="evidence" @change="formData.evidence = $event.target.files[0]">
+      </div>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const currentQuestionData = computed(() => {
+  return props.contest.questions[currentQuestion.value]
+})
+
+import { ref } from 'vue'
+const showSuccess = ref(false)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

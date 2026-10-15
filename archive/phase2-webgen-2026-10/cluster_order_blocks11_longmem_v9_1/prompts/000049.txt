@@ -1,0 +1,67 @@
+Please implement a barber shop management website for managing barbers and services. The website should have functionalities for adding barbers, services, and sending WhatsApp notifications. Users should be able to browse barbers and services, add new barbers and services, and send notifications to clients. Style the layout with snow in the background and dim gray for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a barber shop management website
+2. adding barbers
+   Note from earlier websites: For the barber form: use v-if to toggle 'AddBarberForm' with 'activeTab' set to 'addBarber'.
+3. adding services
+4. sending WhatsApp notifications
+5. browse barbers
+6. browse services
+7. add new barbers
+8. add new services
+9. send notifications to clients
+10. style the layout with snow in the background and dim gray for the interface
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

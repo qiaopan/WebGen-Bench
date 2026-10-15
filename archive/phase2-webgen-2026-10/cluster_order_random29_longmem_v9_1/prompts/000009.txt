@@ -1,0 +1,51 @@
+Please implement a chess web application where users can play chess online. The application should have functionalities for creating new games, joining existing games, moving pieces, undoing moves, and resigning. Users should be able to click buttons to choose from different board themes and difficulty levels, and view game history and statistics. Style the layout with alice blue in the background and steel blue for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. users can play chess online
+2. creating new games
+3. joining existing games
+4. moving pieces
+5. undoing moves
+6. resigning
+7. click buttons to choose from different board themes and difficulty levels
+8. view game history
+   Note from earlier websites: For game history: create a component with v-if to show history when 'View History' is clicked.
+9. view statistics
+   Note from earlier websites: For user stats: integrate a component to display stats on 'View Statistics' button click.
+10. alice blue in the background and steel blue for the interface
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file input. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label for="evidence">Evidence (Optional)</label>
+        <input type="file" id="evidence" @change="formData.evidence = $event.target.files[0]">
+      </div>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
