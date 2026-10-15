@@ -11,7 +11,7 @@ We began by inspecting the code that No Memory actually produced, rather than it
 
 \section{Design History}
 \label{sec:history}
-Each version was motivated by an error analysis of the previous one. \Cref{tab:history} summarises the path; we describe the main steps below.
+Each version was motivated by an error analysis of the previous one. Versions are numbered in the order they were built, and every number appears in \Cref{tab:history}: v1 and v2 used the early text-memory design of the first three rows, v5 was a local prototype of the code pool that was never run on all tasks, and v8 and v9 were stopped part-way. Only v4, v7 and v9.1 were run on all 101 tasks; in the rest of this dissertation they are called \emph{text memory}, \emph{code memory} and the \emph{final} version.
 
 \begin{table}[ht]
 \centering
@@ -20,14 +20,14 @@ Each version was motivated by an error analysis of the previous one. \Cref{tab:h
 \label{tab:history}
 \begin{tabularx}{\textwidth}{p{3.2cm}XXX}
 \toprule
-Attempt & Problem addressed & Inspired by & Outcome \\
+Attempt (version) & Problem addressed & Inspired by & Outcome \\
 \midrule
-Three-layer memory (trajectories, cases, experiences/skills) & Traceable lessons & \cite{zhao2024expel,wang2023voyager,reasoningbank2025} & Abstract experiences too vague; kept concrete cases only \\
+Three-layer memory (v1--v2) & Traceable lessons & \cite{zhao2024expel,wang2023voyager,reasoningbank2025} & Abstract experiences too vague; kept concrete cases only \\
 Guidance compression & Injected text 5.7$\times$ the requirement; only the home page was built & \cite{harada2025curse,liu2024lost} & One task 0.25 $\rightarrow$ 0.83, but compression dropped required features \\
 Step-wise reflection & Guesses stored as lessons & \cite{zeller2009whyprograms,chen2023selfdebug,dhuliawala2023cove} & Better evidence; high run-to-run variance \\
 Dedup + utility (v3) & 34 near-identical lessons filled the pool & \cite{zhao2024expel,chhikara2025mem0,zhou2025memento} & Less repetition; blank pages unchanged \\
 Requirement checklist (v4) & Requirement drowned by guidance & \cite{wallace2024hierarchy,liu2024lost} & Strong early, worse than No Memory later \\
-Code pool (v6) & Text not followed; generic entries & \cite{dai2026metis,wang2023voyager,wang2025awm} & A one-line example caused untouched scaffolds \\
+Code pool (v5 prototype, v6) & Text not followed; generic entries & \cite{dai2026metis,wang2023voyager,wang2025awm} & A one-line example caused untouched scaffolds \\
 Fragments only (v7) & Example read as a finished file & -- & Best of the first round; gap grows over time \\
 v8 & Whole-file example caused scaffolds after a change of task order & \cite{wang2025awm,zheng2024synapse,ace2026} & Scaffolds removed; example kept switching versions \\
 v9 & Rare whole-site failures learned too late; two slots too few & \cite{dai2026metis} & Scaffolds stay at zero; v-model memory never applied \\
