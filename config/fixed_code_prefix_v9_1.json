@@ -1,0 +1,30 @@
+{
+ "description": "v9.1 final code-pool entries (learned by cluster_manifest_longmem_v9_1_webgenlm7b over 101 tasks), injected from task 1 for the fixed-prefix ablation (code_pool_fixed). Only entries the online run injected at least once are kept (5 others were never injected), as for v7.",
+ "source_run": "outputs/experiment/cluster_manifest_longmem_v9_1_webgenlm7b",
+ "entries": [
+  {
+   "problem_key": "compile:v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead.",
+   "name": "Vue compile error: v-model on file inputs",
+   "applies_when": "the requirement includes file uploads for evidence or similar purposes",
+   "explanation": "Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:",
+   "code": "<div class=\"form-group\">\n        <label>Evidence (optional)</label>\n        <input @change=\"handleEvidenceChange\" type=\"file\">\n      </div>\n      \n      <button type=\"submit\">Submit Report</button>\n    </form>\n    \n    <div v-if=\"submitted\" class=\"success-message\">\n      <h3>Thank you for your submission!</h3>\n      <p>Your report has been received and will be reviewed.</p>\n    </div>\n  </div>\n</template>",
+   "source_task_id": "000032"
+  },
+  {
+   "problem_key": "import:vue-router",
+   "name": "Missing package: imports a package that package.json does not declare",
+   "applies_when": "the requirement has several pages or sections to switch between",
+   "explanation": "Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:",
+   "code": "import { ref } from 'vue'\nconst currentPage = ref('home')\n  <div class=\"app-container\">\n    <nav>\n      <button @click=\"currentPage = 'home'\">Home</button>\n      <button @click=\"currentPage = 'about'\">About</button>\n      <button @click=\"currentPage = 'products'\">Products</button>\n      <button @click=\"currentPage = 'news'\">News</button>\n      <button @click=\"currentPage = 'contact'\">Contact</button>\n    <main>\n      <HomePage v-if=\"currentPage === 'home'\" />\n      <AboutPage v-if=\"currentPage === 'about'\" />\n      <ProductsPage v-if=\"currentPage === 'products'\" />\n      <NewsPage v-if=\"currentPage === 'news'\" />\n      <ContactPage v-if=\"currentPage === 'contact'\" />",
+   "source_task_id": "000016"
+  },
+  {
+   "problem_key": "vue-api:any",
+   "name": "Component fails: ref() not recognized",
+   "applies_when": "the requirement includes dynamic content updates on the page",
+   "explanation": "Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:",
+   "code": "import { ref } from 'vue'\nconst currentSlide = ref(0)",
+   "source_task_id": "000017"
+  }
+ ]
+}
