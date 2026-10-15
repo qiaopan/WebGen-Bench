@@ -2,12 +2,26 @@
 \label{chap:intro}
 \glsresetall
 
-\section{Motivation}
-Agents built on \glspl{llm} can now turn a natural-language request into a running website~\cite{lu2025webgenbench}. Benchmarks such as WebGen-Bench evaluate this ability end to end: the agent writes a project, the project is started, and a \gls{vlm} tester clicks through the site to check whether each requested feature works~\cite{lu2025webgenbench}. In these benchmarks every task is solved in isolation. An agent that produced a blank page because it imported an uninstalled package on one task will make the same mistake on the next one.
+\section{Background}
+\subsection{Website Generation with Language Models}
+Agents built on \glspl{llm} can now turn a natural-language request into a running website~\cite{lu2025webgenbench}. A user describes the pages and features they need, for example a booking form, a product list and a contact page, and the agent writes a complete project, installs its dependencies and starts it. Benchmarks such as WebGen-Bench evaluate this ability end to end: the generated project is started, and a \gls{vlm} tester clicks through the site to check whether each requested feature actually works~\cite{lu2025webgenbench,he2024webvoyager}. This is a demanding test. A website that looks plausible in a screenshot but has a form that does nothing, or a page that cannot be reached from the navigation, fails the corresponding check.
 
-Humans do not work this way. A developer who has broken a build once remembers why. Recent work on agent memory tries to give \glspl{llm} the same ability by storing lessons from earlier trajectories and retrieving them for later tasks~\cite{zhao2024expel,wang2023voyager,reasoningbank2025,dai2026metis}. Most of these studies use large, capable models. It is less clear whether memory helps a \emph{small} model, which may not reliably follow long instructions~\cite{harada2025curse,li2025smallmodels} and may be distracted by irrelevant context~\cite{shi2023distracted,du2025contextlength}.
+The strongest results on such benchmarks come from large proprietary models. Small open models are attractive for a different reason: they can be run locally, at low cost and without sending data to a third party. WebGen-LM-7B, the 7-billion-parameter generator released with WebGen-Bench, was fine-tuned specifically for this task, yet it reaches only 28.4\% accuracy under the official protocol~\cite{lu2025webgenbench}. Improving small generators without retraining them is therefore a practical problem as well as a research one.
 
-This dissertation studies that question on WebGen-Bench with WebGen-LM-7B, the 7-billion-parameter generator released with the benchmark. We keep the generator's weights, the scaffold (Bolt.diy) and the official evaluation protocol fixed, and change only the text that is added to the prompt from a memory of earlier tasks.
+\subsection{Every Task Is Solved in Isolation}
+In WebGen-Bench, as in most code-generation benchmarks, every task is solved independently. The agent starts each task with the same weights and the same empty context. An agent that produced a blank page on one task because it imported a package that was not installed will make the same mistake on the next task, and on the one after that. In our reproduction of the baseline (\Cref{sec:nm-failures}), almost a third of the 101 tasks received a score of zero, and many of these failures had the same few causes: an undeclared dependency, a missing import, or a template that does not compile.
+
+Human developers do not work this way. A developer who has broken a build once remembers why, and the second time the same situation appears they avoid it. The failures above are exactly the kind of mistakes that experience should remove.
+
+\subsection{Long-Term Memory for Agents}
+Recent work on agent memory tries to give \glspl{llm} this ability. After each task, the agent reflects on its trajectory, stores lessons or reusable procedures, and retrieves the relevant ones when it meets a later task~\cite{zhao2024expel,wang2023voyager,reasoningbank2025,wang2025awm,dai2026metis}. These systems report clear gains, but almost all of them use large, capable models as the agent. The memory is usually stored as natural-language insight, and the agent is trusted to understand and apply it.
+
+It is much less clear whether the same approach works for a \emph{small} model. Small models follow long or numerous instructions less reliably~\cite{harada2025curse,jaroslawicz2025ifscale,li2025smallmodels}, are easily distracted by irrelevant context~\cite{shi2023distracted}, and degrade as the prompt grows even when all of it is relevant~\cite{du2025contextlength,liu2024lost}. A memory that adds a paragraph of lessons to every prompt may therefore help a large model and hurt a small one. Which \emph{form} of memory a small model can actually use is an open question.
+
+\section{Problem Statement}
+This dissertation asks whether a small website generator can get better with experience, without any change to its weights. We study the question on WebGen-Bench with WebGen-LM-7B. The generator, the agent scaffold (Bolt.diy) and the official evaluation protocol are kept fixed; the only thing that changes is the text added to the generator's prompt from a memory of earlier tasks. The memory is built only from the agent's own earlier tasks and their evaluation results; the hidden evaluation of the current task is never used, so the comparison with the no-memory baseline is fair.
+
+Two properties make this setting a demanding test of long-term memory. First, tasks arrive in a sequence and the memory available to a task depends on which tasks came before it, so the result may depend on task order. Second, under the official protocol the generator has a single attempt per task and no repair loop, so the memory must prevent an error rather than help fix it afterwards.
 
 \section{Research Questions}
 \begin{questions}[itemindent=1.5em]
@@ -16,12 +30,24 @@ This dissertation studies that question on WebGen-Bench with WebGen-LM-7B, the 7
     \item Does the benefit grow as experience accumulates, and is it robust to the order in which tasks are presented? \label{rq3}
 \end{questions}
 
+\Cref{rq1} asks whether there is an effect at all. \Cref{rq2} asks what produces it, which matters for designing memory for small models in other domains. \Cref{rq3} asks whether the effect behaves like learning from experience, rather than like a fixed prompt change that would help equally on every task, and whether it survives a change of task order.
+
+\section{Scope}
+The study is deliberately narrow so that its comparisons are clean.
+\begin{itemize}
+    \item \textbf{One benchmark, one generator, one scaffold.} All experiments use the 101 tasks of WebGen-Bench, WebGen-LM-7B and Bolt.diy. A stronger generator from the same family is an extension (\Cref{sec:stronger}); other agents such as OpenHands or Aider are not studied, because changing the agent also changes how memory reaches the model.
+    \item \textbf{Official protocol, no repair.} Each website is generated once and evaluated as it is, as in the original benchmark. We do not add build checks or repair loops, which would make the results incomparable with the published baseline.
+    \item \textbf{No retraining.} Memory only changes the prompt. Fine-tuning on stored experience is outside the scope.
+    \item \textbf{Self-hosted models only.} Generation, evaluation and memory processing all run on a university GPU cluster; no commercial API is used.
+\end{itemize}
+
 \section{Contributions}
 \begin{enumerate}
-    \item A faithful, fully self-hosted reproduction of the WebGen-Bench No Memory baseline for WebGen-LM-7B (28.5\% vs 28.4\% reported), together with a failure analysis showing that a large share of zero scores are blank pages caused by basic code errors (\Cref{chap:setup}).
-    \item A long-term memory pipeline for website generation with three components, a requirement checklist, a code pool of verified fragments, and memory hygiene, each motivated by a failure of the previous version (\Cref{chap:method}).
-    \item Empirical evidence that, for a small generator, verified code fragments are followed where textual advice is not, and that a text-only memory can become harmful as generic lessons accumulate (\Cref{chap:results}).
-    \item An experimental design for cross-task memory that controls for task order and time drift (orders with same-domain tasks adjacent versus mixed, two runs of each, with the two arms run as alternating pairs), and an honest account of the limits of single-run results (\Cref{chap:results,chap:discussion}).
+    \item A faithful, fully self-hosted reproduction of the WebGen-Bench No Memory baseline for WebGen-LM-7B (28.5\% vs 28.4\% reported), together with a failure analysis showing that a large share of zero scores are blank pages caused by basic code errors (\Cref{chap:setup,sec:nm-failures}).
+    \item A long-term memory pipeline for website generation with three components, a requirement checklist, a code pool of verified fragments, and memory hygiene, each motivated by a measured failure of the previous version (\Cref{chap:method}).
+    \item Empirical evidence that, for a small generator, verified code fragments are followed where textual advice is not, and that a text-only memory can become harmful as generic lessons accumulate. On the original task order the code-based memory raises accuracy from 28.5\% to 40.0\% (paired gain 11.5 points, 95\% \gls{ci} 6.0--16.9), and an ablation attributes most of this gain to the memory rather than to the checklist (\Cref{chap:results}).
+    \item A task-order study of cross-task memory, which shows that a single memory entry can turn into a failure mode under a different order, and that replacing whole-file examples with verified fragments removes it (\Cref{sec:order-design,sec:fix}).
+    \item An experimental design for cross-task memory that controls for time drift by running the two arms as alternating pairs, reports task-paired confidence intervals, and is explicit about the limits of single-run results (\Cref{chap:results,chap:discussion}).
 \end{enumerate}
 
 \section{Organisation of Thesis}
