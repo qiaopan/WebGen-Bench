@@ -63,7 +63,7 @@ We report accuracy over all test cases, the mean appearance score (1--5), and th
 Memory never uses information from the current task itself (leave-one-task-out), and evaluation results are never fed back into the same task.
 
 \section{Reproducing the Baseline}
-No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean appearance score of 2.34 (paper: 2.5 with GPT-4o) and 30 zero-score tasks. The close match in accuracy gives us confidence that the self-hosted pipeline is faithful to the official one.
+No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean appearance score of 2.35 (paper: 2.5 with GPT-4o) and 30 zero-score tasks. The close match in accuracy gives us confidence that the self-hosted pipeline is faithful to the official one.
 
 \section{Reproducibility and Constraints}
 Every run starts from an empty memory and stores its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts and scores; the key files of every run are archived in the project repository. The generator is decoded deterministically, so differences between arms come from the prompt rather than from sampling, although the \gls{gui} tester is not deterministic.
