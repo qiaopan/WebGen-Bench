@@ -1,0 +1,63 @@
+Please develop a domain leasing website for renting and managing domain names. The website should have functionalities for searching, leasing, renewing, and transferring domain names. Users should be able to search for, lease, renew, and transfer domain names, and view domain information and leasing records. The website should also have user management, order management, and payment management functions. Select old lace for layout background and rosy brown for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. searching domain names
+2. leasing domain names
+   Note from earlier websites: For the booking form: ensure v-if correctly toggles visibility based on user actions.
+3. renewing domain names
+4. transferring domain names
+5. view domain information
+6. view leasing records
+7. user management
+8. order management
+9. payment management
+10. old lace for layout background and rosy brown for component details
+
+General notes from earlier websites:
+- On every page: set up: vue to initialize components without errors.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

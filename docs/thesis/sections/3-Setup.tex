@@ -98,7 +98,7 @@ We compare three memory designs, shown in \Cref{fig:families} and described in \
 \node[base] (nm) {No Memory\\28.5\%};
 \node[fam, right=14mm of nm] (txt) {\textbf{Text memory}\\checklist +\\textual lessons\\30.9\%};
 \node[fam, draw=orange!80!black, right=14mm of txt] (code) {\textbf{Code memory}\\\textbf{(whole-file)}\\+ code pool, some\\examples whole files\\40.0\%};
-\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Code memory}\\\textbf{(fragments)}\\final method:\\verified fragments only\\\todo{result}};
+\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Code memory}\\\textbf{(fragments)}\\final method:\\verified fragments only\\35.2\%};
 \draw[->] (nm) -- (txt);
 \draw[->] (txt) -- node[why, above=1mm]{text not\\followed} (code);
 \draw[->] (code) -- node[why, above=1mm]{whole-file\\example\\$\rightarrow$ scaffold} (fin);

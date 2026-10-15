@@ -2,7 +2,7 @@
 \label{chap:discussion}
 
 \section{The Role of Memory Representation}
-Across the diagnostic and the full runs, this small generator responded more reliably to short code fragments than to accumulated textual lessons. Because the text and code designs differ in more than representation, this is a cross-version observation, not a controlled comparison. This agrees with Metis's finding that code memory complements text memory~\cite{dai2026metis}, and adds that for a 7B generator the format of the memory can decide whether it helps at all. The form of the code also matters: a fragment that looked like a complete file was copied as a finished answer, producing an untouched scaffold.
+Across the diagnostic and the full runs, this small generator responded more reliably to short code fragments than to accumulated textual lessons. Because the text and code designs differ in more than representation, this is a cross-version observation, not a controlled comparison. This agrees with Metis's finding that code memory complements text memory~\cite{dai2026metis}, and adds that for a 7B generator the format of the memory can decide whether it helps at all. The form of the code also matters, in both directions: a complete file was sometimes copied as a finished answer, producing an untouched scaffold, while in the original order a fragment prevented undeclared imports less reliably than the complete file.
 
 This contrasts with strong models, for which text memory transfers more reliably than code~\cite{dai2026metis,kim2026mtl}. The mechanisms differ (Metis executes its code; we show code to the generator), but together the results suggest that the best form of memory depends on the capability of the model that consumes it.
 

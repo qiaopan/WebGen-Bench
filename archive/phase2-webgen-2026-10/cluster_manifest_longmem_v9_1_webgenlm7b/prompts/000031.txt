@@ -1,0 +1,36 @@
+Please implement an anonymous campus discussion platform for students to communicate and discuss. The platform should have a discussion forum feature that allows students to anonymously post, reply to posts, and participate in discussions. Students should be able to browse and search posts, follow topics of interest, and receive notifications. The platform should ensure user privacy and security, protecting students' personal information. Configure your theme with honeydew as background and dark olive green as component color.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an anonymous campus discussion platform for students to communicate and discuss.
+2. The platform should have a discussion forum feature that allows students to anonymously post, reply to posts, and participate in discussions.
+3. Students should be able to browse and search posts, follow topics of interest, and receive notifications.
+4. The platform should ensure user privacy and security, protecting students' personal information.
+5. Configure your theme with honeydew as background and dark olive green as component color.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
