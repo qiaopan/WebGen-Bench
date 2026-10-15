@@ -42,15 +42,6 @@ Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5
 \label{fig:curve}
 \end{figure}
 
-\Cref{fig:gap} shows the same data as a paired gap to No Memory. Both memories lead early; between tasks 40 and 60 text memory falls up to 27 points below No Memory while code memory stays near or above zero, and from task 60 onwards code memory stays clearly positive.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\textwidth]{figures/gap_curve_v4_v7.png}
-\caption{Rolling 10-task mean of the per-task accuracy gap to No Memory, by execution order. Positive values mean Long Memory is better.}
-\label{fig:gap}
-\end{figure}
-
 \section{Why Text Memory Declines and Code Memory Improves}
 \Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. In text memory such lessons appear in most tasks throughout and a separate ``General notes'' block becomes more frequent over time, while nothing addresses blank pages. In code memory these lessons are rarer and the code pool supplies a fragment in almost every task after it activates.
 
@@ -65,8 +56,6 @@ Prompt content & Text & Code (whole-file) \\
 Tasks with a lesson without a code construct & 23 / 25 / 28 & 12 / 4 / 11 \\
 Tasks with a ``General notes'' block & 13 / 16 / 27 & 3 / 0 / 8 \\
 Tasks with a code-pool fragment & 0 / 0 / 0 & 25 / 30 / 41 \\
-Lessons attached to checklist items & 56 / 53 / 81 & 32 / 16 / 41 \\
-\quad of which without a code construct (all tasks) & 102 of 190 & 31 of 89 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -90,11 +79,9 @@ Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 12 / 4 / 6 (2
 These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
 
 \section{Error Analysis}
-Whole-site breaks fall from 26 tasks (No Memory) to 8 (code memory), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22): the code pool prevents the error that blanks the whole site more reliably than the per-page one, which remains a basic error of the 7B generator. Counted per file, 27 of 592 generated Vue components with code memory (4.6\%) call a Vue function without importing it, against 27 of 586 (4.6\%) for No Memory. The omission occurs in \texttt{App.vue} and in child components alike, and is unrelated to whether a component uses \texttt{defineProps}/\texttt{defineEmits}; in the same file other imports are usually correct. The two arms show the same per-file rate, which is consistent with a slip rather than a misconception that an example could correct, though we have not shown this directly; a site with more components is more likely to contain one.
+Whole-site breaks fall from 26 tasks (No Memory) to 8 (code memory), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22). Per file the rate is the same in both arms (27 of 592 vs 27 of 586 components, 4.6\%), and a variant example showing both \texttt{ref} and \texttt{computed} fixed one of four affected tasks; we report it as a residual error of the generator, since the protocol forbids repair. Ten of code memory's 13 zero-score tasks are also zero for No Memory. \todo{Planned (existing data): list the cause of each remaining zero-score task of the final version.}
 
-This slip was not reduced by a better example: a variant that showed both \texttt{ref} and \texttt{computed} removed it in one of four affected tasks. As the official protocol forbids repairing code after generation, we report it as a limitation of the generator. Ten of code memory's 13 zero-score tasks are also zero for No Memory. \todo{Planned (existing data): list the cause of each remaining zero-score task of the final version (blank page, missing feature, budget exhausted) instead of calling them hard.}
-
-\paragraph{Appearance.} Restricted to the 68 tasks where both arms produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for whole-file code memory. We observed no meaningful difference on this common subset; because memory changes which tasks enter the subset, this does not show that memory has no effect on appearance. The three appearance figures in this dissertation use different denominators: 2.35 averages all 101 tasks with failures as 0 (\Cref{tab:main}), 3.25 averages tasks with a grade (\Cref{tab:ablation}), and 3.25 vs 3.22 is the paired subset. 
+\paragraph{Appearance.} On the 68 tasks where both arms produced a graded site, the means are 3.25 (No Memory) and 3.22 (code memory); since memory changes which tasks enter this subset, this does not show that memory has no effect on appearance. \Cref{tab:main} instead averages all 101 tasks with failures as 0, and \Cref{tab:ablation} averages graded tasks.
 
 \section{Ablations: Checklist Only and Fixed Code Prefix}
 \label{sec:ablation}

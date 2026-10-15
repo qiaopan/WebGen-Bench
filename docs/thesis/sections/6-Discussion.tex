@@ -8,11 +8,10 @@ This contrasts with strong models, for which text memory transfers more reliably
 
 A second observation is that part of the gain is not ``smarter'' code but protection against collapse. In the earliest phase, short prompts made the model return the default scaffold in five of eight tasks, while longer, specific prompts did not. Both effects are real benefits of memory, but they should be described separately.
 
-\section{What Is Learned}
-The generator does not change; what changes is which reusable code is shown to it, and when. The system records which problems recur, associates them with code drawn from its own earlier successful and compiling websites, and retires lessons whose recurrence-based utility stays low. This is closer to automatically building a small set of preventive code examples supported by observed prior outcomes than to acquiring new programming ability, and it is a property of the whole system, including a memory model larger than the generator. Within 101 tasks the memory stays small (a few code-pool entries and tens of active lessons); how it behaves over thousands of tasks, with many more problem types competing for three slots and older entries conflicting with newer ones, is not tested here.
+\section{What Is Learned and at What Cost}
+The generator does not change; what changes is which reusable code is shown to it, and when. The system records which problems recur, pairs them with code from its own earlier successful, compiling websites, and retires lessons with low utility. This is closer to building a small set of preventive code examples than to acquiring programming ability, and it is a property of the whole system, including a memory model larger than the generator. Within 101 tasks the memory stays small; behaviour over thousands of tasks, with more problem types competing for three slots, is not tested.
 
-\section{Cost}
-The generator is small, but the system is not. Each Long Memory task takes about 12 minutes against about 6 for No Memory; the extra steps are checklist construction, applicability judgements and reflection by the 72B memory model, which we have not timed separately. The functional tester is shared by both arms and belongs to evaluation, not to deployment. If the fixed-prefix ablation shows that the learned fragments alone recover most of the gain, a deployed system could use the fragments without running the 72B model for every task, at the cost of losing online adaptation. 
+The system is also not cheap: a Long Memory task takes about 12 minutes against about 6 for No Memory, mostly for checklist construction, applicability judgements and reflection by the 72B model. If the fixed-prefix ablation recovers most of the gain, a deployed system could use the learned fragments without the 72B model, at the cost of online adaptation.
 
 \section{Limitations and Threats to Validity}
 \label{sec:threats}

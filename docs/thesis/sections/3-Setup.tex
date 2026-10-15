@@ -26,22 +26,17 @@ We use all 101 WebGen-Bench tasks. They come from 20 application domains of uneq
 
 \section{How One Task Is Generated and Scored}
 \label{sec:walkthrough}
-This section follows one task through the unmodified system, so that it is clear what the memory later changes. Task 000006 asks for a solar dashboard:
+This section follows one task, 000006, through the unmodified system:
 
 \noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 Please implement a solar dashboard to display real-time and historical solar
-data. The dashboard should have functionalities for real-time data display,
-historical data query, and chart analysis. [...] Configure the background color
-to honeydew, with components using dark olive green.
+data. [...] Configure the background color to honeydew, with components using
+dark olive green.
 \end{lstlisting}
 \end{minipage}
 
-\paragraph{Generation.} Under No Memory this text is the entire prompt. Bolt.diy is an open-source browser-based coding agent: it opens a starter project (for Vue, a Vite + Vue + TypeScript template whose \texttt{package.json} declares only \texttt{vue}), sends the requirement to the generator, and writes every file of the model's reply into the project. It then installs the dependencies and starts the development server. The generator has one reply; nothing in the official protocol inspects or repairs the code.
-
-\paragraph{Functional testing.} Each task comes with hidden test cases, on average six. For task 000006 the first two are ``Verify the display of real-time solar power generation data'' and ``Test the display of real-time power consumption data'', each with an expected result. A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} receives one test case at a time. At each step it sees a screenshot in which every interactive element carries a numbered box (\Cref{fig:walkthrough}b), chooses an action such as clicking element 1 or typing into a field, and finally answers YES, PARTIAL or NO. The agent has a fixed step budget; if it runs out before reaching the target, the case counts as failed.
-
-\paragraph{Appearance grading.} A vision model grades a full-page screenshot from 1 to 5 for layout, colour and completeness. Both the tester and the grader are models acting as judges, which are known to have biases~\cite{zheng2023judge}; we therefore keep their raw transcripts and, in \Cref{sec:threats}, check a sample of their verdicts by hand.
+Under No Memory this text is the entire prompt. Bolt.diy, an open-source browser-based coding agent, opens a Vite + Vue + TypeScript starter whose \texttt{package.json} declares only \texttt{vue}, writes every file of the generator's single reply into it, installs dependencies and starts the server. Each task has on average six hidden test cases (here, for example, ``Verify the display of real-time solar power generation data''). A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} takes one case at a time, acts on screenshots in which interactive elements carry numbered boxes, and answers YES, PARTIAL or NO within a fixed step budget. A vision model grades a full-page screenshot from 1 to 5. Both are models acting as judges, which have known biases~\cite{zheng2023judge}; their raw transcripts are kept.
 
 \Cref{fig:walkthrough} shows what the tester saw for this task in two runs. Under No Memory the model imported the chart library \texttt{vue-chartjs}, which the template does not declare; Vite cannot resolve the import, the page shows only the error overlay, and all test cases fail. With the final memory the generator built the three requested views without the undeclared package, and all test cases passed.
 
@@ -141,23 +136,7 @@ No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean a
 \section{Reproducibility and Constraints}
 Every run starts from an empty memory and stores its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts and scores; the key files of every run are archived in the project repository. The generator is decoded deterministically, so differences between arms come from the prompt rather than from sampling, although the \gls{gui} tester is not deterministic.
 
-\paragraph{Hardware.} All experiments ran on one node of the School of Computer Science CS ML cluster (\texttt{foscsmlprd03}, seven NVIDIA H200 GPUs with 141\,GB of memory each, Slurm scheduler), with at most two GPUs per user. A single long-running job held two GPUs and served every model with vLLM; all arms and task orders shared these servers (\Cref{tab:hardware}). Two tasks were processed in parallel, while evaluation was serialised by a lock, because the evaluator restarts the website process manager. From the first job on 5 October 2026 to the end of the 7B runs, the project used about \todo{update} H200 GPU-hours.
-
-\begin{table}[ht]
-\centering
-\caption{Placement of the self-hosted models on the two H200 GPUs (memory reserved by vLLM).}
-\label{tab:hardware}
-\begin{tabular}{llr}
-\toprule
-GPU & Model (role) & Memory (GB) \\
-\midrule
-GPU 0 & Qwen2.5-VL-32B-Instruct, BF16 (evaluator) & 83 \\
-      & WebGen-LM-7B, BF16 (generator) & 26 \\
-GPU 1 & Qwen2.5-VL-72B-Instruct-AWQ (memory) & 113 \\
-      & bge-m3 (embeddings) & 2 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\paragraph{Hardware.} One long-running Slurm job on two NVIDIA H200 GPUs served all models with vLLM and was shared by all arms and orders; it used about \todo{update} H200 GPU-hours.
 
 \paragraph{Code and data availability.} The code, configuration files and the archived run records (prompts, injected memory, scores and memory databases of every run) are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \texttt{archive/phase2-webgen-2026-10/}.
 
