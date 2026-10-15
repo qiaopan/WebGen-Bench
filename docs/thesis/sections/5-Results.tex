@@ -8,14 +8,14 @@ Each arm is a single run over all 101 tasks. \Crefrange{sec:main}{sec:ablation} 
 
 \begin{table}[ht]
 \centering
-\caption{Main results on all 101 tasks in the manifest order (single run per arm). Yes, Partial, No and Start failed are percentages of the 647 test cases; Accuracy $=$ Yes $+\,0.5\times$ Partial. Appearance is the mean grade over all 101 tasks (1--5; tasks without a working site count as 0). $\Delta$ is the mean per-task difference to No Memory with a 95\% bootstrap \gls{ci}. Zero: tasks where every test case fails. Best values in bold.}
+\caption{Main results on all 101 tasks in the manifest order (single run per arm). Yes, Partial, No and Start failed are percentages of the 647 test cases; Accuracy $=$ Yes $+\,0.5\times$ Partial. Appearance is the mean grade over all 101 tasks (1--5; tasks without a working site count as 0). Paired $\Delta$ is the mean per-task difference to No Memory with a 95\% bootstrap \gls{ci}; it can differ from the difference of pooled accuracies because tasks have different numbers of test cases. Zero: tasks where every test case fails. Best values in bold.}
 \label{tab:main}
 \small
 \setlength{\tabcolsep}{4pt}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lcccccccc}
 \toprule
-Arm & Yes & Partial & No & Start fail. & Acc. & Appear. & Zero & $\Delta$ Acc. [95\% CI] \\
+Arm & Yes & Partial & No & Start fail. & Acc. & Appear. & Zero & Paired $\Delta$ [95\% CI] \\
 \midrule
 WebGen-LM-7B (paper)\textsuperscript{a} & 24.9 & 7.1 & 68.0 & 0.0 & 28.4 & 2.5 & -- & -- \\
 \midrule
@@ -98,12 +98,12 @@ This slip was not reduced by a better example: a variant that showed both \textt
 
 \section{Ablations: Checklist Only and Fixed Code Prefix}
 \label{sec:ablation}
-Two ablations separate the contributions of the components, both with the v7 configuration and the manifest order:
+Two complementary ablations use the manifest order: a checklist-only control based on v7, and a retrospective fixed-code control using the code entries learned by v9.1:
 \begin{itemize}
   \item \textbf{Checklist only:} v7 with memory reads and writes disabled; each task sees only the requirement checklist. Checklist only $-$ No Memory estimates the effect of requirement decomposition.
   \item \textbf{Fixed code prefix:} checklist only, plus the code-pool entries that v9.1 had learned by the end of its manifest run (\Cref{sec:codepool}), injected from the first task with the same selection rule, still without memory. The code is not written by hand; it is the method's own learned content. Because it is taken from the end of a complete run, this control has access to experience that an online learner only gains later; it is a retrospective, oracle-style comparison rather than an online one. Fixed prefix $-$ checklist only estimates the effect of having this code in the prompt, and v9.1 $-$ fixed prefix the effect of accumulating experience and selecting it per task.
 \end{itemize}
-If the fixed prefix matches v7, the contribution of the method is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation.
+If the fixed-code control performs similarly to v9.1, the contribution is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation. The comparison does not isolate accumulation alone, because the two conditions also differ in textual lessons and memory maintenance.
 
 \Cref{tab:ablation} reports the checklist-only ablation over all 101 tasks; the fixed-prefix run is queued after the seed-47 order (expected about 10-18).
 
@@ -143,7 +143,7 @@ We therefore compare two kinds of order, each run twice, every run starting from
   \item[Domains adjacent.] The order of the 20 domain blocks and the order of tasks within each block are shuffled, with seed 11 and seed 47. The manifest order, used for the main results, also belongs to this kind.
   \item[Domains mixed.] A uniformly random order of all 101 tasks (seed 29), and an interleaved order that takes one task from each domain in turn, so that consecutive tasks always come from different domains.
 \end{description}
-In every order, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first (ABBA), so that drift in infrastructure or evaluator load affects both arms equally. No Memory should not depend on order; its runs instead measure run-to-run noise (three completed, two running). The checklist-only ablation does not use memory and is run once. Results are task-level paired differences with bootstrap \glspl{ci}.
+In the shuffled and interleaved orders, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first (ABBA), to reduce confounding from infrastructure drift and evaluator load. The manifest-order arms were run at different times and are reported separately. No Memory should not depend on order; its runs instead measure run-to-run noise (three completed, two running). The checklist-only ablation does not use memory and is run once. Results are task-level paired differences with bootstrap \glspl{ci}.
 
 \begin{table}[ht]
 \centering
@@ -167,7 +167,7 @@ Mixed & Interleaved & -- & -- & -- & -- & -- \\
 
 \paragraph{Development and validation.} Seed 11 was used to develop v8--v9.1 (\Cref{sec:fix}) and is therefore development data for the final version. The manifest, seed-29, seed-47 and interleaved runs of v9.1 started after v9.1 was frozen. All orders use the same 101 tasks, on which the earlier versions were developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
-The first two shuffled orders give almost the same result (\Cref{tab:order}): Long Memory leads by about 4.5 points, with zero-score tasks reduced from 29 to 21, but neither confidence interval excludes zero, and the gain is far smaller than in the manifest order. No Memory is stable across its three runs (27.9--28.6\%), so the change is on the Long Memory side. Mixing domains does not remove the gain: the random order (seed 29) matches the shuffled-blocks order (seed 11), and from task 31 onwards Long Memory leads by 6.6 points in the random order (33.9\% vs 27.3\%). A curriculum effect from same-domain neighbours is therefore not the main source of the benefit.
+The first two shuffled orders give almost the same result (\Cref{tab:order}): Long Memory leads by about 4.5 points, with zero-score tasks reduced from 29 to 21, but neither confidence interval excludes zero, and the gain is far smaller than in the manifest order. No Memory is stable across its three runs (27.9--28.6\%), so the change is on the Long Memory side. Mixing domains does not remove the gain: the random order (seed 29) matches the shuffled-blocks order (seed 11), and from task 31 onwards Long Memory leads by 6.6 points in the random order (33.9\% vs 27.3\%). The gain is therefore not restricted to orders with adjacent same-domain tasks, although these results do not establish how much domain adjacency contributes.
 
 Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}). Long Memory returned the unmodified Vite scaffold on 19 tasks in seed 11 and 16 in seed 29, against none for No Memory in either order and two in the manifest order. Every scaffold occurred after the missing-package code memory, whose example was a complete \texttt{App.vue} of another site, began to be injected (task 36 in seed 11, task 19 in seed 29). This is the failure the v8 change targets (\Cref{sec:fix}).
 

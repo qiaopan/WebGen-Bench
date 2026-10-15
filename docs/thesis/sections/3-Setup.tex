@@ -4,7 +4,7 @@
 \section{Benchmark and Protocol}
 We use all 101 WebGen-Bench tasks. They come from 20 application domains of unequal size, from eight tasks each (company brochures, learning platforms, discussion forums, e-commerce) down to two (personal blogs, streaming, email clients). The benchmark's manifest order groups tasks into domain blocks; \Cref{sec:order-design} adds shuffled orders. We follow the official protocol: the generator produces the project once, there is no repair loop, and a project is passed to evaluation as soon as its dependencies install and the development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier phase of this project used a stricter build gate (\texttt{vue-tsc}) and a more generous repair loop; those results are not comparable with the paper and are not reported as main results.
 
-\Cref{fig:pipeline} shows one task in the pipeline. The memory module is the only component that differs between arms; the generator, the scaffold, the tester and the scoring are shared.
+\Cref{fig:pipeline} shows one task in the evaluation pipeline. The memory module is the only component that differs between arms; the generator, the scaffold, the tester and the scoring are shared.
 
 \begin{figure}[ht]
 \centering
