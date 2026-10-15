@@ -4,7 +4,7 @@
 Each arm is a single run over all 101 tasks. \Crefrange{sec:main}{sec:ablation} use the manifest order; \Cref{sec:order-design} repeats the comparison in other orders. Accuracy pools all test cases (as in the official script); the learning curves average per-task accuracy, so their end points differ slightly.
 
 \section{Main Comparison}\label{sec:main}
-\Cref{tab:main} reports the main comparison in the format of the WebGen-Bench results table~\cite{lu2025webgenbench}, with the published WebGen-LM-7B result as the first row. Every arm uses the same generator, scaffold and evaluators; only the memory differs.
+\Cref{tab:main} reports the main comparison in the format of the WebGen-Bench results table~\cite{lu2025webgenbench}, with the published WebGen-LM-7B result as the first row. Every arm uses the same generator, scaffold and evaluators; the treatment is the prompt supplied by the external memory pipeline, including the checklist and any cross-task content.
 
 \begin{table}[ht]
 \centering
@@ -25,7 +25,7 @@ Checklist only & 26.4 & 10.7 & 61.4 & 1.5 & 31.8 & 2.47 & 18 & $+3.4$ [$-2.2$, 8
 Code memory (v7) & \textbf{34.5} & 11.1 & \textbf{53.2} & 1.2 & \textbf{40.0} & \textbf{2.83} & \textbf{13} & $\mathbf{+11.5}$ [6.0, 16.9] \\
 Final, verified fragments (v9.1) & \multicolumn{8}{c}{\todo{running}} \\
 \bottomrule
-\multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B.}
+\multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B, so the two are not directly comparable.}
 \end{tabular}
 \end{adjustbox}
 \end{table}
