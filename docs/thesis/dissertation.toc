@@ -55,18 +55,18 @@
 \contentsline {section}{\numberline {6.1}The Role of Memory Representation}{30}{section.6.1}%
 \contentsline {section}{\numberline {6.2}What Is Learned and at What Cost}{30}{section.6.2}%
 \contentsline {section}{\numberline {6.3}Limitations and Threats to Validity}{31}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Ethical Considerations and Impact}{32}{section.6.4}%
-\contentsline {paragraph}{Data and privacy.}{32}{section.6.4}%
-\contentsline {paragraph}{Environmental cost.}{32}{section.6.4}%
+\contentsline {section}{\numberline {6.4}Ethical Considerations and Impact}{33}{section.6.4}%
+\contentsline {paragraph}{Data and privacy.}{33}{section.6.4}%
+\contentsline {paragraph}{Environmental cost.}{33}{section.6.4}%
 \contentsline {paragraph}{Self-improving code agents.}{33}{section.6.4}%
 \contentsline {paragraph}{Economy and society.}{33}{section.6.4}%
 \contentsline {paragraph}{Use of AI tools.}{33}{section.6.4}%
 \contentsline {paragraph}{Research integrity.}{33}{section.6.4}%
-\contentsline {section}{\numberline {6.5}Project Management}{33}{section.6.5}%
-\contentsline {chapter}{\numberline {7}Conclusion}{34}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Answers to the Research Questions}{34}{section.7.1}%
-\contentsline {paragraph}{\ref {rq1}}{34}{section.7.1}%
-\contentsline {paragraph}{\ref {rq2}}{34}{section.7.1}%
-\contentsline {paragraph}{\ref {rq3}}{34}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Future Work}{35}{section.7.2}%
-\contentsline {chapter}{Bibliography}{36}{section.7.2}%
+\contentsline {section}{\numberline {6.5}Project Management}{34}{section.6.5}%
+\contentsline {chapter}{\numberline {7}Conclusion}{35}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Answers to the Research Questions}{35}{section.7.1}%
+\contentsline {paragraph}{\ref {rq1}}{35}{section.7.1}%
+\contentsline {paragraph}{\ref {rq2}}{35}{section.7.1}%
+\contentsline {paragraph}{\ref {rq3}}{35}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Future Work}{36}{section.7.2}%
+\contentsline {chapter}{Bibliography}{37}{section.7.2}%
