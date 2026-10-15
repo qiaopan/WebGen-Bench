@@ -3,8 +3,8 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces One task in the pipeline. Black: the official WebGen-Bench setup (No Memory). Blue: the memory module, which reflects after each task and adds text to the prompt of later tasks only.\relax }}{9}{figure.caption.2}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces The first screenshot the tester received for task 000006 (seed-11 order). (a) An undeclared package stops the whole site. (b) The numbered dashed boxes are drawn by the tester to name the elements it can click; they are not part of the website.\relax }}{10}{figure.caption.3}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces The three memory designs. Each arrow names the failure that motivated the next design. Accuracy is on the manifest order (101 tasks, one run).\relax }}{12}{figure.caption.5}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces The first screenshot the tester received for task 000006 (seed-11 order). (a) An undeclared package stops the whole site. (b) The numbered dashed boxes are drawn by the tester to name the elements it can click; they are not part of the website.\relax }}{11}{figure.caption.3}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces The three memory designs. Each arrow names the failure that motivated the next design. Accuracy is on the manifest order (101 tasks, one run).\relax }}{13}{figure.caption.5}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {4.1}{\ignorespaces The memory flow of the final method.}}{16}{figure.caption.7}%
 \contentsline {figure}{\numberline {4.2}{\ignorespaces The final method's prompt for task 000041 (seed 11), shortened: requirement, checklist with attached lessons, and verified code fragments.\relax }}{18}{figure.caption.8}%
