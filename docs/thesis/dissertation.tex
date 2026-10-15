@@ -72,7 +72,7 @@
 
 \frontmatter
 \begin{abstract}
-Agents that generate websites with large language models solve every task from scratch: what went wrong on one website is forgotten before the next one starts. This dissertation asks whether a system built around a \emph{small} generator, WebGen-LM-7B, can improve across a sequence of WebGen-Bench tasks when it is given a long-term memory built from its own earlier attempts, without changing its weights or the official evaluation protocol. The memory is maintained by a separate, larger model; only the generator is small.
+Agents that generate websites with large language models solve every task from scratch: what went wrong on one website is forgotten before the next one starts. This dissertation asks whether a system built around a \emph{small} generator, WebGen-LM-7B, can improve across a sequence of WebGen-Bench tasks when it is given a long-term memory built from its own earlier attempts, without changing its weights and while retaining the official single-attempt generation and evaluation of each task. The memory is maintained by a separate, larger model; only the generator is small.
 
 We first reproduce the official No Memory baseline on a self-hosted cluster (28.5\% accuracy on 101 tasks versus 28.4\% reported). Its failures show that many zero-score tasks are blank pages caused by basic code errors, such as importing a package that is not installed, and that the model rarely follows advice written as text. A text-based memory therefore helps early in the sequence but falls behind No Memory later, as generic advice accumulates.
 
