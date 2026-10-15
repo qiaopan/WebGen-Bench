@@ -36,9 +36,7 @@ We began by inspecting the code that No Memory actually produced, rather than it
 
 \section{Design History}
 \label{sec:history}
-The three families of \Cref{fig:families} were reached through the attempts listed in \Cref{tab:history}. \Cref{tab:design} in \Cref{chap:setup} lists what was run in the final experiments; the table below lists how the design got there, so the two tables describe different things: the arms compared, and the history of the method.
-
-Each version was motivated by an error analysis of the previous one. Versions are numbered in the order they were built, and every number appears in \Cref{tab:history}: v1 and v2 used the early text-memory design of the first three rows, v5 was a local prototype of the code pool that was never run on all tasks, and v8 and v9 were stopped part-way. Only v4, v7 and v9.1 were run on all 101 tasks; in the rest of this dissertation they are called \emph{text memory}, \emph{code memory} and the \emph{final} version.
+The three families of \Cref{fig:families} were reached through the attempts in \Cref{tab:history}; unlike \Cref{tab:design}, which lists the arms compared, the table records how the method evolved. Versions are numbered in build order. v1 and v2 are early text-memory designs, v5 was a local prototype, and v8 and v9 were stopped part-way; only v4, v7 and v9.1 ran on all 101 tasks.
 
 \begin{table}[ht]
 \centering
@@ -64,15 +62,7 @@ Short \gls{cot} (rejected) & Missing imports & \cite{li2025smallmodels} & 0/5 pr
 \end{tabularx}
 \end{table}
 
-\paragraph{Phase 1 (text memory).} Our first memory followed ExpeL-style reflection: after each task a reflection model wrote \emph{cases} (trigger, expected state, observation, cause, preventative action) with evidence, and later tasks retrieved them as guidance. A scaffold bug first hid every result: Bolt.diy treats Enter as ``send'', so all text after the first line break was dropped. Once fixed, long guidance made the model build only the home page, and compressing it sometimes removed required features. Rules for the reflection model must teach a method of investigation, not answers; hand-written conclusions would turn a learned memory into a designed prompt.
-
-\paragraph{v4: requirement checklist.} The memory model splits the original requirement into a checklist and attaches each retrieved lesson verbatim to the checklist item it concerns. Code checks reject checklist items that share no content words with the requirement (to avoid importing features from other tasks), and re-split the requirement if the checklist covers too little of it. v4 was clearly better than No Memory on the first 30 tasks (39.3\% vs 26.0\%) but slightly worse on the remaining 71 (27.8\% vs 29.5\%).
-
-\paragraph{v6: code pool.} Motivated by \Cref{sec:nm-failures}, the code pool turns recurring code-level problems into code examples (\Cref{sec:codepool}). Its first version showed a one-line import wrapped in \texttt{<script setup>} tags. To the generator this looked like a finished empty component, and in two of six tasks that received it the model returned the untouched Vite scaffold.
-
-\paragraph{v7: fragments only.} v7 requires every example to be a fragment: verbatim lines from a working file, no tag lines, and at least one line that \emph{uses} the imported function. It also fixes a leak through which a statistics block, meant only for ranking, reached the prompt. v7 was frozen and evaluated on the manifest order and the checklist ablation.
-
-\paragraph{v8 to v9.1: fixing what a new task order exposed.} Under shuffled orders v7 returned the untouched scaffold on many tasks, traced to a missing-package entry whose example was a whole \texttt{App.vue} from another site. \Cref{fig:scaffold} shows one such case. v8 to v9.1 address this and two related limits; \Cref{sec:fix} gives the evidence for each step. The final version, v9.1, differs from v7 only in the code pool.
+\paragraph{From text to code.} The first memory followed ExpeL-style reflection: after each task the memory model wrote cases (trigger, observation, cause, preventative action) with evidence, retrieved later as guidance. Reflection rules teach a method of investigation, never answers, so that the memory is learned rather than designed. After a scaffold bug was fixed (Bolt.diy treated a line break as ``send'' and dropped the rest of the prompt), long guidance made the model build only the home page, and compressing it dropped features. The checklist of v4 keeps every requested feature visible and attaches lessons to the item they concern; v4 beat No Memory on the first 30 tasks (39.3\% vs 26.0\%) but not on the last 71 (27.8\% vs 29.5\%). The code pool of v6 replaced text by code, but its one-line example wrapped in \texttt{<script setup>} tags looked like a finished empty component and produced untouched scaffolds; v7 therefore admits only verbatim fragments without tag lines that include a line using the imported function. Under shuffled orders v7 still returned scaffolds when an entry showed a whole \texttt{App.vue} (\Cref{fig:scaffold}); v8 to v9.1 change only the code pool to fix this (\Cref{sec:fix}). A planning step before generation was rejected: in five of five tasks the generator wrote only the plan and lost Bolt.diy's file format.
 
 \begin{figure}[ht]
 \centering
@@ -103,8 +93,6 @@ const activeTab = ref('donation')
 \caption{Code memory (v7) on task 000041, an online trading site (seed-11 order). Left: part of the code-pool entry in the prompt, a complete \texttt{App.vue} from an earlier food-donation site. Right: the generator returned the untouched Vite starter project, and all five test cases failed. The final version shows only verified lines of such a file, without the \texttt{<script>} and \texttt{<template>} tags (\Cref{fig:prompt}).}
 \label{fig:scaffold}
 \end{figure}
-
-\paragraph{Rejected: short planning step.} Asking the generator to first list, per file, the Vue functions it would use and then write the code produced planning text only, losing Bolt.diy's file format in five of five tasks.
 
 \section{Final Pipeline (v9.1)}
 \label{sec:pipeline}
