@@ -44,7 +44,7 @@
 \contentsline {chapter}{\numberline {5}Results}{21}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Main Comparison}{21}{section.5.1}%
 \contentsline {section}{\numberline {5.2}Learning Curve}{22}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Why Text Memory Declines and Code Memory Improves}{22}{section.5.3}%
+\contentsline {section}{\numberline {5.3}Why Text Memory Declines and Code Memory Improves}{23}{section.5.3}%
 \contentsline {section}{\numberline {5.4}Error Analysis}{23}{section.5.4}%
 \contentsline {paragraph}{Appearance.}{24}{section.5.4}%
 \contentsline {section}{\numberline {5.5}Ablations: Checklist Only and Fixed Code Prefix}{24}{section.5.5}%
