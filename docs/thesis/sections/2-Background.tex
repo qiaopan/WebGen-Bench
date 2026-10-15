@@ -1,7 +1,7 @@
 \chapter{Background and Related Work}
 \label{chap:background}
 
-This chapter places the work in four bodies of literature. \Cref{sec:bg-webgen} describes how website generation is evaluated and why WebGen-Bench and WebGen-LM-7B were chosen. \Cref{sec:bg-memory} reviews memory for \gls{llm} agents, with attention to the \emph{form} in which experience is stored. \Cref{sec:bg-small} summarises evidence that small models respond differently to added prompt text, and \Cref{sec:bg-selfcorr} separates our use of reflection from self-correction on the same task. \Cref{sec:gap} states the gap that this dissertation addresses.
+This chapter covers website-generation benchmarks, memory for \gls{llm} agents, small models and added prompt text, and self-correction, and then states the research gap (\Cref{sec:gap}).
 
 \section{Website Generation Benchmarks}
 \label{sec:bg-webgen}
@@ -11,9 +11,7 @@ WebGen-Bench~\cite{lu2025webgenbench} contains 101 website requirements from 20 
 
 WebGen-Bench evaluates generators inside agent scaffolds rather than as bare models. In the Bolt.diy scaffold used here, the model writes the project as a sequence of file actions in its reply, the scaffold applies them to a template project, installs dependencies and starts a development server. The official protocol gives the generator a single attempt: there is no build check and no repair loop, and a project that does not start receives zero for all of its test cases. This is important for our study, because it means memory cannot help by fixing errors after they happen; it can only change what the generator writes in the first place.
 
-The benchmark paper reports each configuration as a single run without error bars; its NeurIPS checklist states that error bars were not reported because it would be too computationally expensive~\cite{lu2025webgenbench}. The limitations it lists itself are that generation covers only TypeScript, JavaScript, CSS and HTML, and that only supervised fine-tuning was used to improve open models. Because we compare two arms whose difference may be small relative to run-to-run noise, we repeat runs and report paired confidence intervals (\Cref{sec:order-design}).
-
-WebGen-Bench is a static benchmark. It does not define any interaction between tasks, so neither memory across tasks nor the order of tasks is part of its protocol. Introducing memory makes the order a treatment variable, which we handle explicitly in \Cref{sec:order-design}.
+The benchmark reports single runs without error bars, citing computational cost, and defines no interaction between tasks~\cite{lu2025webgenbench}; with memory, task order becomes a treatment variable (\Cref{sec:order-design}).
 
 \section{Memory for LLM Agents}
 \label{sec:bg-memory}

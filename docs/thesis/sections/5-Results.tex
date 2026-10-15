@@ -136,7 +136,7 @@ Does the memory framework also improve a larger generator from the same family? 
 
 \section{Robustness to Task Order}
 \label{sec:order-design}
-WebGen-Bench is a static benchmark: tasks are solved independently and its main results are single runs without error bars, which the authors attribute to computational cost~\cite{lu2025webgenbench}. With memory, however, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
+With memory, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
 
 We therefore compare two kinds of order, each run twice, every run starting from an empty memory:
 \begin{description}

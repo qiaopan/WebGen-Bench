@@ -4,7 +4,7 @@
 
 \section{Background}
 \subsection{Website Generation with Language Models}
-Agents built on \glspl{llm} can now turn a natural-language request into a running website~\cite{lu2025webgenbench}. A user describes the pages and features they need, for example a booking form, a product list and a contact page, and the agent writes a complete project, installs its dependencies and starts it. Benchmarks such as WebGen-Bench evaluate this ability end to end: the generated project is started, and a \gls{vlm} tester clicks through the site to check whether each requested feature actually works~\cite{lu2025webgenbench,he2024webvoyager}. This is a demanding test. A website that looks plausible in a screenshot but has a form that does nothing, or a page that cannot be reached from the navigation, fails the corresponding check.
+Agents built on \glspl{llm} can now turn a natural-language request into a running website~\cite{lu2025webgenbench}. Benchmarks such as WebGen-Bench start the generated project and let a \gls{vlm} tester check each requested feature through the interface~\cite{lu2025webgenbench,he2024webvoyager}, so a site that only looks plausible still fails.
 
 The strongest results on such benchmarks come from large proprietary models. Small open models are attractive for a different reason: they can be run locally, at low cost and without sending data to a third party. WebGen-LM-7B, the 7-billion-parameter generator released with WebGen-Bench, was fine-tuned specifically for this task, yet it reaches only 28.4\% accuracy under the official protocol~\cite{lu2025webgenbench}. Improving small generators without retraining them is therefore a practical problem as well as a research one.
 
@@ -48,17 +48,4 @@ The study is deliberately narrow so that its comparisons are clean.
 \end{enumerate}
 
 \section{Organisation of Thesis}
-\begin{description}
-    \item[\textbf{\Cref{chap:background}: \nameref{chap:background}}] \hfill \\
-    Website-generation benchmarks, memory for \gls{llm} agents, and why small models are different.
-    \item[\textbf{\Cref{chap:setup}: \nameref{chap:setup}}] \hfill \\
-    The benchmark, models, cluster, protocol and metrics, and the reproduced baseline.
-    \item[\textbf{\Cref{chap:method}: \nameref{chap:method}}] \hfill \\
-    The failure analysis that started the work, the design iterations, and the final pipeline.
-    \item[\textbf{\Cref{chap:results}: \nameref{chap:results}}] \hfill \\
-    Main comparison, learning curves, error analysis, ablation and task-order experiments.
-    \item[\textbf{\Cref{chap:discussion}: \nameref{chap:discussion}}] \hfill \\
-    Interpretation, limitations, threats to validity and ethical considerations.
-    \item[\textbf{\Cref{chap:conclusion}: \nameref{chap:conclusion}}] \hfill \\
-    Answers to the research questions and future work.
-\end{description}
+\Cref{chap:background} reviews related work and states the gap; \Cref{chap:setup} describes the benchmark, models and reproduced baseline; \Cref{chap:method} presents the memory method and how it was developed; \Cref{chap:results} reports the results; \Cref{chap:discussion} discusses their meaning and limits; and \Cref{chap:conclusion} answers the research questions.
