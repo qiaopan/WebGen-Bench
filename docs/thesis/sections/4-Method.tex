@@ -16,7 +16,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \State $M \gets \emptyset$; \quad $F \gets \emptyset$ \Comment{lessons; code facts of earlier sites}
 \For{$i = 1,\dots,n$}
   \State $L \gets \textsc{Checklist}(r_i)$ \Comment{memory model splits the requirement}
-  \State attach to $L$ the lessons in $M$ judged a hard match for $r_i$ (at most three)
+  \State attach to $L$ the lessons in $M$ judged a hard match for $r_i$ (same trigger and state change; at most three)
   \State $C \gets \textsc{ActivateEntries}(F)$ \Comment{trigger: 2 tasks, or 1 if site-breaking}
   \State $P \gets \textsc{SelectAndVerify}(C, \{y_j : j<i,\ a_j \ge 0.5\})$ \Comment{at most three fragments}
   \State $x_i \gets r_i \oplus L \oplus P$; \quad $y_i \gets G(x_i)$; \quad $a_i \gets E(y_i)$
@@ -51,7 +51,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \draw[->] (sa) -- node[above,font=\scriptsize]{write} (M1);
 \draw[->, dotted] (M1) -- node[left,font=\scriptsize]{next task} (M0);
 \end{tikzpicture}
-\caption[The final pipeline (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. The two memory boxes are the same store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
+\caption[The final pipeline (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$ and $M_i$: the same memory store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -129,7 +129,7 @@ const activeTab = ref('donation')
 For each task, in order:
 \begin{enumerate}
   \item \textbf{Requirement checklist.} The memory model splits the requirement into items (\Cref{sec:checklist}).
-  \item \textbf{Retrieve lessons.} The memory model also splits the requirement into at most three functional \emph{aspects} (a feature and the user action that triggers it) and appearance aspects; these are the retrieval queries. Functional lessons are retrieved by similarity and judged for applicability by the memory model; only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
+  \item \textbf{Retrieve lessons.} The memory model also splits the requirement into at most three functional \emph{aspects} (a feature and the user action that triggers it) and appearance aspects; these are the retrieval queries. Functional lessons are retrieved by similarity and judged for applicability by the memory model as a hard match (same user trigger and same state change), a soft transfer (same kind of interaction) or a reject; only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
   \item \textbf{Code pool.} At most three verified fragments whose trigger condition holds (\Cref{sec:codepool}).
   \item \textbf{Generate and evaluate.} One generation by WebGen-LM-7B; official functional and appearance evaluation.
   \item \textbf{Reflect and store.} The memory model reflects on the evaluated task; new lessons are deduplicated against existing ones, utilities are updated, and code facts are computed for the code pool.
@@ -192,7 +192,7 @@ The code pool is computed without an \gls{llm} for detection:
 \begin{table}[ht]
 \centering
 \small
-\caption{Constants of the final configuration (v9.1). All are design choices; none was tuned on results.}
+\caption{Constants of the final configuration (v9.1). Several were revised in response to failure analysis on development runs, mainly seed 11 (\Cref{sec:fix}); all were fixed before the final evaluation runs, and none was set by a systematic search.}
 \label{tab:params}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.2cm}X}
 \toprule
