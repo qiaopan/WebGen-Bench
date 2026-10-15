@@ -4,24 +4,33 @@
 Each arm is a single run over all 101 tasks. \Crefrange{sec:main}{sec:ablation} use the manifest order; \Cref{sec:order-design} repeats the comparison in other orders. Accuracy pools all test cases (as in the official script); the learning curves average per-task accuracy, so their end points differ slightly.
 
 \section{Main Comparison}\label{sec:main}
-\Cref{tab:main} compares the three arms on the same tasks.
+\Cref{tab:main} reports the main comparison in the format of the WebGen-Bench results table~\cite{lu2025webgenbench}, with the published WebGen-LM-7B result as the first row. Every arm uses the same generator, scaffold and evaluators; only the memory differs.
 
 \begin{table}[ht]
 \centering
-\caption{Results on all 101 tasks (single run, manifest order). Accuracy in \%. Appearance is averaged over tasks with an appearance grade.}
+\caption{Main results on all 101 tasks in the manifest order (single run per arm). Yes, Partial, No and Start failed are percentages of the 647 test cases; Accuracy $=$ Yes $+\,0.5\times$ Partial. Appearance is the mean grade over all 101 tasks (1--5; tasks without a working site count as 0). $\Delta$ is the mean per-task difference to No Memory with a 95\% bootstrap \gls{ci}. Zero: tasks where every test case fails. Best values in bold.}
 \label{tab:main}
-\begin{tabular}{lccc}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lcccccccc}
 \toprule
-Arm & Accuracy & Appearance & Zero-score tasks \\
+Arm & Yes & Partial & No & Start fail. & Acc. & Appear. & Zero & $\Delta$ Acc. [95\% CI] \\
 \midrule
-No Memory & 28.5 & 3.25 & 30 \\
-Long Memory v4 & 30.9 & 3.21 & 20 \\
-Long Memory v7 & \textbf{40.0} & 3.21 & \textbf{13} \\
+WebGen-LM-7B (paper)\textsuperscript{a} & 24.9 & 7.1 & 68.0 & 0.0 & 28.4 & 2.5 & -- & -- \\
+\midrule
+No Memory (ours) & 23.8 & 9.4 & 66.5 & 0.3 & 28.5 & 2.35 & 30 & -- \\
+Text memory (v4) & 25.2 & 11.4 & 62.6 & 0.8 & 30.9 & 2.57 & 20 & $+2.6$ [$-3.6$, 8.7] \\
+Checklist only & 26.4 & 10.7 & 61.4 & 1.5 & 31.8 & 2.47 & 18 & $+3.4$ [$-2.2$, 8.7] \\
+Code memory (v7) & \textbf{34.5} & 11.1 & \textbf{53.2} & 1.2 & \textbf{40.0} & \textbf{2.83} & \textbf{13} & $\mathbf{+11.5}$ [6.0, 16.9] \\
+Final, verified fragments (v9.1) & \multicolumn{8}{c}{\todo{running}} \\
 \bottomrule
+\multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B.}
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
-Per task, v7 beats No Memory on 54 tasks, loses on 24 and ties on 23; the mean paired difference in per-task accuracy is $+11.5$ points (95\% bootstrap \gls{ci} $[6.0, 16.9]$). Against v4 the difference is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties).
+Code memory (v7) raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). Neither text memory nor the checklist alone gives a significant gain. Appearance rises only because more sites work: on the 68 tasks where both No Memory and v7 produced a graded site, the means are 3.25 and 3.22.
 
 \section{Learning Curve}
 \Cref{fig:curve} plots cumulative and rolling accuracy in execution order. v4 and v7 are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks v4 falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while v7 keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (v7) vs 26.0\% (No Memory) vs 23.2\% (v4).
@@ -133,13 +142,13 @@ Paired by task, checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI
 Arm & Order & Question & Acc. & vs.\ No Memory & Zero \\
 \midrule
 No Memory & Manifest & Does the baseline reproduce the paper? & 28.5 & -- & 30 \\
-v4 (text memory) & Manifest & Does textual memory help? & 30.9 & below NM after task 30 & 20 \\
-v7 & Manifest & Does code memory help? & 40.0 & $+11.5$ [6.0, 16.9] & 13 \\
+Text memory (v4) & Manifest & Does textual memory help? & 30.9 & below NM after task 30 & 20 \\
+Code memory (v7) & Manifest & Does code memory help? & 40.0 & $+11.5$ [6.0, 16.9] & 13 \\
 Checklist only & Manifest & How much does the checklist add? & 31.8 & $+3.4$ [$-2.2$, 8.7] & 18 \\
-v7 & Seed 11 & Does it hold with another order? & 33.1 & $+4.4$ [$-1.9$, 10.6] & 21 \\
-v7 & Seed 29 & Does it hold with domains mixed? & 32.6 & $+4.5$ [$-2.2$, 11.3] & 21 \\
-v9.1 & Seed 11 & Does the fix hold with another order? & 35.4 & $+7.4$ [1.6, 13.1] & 16 \\
-v9.1 & Seed 29 & Does the fix hold with domains mixed? & 33.7 & $+5.5$ [$-0.5$, 11.6] & 18 \\
+Code memory (v7) & Seed 11 & Does it hold with another order? & 33.1 & $+4.4$ [$-1.9$, 10.6] & 21 \\
+Code memory (v7) & Seed 29 & Does it hold with domains mixed? & 32.6 & $+4.5$ [$-2.2$, 11.3] & 21 \\
+Final (v9.1) & Seed 11 & Does the fix hold with another order? & 35.4 & $+7.4$ [1.6, 13.1] & 16 \\
+Final (v9.1) & Seed 29 & Does the fix hold with domains mixed? & 33.7 & $+5.5$ [$-0.5$, 11.6] & 18 \\
 \bottomrule
 \multicolumn{6}{l}{\footnotesize No Memory in the same order: seed 11 27.9\% (29 zero), seed 29 28.6\% (29 zero).}
 \end{tabular}
