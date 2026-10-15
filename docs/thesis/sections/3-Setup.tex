@@ -87,7 +87,7 @@ We report accuracy over all test cases, the mean appearance score (1--5), and th
 
 \section{Experimental Design}
 \label{sec:design}
-We compare three memory designs, shown in \Cref{fig:families} and described in \Cref{chap:method}. \emph{Text memory} stores lessons written in natural language and attaches them to a requirement checklist. \emph{Code memory (whole-file)} keeps the checklist and adds a code pool of examples taken from the chain's own working websites; some of these examples are complete files. \emph{Code memory (fragments)}, the final method, shows only short verified fragments. The method was refined over several iterations; only these three designs were run on all 101 tasks, and only they are reported.\footnote{In the code repository these runs are labelled v4, v7 and v9.1.}
+We compare three memory designs, shown in \Cref{fig:families} and described in \Cref{chap:method}. \emph{Text memory} stores lessons written in natural language and attaches them to a requirement checklist. \emph{Code memory (whole-file)} keeps the checklist and adds a code pool of examples taken from the chain's own working websites; some of these examples are complete files. \emph{Code memory (fragments)}, the final method, shows only short verified fragments. We take it as the final method because it removed the scaffold failure under shuffled orders, not because it scores highest in every order: in the manifest order whole-file code memory scores higher (\Cref{sec:main}). The method was refined over several iterations; only these three designs were run on all 101 tasks, and only they are reported.\footnote{In the code repository these runs are labelled v4, v7 and v9.1.}
 
 \begin{figure}[ht]
 \centering
