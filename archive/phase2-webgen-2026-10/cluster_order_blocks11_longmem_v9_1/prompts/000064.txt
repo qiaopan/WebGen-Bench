@@ -1,0 +1,68 @@
+Please implement a news blog website for the shipping industry to publish news and company information. The website should have sections for news, company profiles, and events. Users should be able to browse news, company information, and events, and subscribe to newsletters. The website should have a backend management system that allows administrators to manage ad spaces. Implement styling with old lace for the background and rosy brown for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. news blog website for the shipping industry
+2. sections for news
+3. sections for company profiles
+4. sections for events
+   Note from earlier websites: For the event section: use v-if to show detailed event page based on client-side navigation handler.
+5. users should be able to browse news
+6. users should be able to browse company information
+7. users should be able to browse events
+8. users should be able to subscribe to newsletters
+9. backend management system
+10. administrators to manage ad spaces
+11. styling with old lace for the background and rosy brown for components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 19 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 4 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

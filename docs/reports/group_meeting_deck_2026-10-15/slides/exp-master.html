@@ -1,0 +1,17 @@
+<section id="exp-master" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:88px 128px 120px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">实验总表 ② · 每次运行验证什么、结果如何</p>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:24px">
+<tr><th style="width:14%;text-align:left">组别</th><th style="width:16%;text-align:left">任务顺序</th><th style="width:26%;text-align:left">验证的问题</th><th style="width:10%;text-align:right">准确率</th><th style="width:20%;text-align:right">比 No Memory</th><th style="width:14%;text-align:right">零分题</th></tr>
+<tr><td>No Memory</td><td>原顺序</td><td>基线能否复现论文</td><td style="text-align:right">28.5%</td><td style="text-align:right">—</td><td style="text-align:right">30</td></tr>
+<tr><td>v4</td><td>原顺序</td><td>文字记忆是否有效</td><td style="text-align:right">30.9%</td><td style="text-align:right">后段低于基线</td><td style="text-align:right">20</td></tr>
+<tr><td>v7</td><td>原顺序</td><td>代码记忆是否有效</td><td style="text-align:right">40.0%</td><td style="text-align:right">+11.5（6.0～16.9）</td><td style="text-align:right">13</td></tr>
+<tr><td>只有清单</td><td>原顺序</td><td>需求拆解贡献多少</td><td style="text-align:right">31.8%</td><td style="text-align:right">+3.4（−2.2～8.7）</td><td style="text-align:right">18</td></tr>
+<tr><td>v7</td><td>种子 11</td><td>换顺序还有效吗</td><td style="text-align:right">33.1%</td><td style="text-align:right">+4.4（−1.9～10.6）</td><td style="text-align:right">21</td></tr>
+<tr><td>v7</td><td>种子 29</td><td>领域打散还有效吗</td><td style="text-align:right">32.6%</td><td style="text-align:right">+4.5（−2.2～11.3）</td><td style="text-align:right">21</td></tr>
+<tr><td>v9.1</td><td>种子 11</td><td>修复后换顺序</td><td style="text-align:right">35.4%</td><td style="text-align:right"><b>+7.4（1.6～13.1）</b></td><td style="text-align:right">16</td></tr>
+<tr><td>v9.1</td><td>种子 29</td><td>修复后领域打散</td><td style="text-align:right">33.7%</td><td style="text-align:right">+5.5（−0.5～11.6）</td><td style="text-align:right">18</td></tr>
+<tr><td>v9.1</td><td>原 / 47 / 交错</td><td>见后面各页</td><td style="text-align:right" colspan="3">运行中，约 10-16～18 完成</td></tr>
+</table>
+<p style="font-size:24px;color:#6A7179">括号内为按题配对的 95% 置信区间；同顺序的 No Memory：原 28.5%、种子 11 27.9%、种子 29 28.6%。每组单次运行。v8、v9 中途停止，不列入。</p>
+<aside>第二页是所有运行的结果。每一行是一个组别在一种任务顺序下跑完 101 题。原顺序上：No Memory 28.5%；文字记忆 v4 30.9%，但后段反而低于基线；代码记忆 v7 40.0%，比基线高 11.5 个点，置信区间 6 到 16.9，显著；只有清单 31.8%，只高 3.4 个点，不显著，说明主要贡献是记忆。然后我们换任务顺序：v7 在种子 11 和种子 29 上只高约 4.5 个点，都不显著。原因是脚手架，后面会讲。修复后的 v9.1 在种子 11 上高 7.4 个点，显著；在种子 29 上高 5.5 个点，下限略低于 0。原顺序、种子 47 和交错顺序的 v9.1 还在跑。No Memory 在三个顺序上都在 28% 左右，非常稳定，说明变化来自记忆这一侧。</aside>
+</section>

@@ -1,0 +1,69 @@
+Please develop a domain leasing website for renting and managing domain names. The website should have functionalities for searching, leasing, renewing, and transferring domain names. Users should be able to search for, lease, renew, and transfer domain names, and view domain information and leasing records. The website should also have user management, order management, and payment management functions. Select old lace for layout background and rosy brown for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. searching domain names
+2. leasing domain names
+   Note from earlier websites: For the lease and renew buttons: use v-if to show confirmation pages after button clicks.
+3. renewing domain names
+4. transferring domain names
+5. view domain information
+6. view leasing records
+7. user management
+8. order management
+9. payment management
+10. old lace for layout background and rosy brown for component details
+11. functionalities for searching, leasing, renewing, and transferring domain names
+   Note from earlier websites: On every page: ensure all elements have consistent alignment and padding.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 4 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

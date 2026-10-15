@@ -1,0 +1,14 @@
+<section id="order-design" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:96px 128px 140px;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">顺序鲁棒性 · 实验设计</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:48px;font-weight:700;line-height:1.2">有记忆时，任务顺序决定了每题能用上哪些经验</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:24px">
+<tr><th style="width:22%;text-align:left">顺序</th><th style="width:22%;text-align:left">怎么排</th><th style="width:36%;text-align:left">验证的问题</th><th style="width:20%;text-align:left">状态（v9.1）</th></tr>
+<tr><td>原顺序</td><td>按领域分块（基准自带）</td><td>修复后是否保住原来的优势</td><td>约 10-16 早上</td></tr>
+<tr><td>种子 11</td><td>打乱领域块和块内顺序</td><td>换一个领域先后，还有效吗</td><td>已完成</td></tr>
+<tr><td>种子 47</td><td>同上，换一个种子</td><td>种子 11 的结果是否偶然</td><td>约 10-17</td></tr>
+<tr><td>种子 29</td><td>101 题完全随机</td><td>领域打散，是不是靠同领域挨着</td><td>已完成</td></tr>
+<tr><td>交错</td><td>相邻题都来自不同领域</td><td>最不利情况：跨领域检索是否是瓶颈</td><td>约 10-18</td></tr>
+</table>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">每个顺序都从空记忆开始，Long Memory 与 No Memory 逐题背靠背、ABBA 轮换谁先跑，按题配对报告差值和置信区间。</p>
+<aside>为什么要做顺序实验？原论文的基准是静态的，每题独立做，顺序无所谓。但有了记忆，任务顺序决定了做到第几题时能用上哪些经验；原顺序里同领域的题挨着，后一题总能借到刚做过的类似网站，所以审稿人一定会问：提升是不是因为同领域的题挨着做？我们设计了五种顺序，分两类。领域挨着：原顺序、种子 11 和种子 47，后两个把领域块的先后和块内顺序打乱。领域打散：种子 29 完全随机，交错顺序让相邻题都来自不同领域，是对记忆最不利的情况。每种顺序都从空记忆开始，和 No Memory 逐题背靠背交替跑，谁先跑轮换，避免时间漂移影响某一组。下面每一页讲一个顺序验证什么、结果怎样。</aside>
+</section>

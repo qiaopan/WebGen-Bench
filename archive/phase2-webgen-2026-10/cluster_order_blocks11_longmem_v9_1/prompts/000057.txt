@@ -1,0 +1,54 @@
+Please develop a student portal website for registration and management of student information. The website should have user registration and profile management features, allowing students to input and manage personal details, qualifications, and career preferences. The website should also have an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests. Additionally, the website should streamline the application process with an intuitive interface, allowing students to easily apply for programs. Training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs. Establish azure as the main background and midnight blue for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and profile management features
+   Note from earlier websites: For the application form: implement a submit handler that updates a confirmation message state with `v-if`.
+2. allowing students to input and manage personal details, qualifications, and career preferences
+3. an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests
+   Note from earlier websites: For the matching algorithm: implement the filterTrainingProviders function to correctly filter training providers.
+4. streamline the application process with an intuitive interface, allowing students to easily apply for programs
+5. training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs
+6. Establish azure as the main background and midnight blue for the controls
+
+General notes from earlier websites:
+- On every page: implement subtle animations and a bolder font for headings to enhance visual engagement.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,68 @@
+Please implement a web application for an insurance industry automation system to manage insurance business. The system should have functionalities for customer management, policy management, and claims management. Users should be able to browse customer information, policy information, and claims information, and perform corresponding operations. The system should also have data analysis and reporting capabilities, generating various reports and charts. Apply theme using whitesmoke as background and dark cyan for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web application for an insurance industry automation system
+2. manage insurance business
+3. functionalities for customer management
+4. functionalities for policy management
+5. functionalities for claims management
+6. browse customer information
+7. browse policy information
+8. browse claims information
+9. perform corresponding operations
+10. data analysis and reporting capabilities
+11. generating various reports and charts
+12. theme using whitesmoke as background and dark cyan for elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: Vue components not rendering. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentView = ref('lobby')
+const activeGame = ref(null)
+const messages = ref([])
+const users = ref([])
+const gameHistory = ref([])
+  <div class="app-container">
+    <GameLobby
+      v-if="currentView === 'lobby'"
+      @join-game="joinGame"
+      @create-game="createGame"
+    />
+    <TableGame
+      v-if="currentView === 'table'"
+      :game="activeGame"
+      @back-to-lobby="currentView = 'lobby'"
+    />
+    <ChatWindow
+      v-if="currentView === 'chat'"
+      :messages="messages"
+      @send-message="sendMessage"
+    />
+    <UserProfile
+      v-if="currentView === 'profile'"
+      :users="users"
+      :gameHistory="gameHistory"
+    />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 15 tasks). Code that works:
+```vue
+import { ref, onMounted } from 'vue'
+const wheelRef = ref<HTMLElement | null>(null)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 3 tasks). Code that works:
+```vue
+<SearchBar :modelValue="searchQuery" @update:modelValue="emit('update:searchQuery', $event)" />
+      <PostList :posts="filteredPosts" />
+    </div>
+
+    <div v-if="activeTab === 'create'" class="create-post">
+      <CreatePost @post-created="createPost" :modelValue="newPost" @update:modelValue="newPost = $event" />
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

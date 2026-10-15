@@ -1,0 +1,14 @@
+<section id="history-2" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:96px 128px 128px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">研究历程（二）· 第二阶段，10 月，集群 + 官方协议</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:52px;font-weight:700">从"文字经验"到"代码经验"</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:24px">
+<tr><th style="width:20%;text-align:left">尝试</th><th style="width:28%;text-align:left">要解决的问题</th><th style="width:22%;text-align:left">借鉴</th><th style="width:30%;text-align:left">结果</th></tr>
+<tr><td>官方协议（一次生成、不修复）</td><td>结果要能和论文 28.4% 对照</td><td>Lu et al., 2025</td><td>No Memory 28.5%；暴露出大量白屏</td></tr>
+<tr><td>源头去重 + 效用排序（v3）</td><td>34 条同义经验占满通用池</td><td>Zhao et al., 2024；Chhikara et al., 2025；Zhou et al., 2025</td><td>重复减少，但文字经验仍救不回白屏</td></tr>
+<tr><td>需求清单（v4）</td><td>需求被经验淹没</td><td>—</td><td>前 30 题好，后期输给 No Memory</td></tr>
+<tr><td>代码池 + 具体化过滤（v6）</td><td>小模型不听文字；空泛条目</td><td>Dai et al., 2026；Wang et al., 2023；Wang et al., 2025</td><td>一行 import 示例 → 交脚手架</td></tr>
+<tr><td>示例只给片段（v7）</td><td>整份文件被当作已写完</td><td>—</td><td>101 题 40.0% vs No Memory 28.5%</td></tr>
+<tr><td>short CoT</td><td>漏写 import</td><td>Li et al., 2025</td><td>否决：丢失回复格式，0/5</td></tr>
+</table>
+<aside>第二阶段在十月，换到学校 H200 集群，并改用官方协议，No Memory 复现出 28.5%，和论文的 28.4% 几乎一样。v3 做了源头去重和效用排序，但文字经验仍然救不回白屏。v4 加了需求清单，前期好、后期输。v6 引入代码池，参考 Metis 和 Voyager，但一行 import 的示例被模型当成写完的空组件，直接交回了模板。v7 改成只给片段、必须带调用行，最终 101 题 40.0%。short CoT 被否决。可以看到，每一步都来自上一版的错误分析。</aside>
+</section>

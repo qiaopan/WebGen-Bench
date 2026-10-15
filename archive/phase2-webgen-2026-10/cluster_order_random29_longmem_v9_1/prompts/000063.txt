@@ -1,0 +1,44 @@
+Please implement a website that displays Canadian nutrition facts labels to help users understand food nutrition information. The website should have a product search function, where users can input food names or keywords (such as apple) to search for related nutrition information. The website should also have a nutrition analysis function, where users can input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value. Additionally, the website should provide a packaging design function, where users can design their own food packaging according to Canadian regulations. Define background as linen; define components with maroon.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website that displays Canadian nutrition facts labels to help users understand food nutrition information.
+2. The website should have a product search function, where users can input food names or keywords (such as apple) to search for related nutrition information.
+3. The website should also have a nutrition analysis function, where users can input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value.
+4. Additionally, the website should provide a packaging design function, where users can design their own food packaging according to Canadian regulations.
+5. Define background as linen; define components with maroon.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file input. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label for="evidence">Evidence (Optional)</label>
+        <input type="file" id="evidence" @change="formData.evidence = $event.target.files[0]">
+      </div>
+```
+
+Component fails: computed missing. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
