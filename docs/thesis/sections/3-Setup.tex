@@ -44,6 +44,8 @@ Embeddings & bge-m3 \\
 \end{tabularx}
 \end{table}
 
+\paragraph{The generator.} WebGen-LM is a family of website-generation models (7B, 14B and 32B) released with WebGen-Bench~\cite{lu2025webgenbench}. Each is Qwen2.5-Coder-Instruct of the same size, fine-tuned with supervised learning only. The training data come from WebGen-Instruct, 6,667 website instructions decontaminated against the benchmark: the authors ran DeepSeek-V3 in Bolt.diy on 2,000 of them and kept the 600 trajectories whose websites scored at least 3 for appearance. WebGen-LM-7B therefore already knows the Bolt.diy output format, which makes it the natural small baseline for this benchmark: it is not a general model prompted to build websites, but a model distilled for exactly this scaffold.
+
 The memory model is deliberately different from the evaluator, so that reflection cannot copy the evaluator's grading behaviour. vLLM applies the model repository's generation configuration by default; WebGen-LM-7B ships with a repetition penalty that Bolt.diy never sends, so we disable it for the generator to match the paper's setting.
 
 \section{Metrics}
@@ -62,7 +64,7 @@ We report accuracy over all test cases, the mean appearance score (1--5), and th
 \caption{Experimental design. Memory content is what is added to the generator's prompt; version numbers refer to the design history in \Cref{sec:history}.}
 \label{tab:design}
 \small
-\begin{tabularx}{\textwidth}{>{\raggedright}p{2.9cm}>{\raggedright}X>{\raggedright}p{2.6cm}>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{>{\raggedright}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright}X>{\raggedright}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
 \toprule
 Arm & Memory content & Task orders & Question \\
 \midrule
@@ -84,5 +86,23 @@ No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean a
 
 \section{Reproducibility and Constraints}
 Every run starts from an empty memory and stores its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts and scores; the key files of every run are archived in the project repository. The generator is decoded deterministically, so differences between arms come from the prompt rather than from sampling, although the \gls{gui} tester is not deterministic.
+
+\paragraph{Hardware.} All experiments ran on one node of the School of Computer Science CS ML cluster (\texttt{foscsmlprd03}, seven NVIDIA H200 GPUs with 141\,GB of memory each, Slurm scheduler), with at most two GPUs per user. A single long-running job held two GPUs and served every model with vLLM; all arms and task orders shared these servers (\Cref{tab:hardware}). Two tasks were processed in parallel, while evaluation was serialised by a lock, because the evaluator restarts the website process manager. From the first job on 5 October 2026 to the end of the 7B runs, the project used about \todo{update} H200 GPU-hours.
+
+\begin{table}[ht]
+\centering
+\caption{Placement of the self-hosted models on the two H200 GPUs (memory reserved by vLLM).}
+\label{tab:hardware}
+\begin{tabular}{llr}
+\toprule
+GPU & Model (role) & Memory (GB) \\
+\midrule
+GPU 0 & Qwen2.5-VL-32B-Instruct, BF16 (evaluator) & 83 \\
+      & WebGen-LM-7B, BF16 (generator) & 26 \\
+GPU 1 & Qwen2.5-VL-72B-Instruct-AWQ (memory) & 113 \\
+      & bge-m3 (embeddings) & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The main constraint is compute. A task takes about twelve minutes with memory and six without, so one 101-task run takes about a day on our two GPUs. As in the original benchmark, each configuration is therefore run once per task order. We compensate by pairing comparisons by task, by repeating the No Memory baseline in three orders to measure its run-to-run variation, and by repeating the memory method across orders rather than within one.
