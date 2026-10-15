@@ -35,7 +35,7 @@ Two properties make this setting a demanding test of long-term memory. First, ta
 \section{Scope}
 The study is deliberately narrow so that its comparisons are clean.
 \begin{itemize}
-    \item \textbf{One benchmark, one generator, one scaffold.} All experiments use the 101 tasks of WebGen-Bench, WebGen-LM-7B and Bolt.diy. A stronger generator from the same family is an extension (\Cref{sec:stronger}); other agents such as OpenHands or Aider are not studied, because changing the agent also changes how memory reaches the model.
+    \item \textbf{One benchmark, one generator, one scaffold.} All experiments use the 101 tasks of WebGen-Bench, WebGen-LM-7B and Bolt.diy. A stronger generator is left to future work; other agents such as OpenHands or Aider are not studied, because changing the agent also changes how memory reaches the model.
     \item \textbf{Official protocol, no repair.} Each website is generated once and evaluated as it is, as in the original benchmark. We do not add build checks or repair loops, which would make the results incomparable with the published baseline.
     \item \textbf{No retraining.} Memory only changes the prompt. Fine-tuning on stored experience is outside the scope.
     \item \textbf{Self-hosted models only.} Generation, evaluation and memory processing all run on a university GPU cluster; no commercial API is used.
