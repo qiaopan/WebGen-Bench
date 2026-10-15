@@ -1,0 +1,14 @@
+<section id="related" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:96px 128px 140px;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">相关工作与定位</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:48px;font-weight:700;line-height:1.2">强模型上文字更好，7B 上代码更好：记忆的形式取决于模型能力</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:21px">
+<tr><th style="width:24%;text-align:left">工作</th><th style="width:42%;text-align:left">做了什么、发现了什么</th><th style="width:34%;text-align:left">和我们的区别</th></tr>
+<tr><td>Metis（Dai et al., 2026）</td><td>GPT-4o，AppWorld；只用更早任务的记忆时，代码工具 53.3%，文字 73.3%：代码"高效但脆弱"</td><td>它的代码是被执行的工具；我们的是让生成器模仿的片段。7B 上结论相反</td></tr>
+<tr><td>Memory Transfer Learning（Kim et al., 2026）</td><td>GPT-5-mini 等强模型、6 个编码基准；抽象 insight 迁移最好，具体轨迹会负迁移</td><td>没有小模型；我们看到 7B 上空泛文字有害、核对过的代码片段有效</td></tr>
+<tr><td>Super Library Agent（Sung et al., 2026）</td><td>同样用 WebGen-Bench，24 题、强模型，跨应用共享代码库；准确率 76.0 → 77.2，不显著；收益在可维护性</td><td>不记忆失败、不研究顺序；我们 7B、101 题、官方协议，准确率 +11.5</td></tr>
+<tr><td>Evo-Memory（Wei et al., 2025）/ AgentCL（Shu et al., 2026）</td><td>任务序列的顺序和构成会改变记忆方法的结论</td><td>支持我们把"领域挨着 vs 打散"作为变量</td></tr>
+</table>
+<p style="font-size:24px;line-height:1.5;color:#4A5568">没找到在网站生成上研究小模型的记忆形式、或把任务顺序作为变量并逐题配对的工作。接下来的 WebGen-LM-32B 实验会检验"形式取决于能力"。</p>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:48px;font-size:20px;color:#6A7179">以上数字均对照论文全文核对（2026-10-08）；整理见 docs/reports/literature_positioning_2026-10.md。</p>
+<aside>这一页讲我们在已有工作里的位置。最相关的是 Metis：它用 GPT-4o 做了文字和代码记忆的对照，发现只用之前任务的记忆时，代码工具掉到 53.3%，文字保持 73.3%，作者说代码高效但脆弱。我们在 7B 上看到的正好相反。要说清楚，两者的代码不是一回事：Metis 的代码是智能体调用执行的工具，我们的是放进提示里让生成器模仿的片段，所以不是直接矛盾。第二篇 Memory Transfer Learning 用强模型发现，越抽象的经验迁移越好，具体轨迹反而有害；它没有测小模型，而我们在 7B 上看到空泛的文字经验有害。两篇合起来指向一个结论：最好的记忆形式取决于用它的模型能做什么。强模型能把抽象经验自己变成正确代码，7B 做不到，需要直接给代码。第三篇 Super Library Agent 也用了 WebGen-Bench，但它的目标是跨应用复用代码、提高可维护性，准确率没有显著变化，也不记忆失败、不研究顺序。最后，Evo-Memory 和 AgentCL 都说明任务顺序会影响结论，支持我们做顺序实验。我们没找到在网站生成上研究小模型记忆形式、或者把顺序当变量并逐题配对的工作。接下来用同一家族、明显更强的 32B 做对比，正好检验“形式取决于能力”。</aside>
+</section>

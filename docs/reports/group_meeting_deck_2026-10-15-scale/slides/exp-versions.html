@@ -1,0 +1,15 @@
+<section id="exp-versions" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:96px 128px 140px;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">实验总表 ① · 各组别是什么</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:48px;font-weight:700;line-height:1.2">六个组别：一个基线、一个消融、四个记忆版本</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:24px">
+<tr><th style="width:18%;text-align:left">组别</th><th style="width:52%;text-align:left">内容</th><th style="width:30%;text-align:left">用途</th></tr>
+<tr><td>No Memory</td><td>只给需求原文，不读写记忆</td><td>基线（复现论文 28.4%）</td></tr>
+<tr><td>v4</td><td>需求清单 + 文字经验</td><td>早期版本：文字记忆</td></tr>
+<tr><td>只有清单</td><td>v7 配置，但不读写任何记忆</td><td>消融：需求拆解的贡献</td></tr>
+<tr><td>v7</td><td>清单 + 文字经验 + 代码池（整份文件示例）</td><td>原顺序主结果</td></tr>
+<tr><td>v8 / v9</td><td>v7 的代码池修复的中间版本</td><td>开发中，已停止</td></tr>
+<tr><td>v9.1</td><td>代码池只给核对过的关键行；整站崩溃 1 次即建记忆；编译错误对所有 Vue 网站适用</td><td>最终版本：顺序实验</td></tr>
+</table>
+<p style="font-size:24px;color:#6A7179">所有组别：WebGen-LM-7B + Bolt，官方协议（只生成一次、不修复），101 题，Qwen2.5-VL-32B 评测。</p>
+<aside>先用两页把所有实验放在一起。第一页是组别。No Memory 是基线，只给需求原文，复现出 28.5%，和论文的 28.4% 几乎一样。v4 是早期的文字记忆版本。只有清单是消融：和 v7 配置完全相同，但不读写任何记忆，用来分出需求拆解的贡献。v7 是原顺序的主结果，加入了代码池，但代码池里有一条示例是整份别的网站的文件。v8 和 v9 是修这个问题的中间版本，各自发现了新问题后停止。v9.1 是最终版本：代码池只给经过代码核对的关键几行，整站崩溃的问题出现一次就建记忆，编译错误类的记忆对所有 Vue 网站都适用。所有组别都用同一个生成器、同一个评测，官方协议，101 题。</aside>
+</section>
