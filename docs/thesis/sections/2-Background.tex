@@ -49,20 +49,20 @@ Reflection on failed attempts is related to self-correction methods such as Self
 
 \begin{table}[ht]
 \centering
-\caption{Closest related studies. Update: how the memory changes across tasks. Consumer: the model that uses the memory. Order: results compared across task orders. ``no'' means not evaluated, not a shown limitation.}
+\caption{Closest related studies. Update: how the memory changes across tasks. Consumer: the model that uses the memory. Order: results compared across task orders. ``no'' and ``--'' mean not evaluated, not a shown limitation.}
 \label{tab:related}
 \small
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X ccc}
 \toprule
-Study & Memory form & Update & Consumer & Websites & Order \\
+Study & Memory form & Update & Consumer & Website tasks & Order \\
 \midrule
-ExpeL~\cite{zhao2024expel} & textual insights & add, edit, up/down-vote & large & no & no \\
-ReasoningBank~\cite{reasoningbank2025} & reasoning strategies & append from successes and failures & large & no & no \\
-Voyager~\cite{wang2023voyager} & executable skills & add verified skills & large & no & no \\
-Metis~\cite{dai2026metis} & text + executed code tools & promote recurring procedures & large & no & no \\
-Memory Transfer Learning~\cite{kim2026mtl} & four representations & fixed (transfer study) & large & no & no \\
+ExpeL~\cite{zhao2024expel} & textual insights & add, edit, up/down-vote & large & -- & no \\
+ReasoningBank~\cite{reasoningbank2025} & reasoning strategies & append from successes and failures & large & -- & no \\
+Voyager~\cite{wang2023voyager} & executable skills & add verified skills & large & -- & no \\
+Metis~\cite{dai2026metis} & text + executed code tools & promote recurring procedures & large & -- & no \\
+Memory Transfer Learning~\cite{kim2026mtl} & four representations & fixed (transfer study) & large & -- & no \\
 Super Library Agent~\cite{sung2026superlibrary} & shared component library & library grows with tasks & large & 24 tasks & no \\
-Evo-Memory~\cite{wei2025evomemory} & benchmark of memory methods & varies & various & no & yes \\
+Evo-Memory~\cite{wei2025evomemory} & benchmark of memory methods & varies & various & -- & yes \\
 \textbf{This work} & checklist + code fragments + text & dedup, utility retirement, versioned code & \textbf{7B} & \textbf{101 tasks} & \textbf{yes} \\
 \bottomrule
 \end{tabularx}
