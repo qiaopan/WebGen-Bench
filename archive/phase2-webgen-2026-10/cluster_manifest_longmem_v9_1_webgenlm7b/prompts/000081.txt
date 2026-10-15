@@ -1,0 +1,61 @@
+Please implement a cross-platform HTML editor with live preview and code editing functionality. The editor should allow users to switch between HTML code and text editing modes and automatically convert to HTML. The editor should have project management capabilities, allowing users to organize multiple HTML documents, images, and other files. The editor should also have features such as syntax highlighting, saving template pages, and a basic user guide. Set the background color to honeydew and the component color to dark olive green.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. cross-platform HTML editor
+2. live preview
+3. code editing functionality
+4. switch between HTML code and text editing modes
+5. automatically convert to HTML
+6. project management capabilities
+7. organize multiple HTML documents, images, and other files
+8. syntax highlighting
+9. saving template pages
+10. basic user guide
+11. background color to honeydew
+12. component color to dark olive green
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 13 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

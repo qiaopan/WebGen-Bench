@@ -1,0 +1,56 @@
+Please develop a student portal website for registration and management of student information. The website should have user registration and profile management features, allowing students to input and manage personal details, qualifications, and career preferences. The website should also have an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests. Additionally, the website should streamline the application process with an intuitive interface, allowing students to easily apply for programs. Training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs. Establish azure as the main background and midnight blue for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and profile management features
+   Note from earlier websites: For the ProfileManagement.vue: use v-if to conditionally render updated details after submit.
+2. allowing students to input and manage personal details, qualifications, and career preferences
+3. an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests
+4. streamline the application process with an intuitive interface, allowing students to easily apply for programs
+5. training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs
+6. Establish azure as the main background and midnight blue for the controls
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

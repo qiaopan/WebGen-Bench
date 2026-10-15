@@ -1,12 +1,14 @@
 """Learning curve: cumulative and rolling-10 functional accuracy by task position (v7 execution order),
-No Memory vs Long Memory v4 vs v7. Accuracy = (passed + 0.5 partial) / checks, appearance row excluded."""
+No Memory vs text memory vs code memory (whole-file, fragments). Accuracy = (passed + 0.5 partial) / checks, appearance row excluded."""
 import json, sys
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-E = "outputs/experiment/"
+import os
+E = os.environ.get("RUNS", "outputs/experiment/")
 ARMS = [("No Memory", "cluster_nomem_webgenlm7b_r1", "#8a8a85"),
         ("Text memory", "cluster_longmem_v4_webgenlm7b_r1", "#eb6834"),
-        ("Code memory (whole-file)", "cluster_longmem_v7_webgenlm7b_r1", "#2a78d6")]
+        ("Code memory (whole-file)", "cluster_longmem_v7_webgenlm7b_r1", "#2a78d6"),
+        ("Code memory (fragments)", "cluster_manifest_longmem_v9_1_webgenlm7b", "#2e9e6a")]
 def scores(d):
     r = {}
     for line in open(E + d + "/progress.jsonl"):

@@ -1,0 +1,64 @@
+Please implement an entertainment directory website to display band information and advertisements. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos. Additionally, the website should allow advertisers to register, log in, and upload their ad content. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements. Implement floral white for the page background and dark goldenrod for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display band information
+2. display advertisements
+   Note from earlier websites: For the advertisement display: use `v-for` to render each ad from the ad array.
+3. band registration and login functionality
+4. input their bio
+5. provide picture links
+6. provide audio sample links
+7. provide direct links to YouTube videos
+8. advertisers to register, log in, and upload their ad content
+   Note from earlier websites: For the AdvertiserLogin.vue: implement a form with a submit handler for login confirmation.
+9. browse band information
+10. listen to audio samples
+11. watch videos
+12. view advertisements
+13. floral white for the page background and dark goldenrod for the elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 17 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

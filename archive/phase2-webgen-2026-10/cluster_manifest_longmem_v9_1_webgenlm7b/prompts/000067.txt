@@ -1,0 +1,62 @@
+Please implement a family event portal website for publishing and storing obituaries, funeral arrangements, and multimedia memories. The website should have functionalities for obituary publishing, mortuary list, condolences, and statistics. Users should be able to publish and manage their own obituaries and funeral arrangements, view and leave messages on others' obituaries, and view statistical analysis. Use cornsilk for the outer layout and peru for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. family event portal website
+2. publishing and storing obituaries
+3. funeral arrangements
+4. multimedia memories
+5. obituary publishing
+6. mortuary list
+7. condolences
+8. statistics
+9. publish and manage their own obituaries and funeral arrangements
+10. view and leave messages on others' obituaries
+11. view statistical analysis
+12. cornsilk for the outer layout and peru for UI blocks
+   Note from earlier websites: On every page: set the outer layout background color as 'cornsilk' using v-bind.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

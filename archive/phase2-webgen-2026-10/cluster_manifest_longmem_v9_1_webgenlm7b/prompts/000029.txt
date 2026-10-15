@@ -1,0 +1,25 @@
+Please implement a forum webpage with multiple features. The forum webpage should have functionalities for posting, replying, searching, and browsing by category. Users should be able to browse and search for posts, create new posts, reply to others' posts, and browse posts by category. The forum should also have a user center where users can view their own posts, reply records, and personal information. Choose ghost white for global background and slate gray for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. forum webpage
+2. posting
+3. replying
+4. searching
+5. browsing by category
+6. user center
+7. view their own posts
+8. reply records
+9. personal information
+10. ghost white for global background and slate gray for all components
+
+General notes from earlier websites:
+- For the new post form: use @submit to validate fields before setting post as submitted.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

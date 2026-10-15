@@ -1,0 +1,54 @@
+Please implement a customer support chatbot on the website that can provide customer support and handle customer interactions. The chatbot should be able to answer frequently asked questions, provide product information, and assist users in completing orders. Users should be able to interact with the chatbot through a chat interface to get the information and help they need. Implement styling with snow for the background and dim gray for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a customer support chatbot on the website that can provide customer support and handle customer interactions.
+   Note from earlier websites: For the chatbot: use snow background and dim gray components for text contrast.
+2. The chatbot should be able to answer frequently asked questions, provide product information, and assist users in completing orders.
+3. Users should be able to interact with the chatbot through a chat interface to get the information and help they need.
+4. Implement styling with snow for the background and dim gray for components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

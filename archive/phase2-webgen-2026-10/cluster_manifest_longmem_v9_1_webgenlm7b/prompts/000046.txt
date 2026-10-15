@@ -1,0 +1,70 @@
+Please implement a hospital management website for managing hospital finances, reports, inventory, and patient information. The website should have financial management functionality, including collecting patient fees and managing hospital finances. The reporting functionality should include inventory reports, patient reports, and financial reports. Employees should be able to submit daily reports to superiors, including detailed information about daily activities. Pharmacy management should include inventory management of medicines. Patient electronic files should include patient name, date of visit, diagnosis, and comments. The website should also have claim formulation, laboratory management, and theater management. Configure the background color to peach puff, with components using indian red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. financial management functionality
+   Note from earlier websites: For the financial management: collect patient fees using ref and manage finances with v-for.
+2. collecting patient fees
+3. managing hospital finances
+4. inventory reports
+5. patient reports
+   Note from earlier websites: For patient reports: include name, date, diagnosis, and comments in electronic files.
+6. financial reports
+7. daily reports submission
+8. detailed information about daily activities
+9. pharmacy management
+10. inventory management of medicines
+11. patient electronic files
+12. patient name
+13. date of visit
+14. diagnosis
+15. comments
+16. claim formulation
+17. laboratory management
+18. theater management
+19. background color peach puff, components indian red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
