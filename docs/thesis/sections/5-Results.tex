@@ -8,7 +8,7 @@ Each arm is a single run over all 101 tasks. \Crefrange{sec:main}{sec:ablation} 
 
 \begin{table}[ht]
 \centering
-\caption{Main results on all 101 tasks in the manifest order (single run per arm). Yes, Partial, No and Start failed are percentages of the 647 test cases; Accuracy $=$ Yes $+\,0.5\times$ Partial. Appearance is the mean grade over all 101 tasks (1--5; tasks without a working site count as 0). Paired $\Delta$ is the mean per-task difference to No Memory with a 95\% bootstrap \gls{ci}; it can differ from the difference of pooled accuracies because tasks have different numbers of test cases. Zero: tasks where every test case fails. Best values in bold.}
+\caption{Main results on all 101 tasks in the manifest order (single run per arm). Yes, Partial, No and Start failed are percentages of the 647 test cases; Accuracy $=$ Yes $+\,0.5\times$ Partial. Appearance is the mean grade over all 101 tasks (1--5; tasks without a working site count as 0). Paired $\Delta$ is the mean per-task difference to No Memory with a 95\% bootstrap \gls{ci}; it can differ from the difference of pooled accuracies because tasks have different numbers of test cases. Zero: tasks where every test case fails.}
 \label{tab:main}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -22,15 +22,18 @@ WebGen-LM-7B (paper)\textsuperscript{a} & 24.9 & 7.1 & 68.0 & 0.0 & 28.4 & 2.5 &
 No Memory (ours) & 23.8 & 9.4 & 66.5 & 0.3 & 28.5 & 2.35 & 30 & -- \\
 Text memory & 25.2 & 11.4 & 62.6 & 0.8 & 30.9 & 2.57 & 20 & $+2.6$ [$-3.6$, 8.7] \\
 Checklist only & 26.4 & 10.7 & 61.4 & 1.5 & 31.8 & 2.47 & 18 & $+3.4$ [$-2.2$, 8.7] \\
-Code memory (whole-file) & \textbf{34.5} & 11.1 & \textbf{53.2} & 1.2 & \textbf{40.0} & \textbf{2.83} & \textbf{13} & $\mathbf{+11.5}$ [6.0, 16.9] \\
-Code memory (fragments) & 29.5 & 11.4 & 59.0 & 0.0 & 35.2 & 2.67 & 20 & $+7.1$ [0.9, 13.1] \\
+Code memory (whole-file)\textsuperscript{b} & 34.5 & 11.1 & 53.2 & 1.2 & 40.0 & 2.83 & 13 & $+11.5$ [6.0, 16.9] \\
+\textbf{Code memory (fragments, final)} & 29.5 & 11.4 & 59.0 & 0.0 & 35.2 & 2.67 & 20 & $+7.1$ [0.9, 13.1] \\
 \bottomrule
-\multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B, so the two are not directly comparable.}
+\multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B, so the two are not directly comparable.}\\
+\multicolumn{9}{l}{\footnotesize \textsuperscript{b} Intermediate design: some code examples were whole files; see \Cref{sec:order-design}.}
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
-Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. No Memory varies by only 0.7 points across its three orders (\Cref{sec:order-design}), far less than this gain; a memory chain varies more, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and whole-file code memory produced a graded site, the means are 3.25 and 3.22. The final method with fragments reaches 35.2\% ($+7.1$, [0.9, 13.1]; 44 wins, 28 losses, 29 ties), below whole-file code memory in this order ($-4.4$, [$-9.8$, 1.0]). Most of its gain comes from sites that work at all: 19 tasks score above zero only with memory and 9 only without; on the 62 tasks where both arms score above zero, the paired gain is $+2.6$ ([$-3.2$, 8.5]). For whole-file code memory the same split gives 20 against 13 tasks and $+6.3$ ([0.7, 11.8]) on 68 tasks.
+The final method with fragments reaches 35.2\% against 28.5\% for No Memory (paired gain $+7.1$, [0.9, 13.1]; 44 wins, 28 losses, 29 ties) and reduces zero-score tasks from 30 to 20. Most of its gain comes from sites that work at all: 19 tasks score above zero only with memory and 9 only without; on the 62 tasks where both arms score above zero, the paired gain is $+2.6$ ([$-3.2$, 8.5]). No Memory varies by only 0.7 points across its three orders (\Cref{sec:order-design}); a memory chain varies more, because its memory diverges from the first task (\Cref{sec:fix}). For neither text memory nor the checklist alone does the interval exclude zero.
+
+The intermediate whole-file design scored higher in this order (40.0\%, $+11.5$ [6.0, 16.9]; $-4.4$ [$-9.8$, 1.0] for the final method against it), but this advantage did not carry over to other orders (\Cref{sec:order-design}). Appearance in \Cref{tab:main} counts tasks without a working site as 0; on the 66 tasks where both No Memory and the final method produced a graded site, the means are 3.23 and 3.24.
 
 \section{Learning Curve}
 \Cref{fig:curve} plots cumulative and rolling accuracy in execution order. Text memory and whole-file code memory are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while code memory keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (code) vs 26.0\% (No Memory) vs 23.2\% (text).
@@ -113,7 +116,7 @@ Code memory (fragments) & 35.0 & 35.3 & 35.2 & 20 & 3.25 \\
 \end{tabular}
 \end{table}
 
-Paired by task (a mean of per-task differences, so it can differ slightly from the difference of the pooled accuracies in \Cref{tab:ablation}), checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and whole-file code memory $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger share, with an interval that excludes zero, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred.
+Paired by task (a mean of per-task differences, so it can differ slightly from the difference of the pooled accuracies in \Cref{tab:ablation}), checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and whole-file code memory $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger share, with an interval that excludes zero, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred. For the final method the difference to checklist only is smaller, $+3.7$ ([$-1.8$, 9.1]), so on its own it does not show that the memory adds to the checklist; the fixed-prefix comparison will separate the two.
 
 \todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and final $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ final, describe the contribution as automatically discovering effective prompt code; if the final method is clearly better, as accumulation and per-task selection.}
 
