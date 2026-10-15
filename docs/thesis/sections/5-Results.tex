@@ -30,7 +30,7 @@ Code memory (fragments) & \multicolumn{8}{c}{\todo{running}} \\
 \end{adjustbox}
 \end{table}
 
-Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. For scale, No Memory has no cross-task state, so changing the order should not change its prompts; its three runs under different orders (28.5\%, 27.9\% and 28.6\%, \Cref{sec:order-design}) give an approximate estimate of rerun variability, although they are not repeats of one order: its run-to-run spread of 0.7 points is far smaller than the 11.5-point gain of code memory. A Long Memory chain varies more than No Memory, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and whole-file code memory produced a graded site, the means are 3.25 and 3.22. \todo{Planned (existing data): split the gain into (a) tasks where only the memory arm produced a working site and (b) tasks where both arms worked, and report the paired gain and CI on (b). Do this for the final version once its manifest run is scored.}
+Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. No Memory varies by only 0.7 points across its three orders (\Cref{sec:order-design}), far less than this gain; a memory chain varies more, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and whole-file code memory produced a graded site, the means are 3.25 and 3.22. \todo{Planned (existing data): split the gain into (a) tasks where only the memory arm produced a working site and (b) tasks where both arms worked, and report the paired gain and CI on (b). Do this for the final version once its manifest run is scored.}
 
 \section{Learning Curve}
 \Cref{fig:curve} plots cumulative and rolling accuracy in execution order. Text memory and whole-file code memory are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while code memory keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (code) vs 26.0\% (No Memory) vs 23.2\% (text).
@@ -43,7 +43,7 @@ Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5
 \end{figure}
 
 \section{Why Text Memory Declines and Code Memory Improves}
-\Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. In text memory such lessons appear in most tasks throughout and a separate ``General notes'' block becomes more frequent over time, while nothing addresses blank pages. In code memory these lessons are rarer and the code pool supplies a fragment in almost every task after it activates.
+\Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. Such lessons and a ``General notes'' block remain frequent in text memory; in code memory they are rarer, and a fragment is injected in almost every task once the pool activates.
 
 \begin{table}[ht]
 \centering
@@ -148,9 +148,9 @@ Mixed & Interleaved & -- & -- & -- & -- & -- \\
 
 \paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
-The first two shuffled orders give almost the same result (\Cref{tab:order}): Long Memory leads by about 4.5 points, with zero-score tasks reduced from 29 to 21, but neither confidence interval excludes zero, and the gain is far smaller than in the manifest order. No Memory is stable across its three runs (27.9--28.6\%), so the change is on the Long Memory side. Mixing domains does not remove the gain: the random order (seed 29) matches the shuffled-blocks order (seed 11), and from task 31 onwards Long Memory leads by 6.6 points in the random order (33.9\% vs 27.3\%). The gain is therefore not restricted to orders with adjacent same-domain tasks, although these results do not establish how much domain adjacency contributes.
+In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The random order matches the shuffled-blocks order, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
 
-Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}). Long Memory returned the unmodified Vite scaffold on 19 tasks in seed 11 and 16 in seed 29, against none for No Memory in either order and two in the manifest order. Every scaffold occurred after the missing-package code memory, whose example was a complete \texttt{App.vue} of another site, began to be injected (task 36 in seed 11, task 19 in seed 29). \Cref{fig:scaffold} shows one such case; \Cref{sec:fix} describes the fix.
+Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}): Long Memory returned the unmodified Vite scaffold on 19 tasks (seed 11) and 16 (seed 29), all after a missing-package entry whose example was another site's complete \texttt{App.vue} began to be injected; No Memory never did. \Cref{fig:scaffold} shows one case; \Cref{sec:fix} describes the fix.
 
 \begin{figure}[ht]
 \centering
@@ -178,14 +178,14 @@ const activeTab = ref('donation')
 \begin{minipage}[t]{0.46\textwidth}\vspace{0pt}
 \includegraphics[width=\linewidth]{figures/ex_scaffold.png}
 \end{minipage}
-\caption{Code memory (whole-file) on task 000041, an online trading site (seed-11 order). Left: part of the code-pool entry in the prompt, a complete \texttt{App.vue} from an earlier food-donation site. Right: the generator returned the untouched Vite starter project, and all five test cases failed. The final method shows only verified lines of such a file, without the \texttt{<script>} and \texttt{<template>} tags (\Cref{fig:prompt}).}
+\caption{Task 000041 (seed 11), whole-file code memory. Left: the injected \texttt{App.vue} of an earlier food-donation site. Right: the generator returned the untouched starter project; all five test cases failed.}
 \label{fig:scaffold}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/order_gaps.png}
-\caption{Rolling 10-task mean of the per-task accuracy gap to the No Memory run of the same order, by execution order. Orange: whole-file code memory; blue: the final method with fragments only. Positive values mean memory is better. The whole-file dip after task 45 in seed 11 coincides with the scaffold outputs.}
+\caption{Rolling 10-task mean of the accuracy gap to No Memory in the same order (positive: memory better). Orange: whole-file code memory; blue: final method. The orange dip after task 45 in seed 11 coincides with the scaffold outputs.}
 \label{fig:order-gap}
 \end{figure}
 

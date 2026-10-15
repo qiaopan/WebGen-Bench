@@ -1,11 +1,11 @@
 \chapter{Background and Related Work}
 \label{chap:background}
 
-This chapter covers website-generation benchmarks, memory for \gls{llm} agents, small models and added prompt text, and self-correction, and then states the research gap (\Cref{sec:gap}).
+
 
 \section{Website Generation Benchmarks}
 \label{sec:bg-webgen}
-Code-generation benchmarks have moved from single functions towards whole applications. A website is a demanding target: it combines several files, a build configuration, a user interface and interaction logic, and a request in natural language usually lists several pages and features at once. Evaluating such output by reading the code is unreliable, because a project can look complete and still fail to start, or start and render a blank page. Recent benchmarks therefore start the generated project and test it through its interface. Related benchmarks test agents that operate existing websites, such as Mind2Web and WebArena~\cite{deng2023mind2web,zhou2024webarena}, generate a single page from a screenshot and compare it visually, as in Design2Code~\cite{si2024design2code}, or change a code repository and run its tests, as in SWE-bench~\cite{jimenez2024swebench}.
+A website combines several files, a build configuration and interaction logic, and a project can look complete yet fail to start or render a blank page, so recent benchmarks start the generated project and test it through its interface. Related benchmarks cover operating existing websites (Mind2Web, WebArena~\cite{deng2023mind2web,zhou2024webarena}), generating a page from a screenshot (Design2Code~\cite{si2024design2code}) and repairing repositories (SWE-bench~\cite{jimenez2024swebench}).
 
 WebGen-Bench~\cite{lu2025webgenbench} contains 101 website requirements from 20 application domains, each paired with a set of functional test cases (647 in total). A generated project is installed and started, and a \gls{gui} agent based on WebVoyager~\cite{he2024webvoyager} executes each test case and returns \emph{Pass}, \emph{Partial} or \emph{Fail}. A separate \gls{vlm} grades the appearance of the landing page from 1 to 5. The authors also release WebGen-LM, generators fine-tuned from Qwen2.5-Coder~\cite{hui2024qwencoder} on agent trajectories; with the Bolt.diy scaffold, WebGen-LM-7B reaches 28.4\% accuracy and an appearance score of 2.5. Larger general models such as Qwen2.5-Coder-32B score lower (9.5\%), which makes the 7B model a good subject: it is neither at the floor nor at the ceiling of the benchmark.
 
@@ -27,7 +27,7 @@ An agent memory has three parts: what is written after a task, how it is maintai
 \label{sec:bg-small}
 Several results suggest that adding text to a prompt is not free. Models become less likely to satisfy all instructions as their number grows~\cite{harada2025curse,jaroslawicz2025ifscale}; information in the middle of a long context is used less than at its start or end~\cite{liu2024lost}; irrelevant context distracts models~\cite{shi2023distracted}; and longer inputs alone can reduce performance even with perfect retrieval~\cite{du2025contextlength}. Models can be trained to prioritise instructions by source~\cite{wallace2024hierarchy}, which motivates keeping the user requirement explicitly above any memory content. Small models also struggle to benefit from long reasoning chains~\cite{li2025smallmodels}.
 
-These findings were obtained mostly on reasoning and question-answering tasks, but they point to a specific risk for memory. A memory that grows with experience adds more and more text to every prompt. For a large model this may be harmless; for a small one it may bury the user's requirement, introduce instructions that conflict with it, or present advice the model cannot turn into code. Whether a small generator can use memory at all, and in which form, therefore cannot be assumed from results obtained with large models.
+These results come mostly from reasoning and question answering, but they point to a risk for memory: a growing memory adds text to every prompt, which for a small model may bury the requirement or offer advice it cannot turn into code.
 
 \section{Self-Correction and Debugging}
 \label{sec:bg-selfcorr}
