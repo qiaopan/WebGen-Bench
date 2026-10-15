@@ -43,7 +43,7 @@ The study is deliberately narrow so that its comparisons are clean.
 \begin{enumerate}
     \item A fully self-hosted reproduction of the WebGen-Bench No Memory baseline for WebGen-LM-7B (28.5\% vs 28.4\% reported), with a failure analysis showing that many zero scores are blank pages caused by basic code errors (\Cref{chap:setup,sec:nm-failures}).
     \item A long-term memory pipeline for website generation: a requirement checklist, a code pool of fragments copied verbatim from the chain's own compiled websites, and memory hygiene, each motivated by a measured failure of the previous version (\Cref{chap:method}).
-    \item Evidence that, for this small generator, short code fragments reduced the targeted failures where textual lessons did not, with an ablation separating the checklist from the stored cross-task content (\Cref{chap:results}). \todo{Status: final method on the manifest order running (expected 10-16).}
+    \item Evidence that, for this small generator, short code fragments reduced the targeted failures where textual lessons did not, with an ablation separating the checklist from the stored cross-task content (\Cref{chap:results}).
     \item A task-order study with alternating paired runs, showing that one memory entry can become a failure mode under a different order and that replacing whole-file examples with fragments removed it (\Cref{sec:order-design,sec:fix}).
 \end{enumerate}
 

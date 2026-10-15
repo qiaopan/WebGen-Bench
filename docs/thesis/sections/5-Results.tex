@@ -23,14 +23,14 @@ No Memory (ours) & 23.8 & 9.4 & 66.5 & 0.3 & 28.5 & 2.35 & 30 & -- \\
 Text memory & 25.2 & 11.4 & 62.6 & 0.8 & 30.9 & 2.57 & 20 & $+2.6$ [$-3.6$, 8.7] \\
 Checklist only & 26.4 & 10.7 & 61.4 & 1.5 & 31.8 & 2.47 & 18 & $+3.4$ [$-2.2$, 8.7] \\
 Code memory (whole-file) & \textbf{34.5} & 11.1 & \textbf{53.2} & 1.2 & \textbf{40.0} & \textbf{2.83} & \textbf{13} & $\mathbf{+11.5}$ [6.0, 16.9] \\
-Code memory (fragments) & \multicolumn{8}{c}{\todo{running}} \\
+Code memory (fragments) & 29.5 & 11.4 & 59.0 & 0.0 & 35.2 & 2.67 & 20 & $+7.1$ [0.9, 13.1] \\
 \bottomrule
 \multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B, so the two are not directly comparable.}
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
-Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. No Memory varies by only 0.7 points across its three orders (\Cref{sec:order-design}), far less than this gain; a memory chain varies more, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and whole-file code memory produced a graded site, the means are 3.25 and 3.22. \todo{Planned (existing data): split the gain into (a) tasks where only the memory arm produced a working site and (b) tasks where both arms worked, and report the paired gain and CI on (b). Do this for the final version once its manifest run is scored.}
+Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. No Memory varies by only 0.7 points across its three orders (\Cref{sec:order-design}), far less than this gain; a memory chain varies more, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and whole-file code memory produced a graded site, the means are 3.25 and 3.22. The final method with fragments reaches 35.2\% ($+7.1$, [0.9, 13.1]; 44 wins, 28 losses, 29 ties), below whole-file code memory in this order ($-4.4$, [$-9.8$, 1.0]). Most of its gain comes from sites that work at all: 19 tasks score above zero only with memory and 9 only without; on the 62 tasks where both arms score above zero, the paired gain is $+2.6$ ([$-3.2$, 8.5]). For whole-file code memory the same split gives 20 against 13 tasks and $+6.3$ ([0.7, 11.8]) on 68 tasks.
 
 \section{Learning Curve}
 \Cref{fig:curve} plots cumulative and rolling accuracy in execution order. Text memory and whole-file code memory are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while code memory keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (code) vs 26.0\% (No Memory) vs 23.2\% (text).
@@ -38,7 +38,7 @@ Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/learning_curve_v4_v7.png}
-\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, text memory and whole-file code memory. \todo{Planned: add the final version.}}
+\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, text memory and both code memories.}
 \label{fig:curve}
 \end{figure}
 
@@ -79,7 +79,9 @@ Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 12 / 4 / 6 (2
 These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
 
 \section{Error Analysis}
-Whole-site breaks fall from 26 tasks (No Memory) to 8 (code memory), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22). Per file the rate is the same in both arms (27 of 592 vs 27 of 586 components, 4.6\%), and a variant example showing both \texttt{ref} and \texttt{computed} fixed one of four affected tasks; we report it as a residual error of the generator, since the protocol forbids repair. Ten of code memory's 13 zero-score tasks are also zero for No Memory. \todo{Planned (existing data): list the cause of each remaining zero-score task of the final version.}
+Whole-site breaks fall from 26 tasks (No Memory) to 8 (code memory), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22). Per file the rate is the same in both arms (27 of 592 vs 27 of 586 components, 4.6\%), and a variant example showing both \texttt{ref} and \texttt{computed} fixed one of four affected tasks; we report it as a residual error of the generator, since the protocol forbids repair. Ten of code memory's 13 zero-score tasks are also zero for No Memory.
+
+The final method has 20 zero-score tasks, 11 of them also zero for No Memory. Nine import an undeclared package (\texttt{vue-router} in six; a chart, a chess and an editor library in the others), three hit a Vue compile error (\texttt{v-model} on a file input or a prop), three call a Vue function without importing it, and five render but fail every test case. Only one returned the starter project. Undeclared \texttt{vue-router} imports occur in seven tasks against three with whole-file code memory, although a fragment for this problem was injected in 88 tasks once it activated: in this order a fragment prevented the import less reliably than a complete file did, while in the shuffled orders the complete file caused scaffolds (\Cref{sec:order-design}).
 
 \paragraph{Appearance.} On the 68 tasks where both arms produced a graded site, the means are 3.25 (No Memory) and 3.22 (code memory); since memory changes which tasks enter this subset, this does not show that memory has no effect on appearance. \Cref{tab:main} instead averages all 101 tasks with failures as 0, and \Cref{tab:ablation} averages graded tasks.
 
@@ -106,7 +108,7 @@ No Memory & 26.0 & 29.5 & 28.5 & 30 & 3.25 \\
 Checklist only & 33.1 & 31.3 & 31.8 & 18 & 3.23 \\
 Fixed code prefix & \multicolumn{5}{c}{\todo{running}} \\
 Code memory (whole-file) & 39.0 & 40.4 & 40.0 & 13 & 3.21 \\
-Code memory (fragments) & \multicolumn{5}{c}{\todo{running}} \\
+Code memory (fragments) & 35.0 & 35.3 & 35.2 & 20 & 3.25 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -128,14 +130,14 @@ In the shuffled and interleaved orders, Long Memory and No Memory are run as pai
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status: manifest (final method) running, expected 10-16; seed 47 running; interleaved queued. Fill in when complete.}}
+\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status: seed 47 running, interleaved queued.}}
 \label{tab:order}
 \small
 \begin{tabular}{llccccc}
 \toprule
 Kind & Order & NM & WF & F & F $-$ NM & Zero NM / WF / F \\
 \midrule
-Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & -- & -- & 30 / 13 / -- \\
+Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & 35.2 & $+7.1$ [0.9, 13.1] & 30 / 13 / 20 \\
 Adjacent & Shuffled blocks (seed 11) & 27.9 & 33.1 & 35.4 & $+7.4$ [1.6, 13.1] & 29 / 21 / 16 \\
 Adjacent & Shuffled blocks (seed 47) & -- & -- & -- & -- & -- \\
 Mixed & Random (seed 29) & 28.6 & 32.6 & 33.7 & $+5.5$ [$-0.5$, 11.6] & 29 / 21 / 18 \\
@@ -193,7 +195,7 @@ With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (1
 
 
 
-\todo{Status: manifest running (expected 10-16), seed 47 running, interleaved queued. Report whether the gain holds in all orders and whether the interleaved order is clearly worse; add one summary figure of the gain and CI per order, with a shared y-axis across the order plots.}
+\todo{Status: seed 47 running (about 60/101), interleaved queued. Report whether the gain holds in all orders and whether the interleaved order is clearly worse; add one summary figure of the gain and CI per order, with a shared y-axis across the order plots.}
 
 \todo{Planned (existing data, final version): one complete case of transfer (failure, stored entry, why it was retrieved, injected text, change in code, outcome), a few lines; negative transfer is \Cref{fig:scaffold}.}
 
