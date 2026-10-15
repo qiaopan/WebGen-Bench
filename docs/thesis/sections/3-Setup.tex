@@ -28,18 +28,20 @@ We use all 101 WebGen-Bench tasks. They come from 20 application domains of uneq
 \label{sec:walkthrough}
 This section follows one task through the unmodified system, so that it is clear what the memory later changes. Task 000006 asks for a solar dashboard:
 
+\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 Please implement a solar dashboard to display real-time and historical solar
 data. The dashboard should have functionalities for real-time data display,
 historical data query, and chart analysis. [...] Configure the background color
 to honeydew, with components using dark olive green.
 \end{lstlisting}
+\end{minipage}
 
 \paragraph{Generation.} Under No Memory this text is the entire prompt. Bolt.diy is an open-source browser-based coding agent: it opens a starter project (for Vue, a Vite + Vue + TypeScript template whose \texttt{package.json} declares only \texttt{vue}), sends the requirement to the generator, and writes every file of the model's reply into the project. It then installs the dependencies and starts the development server. The generator has one reply; nothing in the official protocol inspects or repairs the code.
 
 \paragraph{Functional testing.} Each task comes with hidden test cases, on average six. For task 000006 the first two are ``Verify the display of real-time solar power generation data'' and ``Test the display of real-time power consumption data'', each with an expected result. A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} receives one test case at a time. At each step it sees a screenshot in which every interactive element carries a numbered box (\Cref{fig:walkthrough}b), chooses an action such as clicking element 1 or typing into a field, and finally answers YES, PARTIAL or NO. The agent has a fixed step budget; if it runs out before reaching the target, the case counts as failed.
 
-\paragraph{Appearance grading.} A vision model grades a full-page screenshot from 1 to 5 for layout, colour and completeness.
+\paragraph{Appearance grading.} A vision model grades a full-page screenshot from 1 to 5 for layout, colour and completeness. Both the tester and the grader are models acting as judges, which are known to have biases~\cite{zheng2023judge}; we therefore keep their raw transcripts and, in \Cref{sec:threats}, check a sample of their verdicts by hand.
 
 \Cref{fig:walkthrough} shows what the tester saw for this task in two runs. Under No Memory the model imported the chart library \texttt{vue-chartjs}, which the template does not declare; Vite cannot resolve the import, the page shows only the error overlay, and all test cases fail. With the final memory the generator built the three requested views without the undeclared package, and all test cases passed.
 
@@ -58,7 +60,7 @@ to honeydew, with components using dark olive green.
 \end{figure}
 
 \section{Models and Roles}
-All models are self-hosted on the university CS ML cluster (two NVIDIA H200 GPUs per job, served with vLLM). No commercial \gls{llm} service is called. \Cref{tab:roles} lists the roles.
+All models are self-hosted on the university CS ML cluster (two NVIDIA H200 GPUs per job, served with vLLM~\cite{kwon2023vllm}). No commercial \gls{llm} service is called. \Cref{tab:roles} lists the roles.
 
 \begin{table}[ht]
 \centering
@@ -69,15 +71,15 @@ All models are self-hosted on the university CS ML cluster (two NVIDIA H200 GPUs
 Role & Model \\
 \midrule
 Generator & WebGen-LM-7B (BF16), Bolt.diy scaffold, single generation \\
-Functional tester & Qwen2.5-VL-32B-Instruct (WebVoyager-style \gls{gui} agent) \\
+Functional tester & Qwen2.5-VL-32B-Instruct~\cite{bai2025qwenvl} (WebVoyager-style \gls{gui} agent) \\
 Appearance grader & Qwen2.5-VL-32B-Instruct (paper: GPT-4o) \\
 Memory / reflection & Qwen2.5-VL-72B-Instruct-AWQ \\
-Embeddings & bge-m3 \\
+Embeddings & bge-m3~\cite{chen2024bgem3} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\paragraph{The generator.} WebGen-LM is a family of website-generation models (7B, 14B and 32B) released with WebGen-Bench~\cite{lu2025webgenbench}. Each is Qwen2.5-Coder-Instruct of the same size, fine-tuned with supervised learning only. The training data come from WebGen-Instruct, 6,667 website instructions decontaminated against the benchmark: the authors ran DeepSeek-V3 in Bolt.diy on 2,000 of them and kept the 600 trajectories whose websites scored at least 3 for appearance. WebGen-LM-7B therefore already knows the Bolt.diy output format, which makes it the natural small baseline for this benchmark: it is not a general model prompted to build websites, but a model distilled for exactly this scaffold.
+\paragraph{The generator.} WebGen-LM is a family of website-generation models (7B, 14B and 32B) released with WebGen-Bench~\cite{lu2025webgenbench}. Each is Qwen2.5-Coder-Instruct~\cite{hui2024qwencoder} of the same size, fine-tuned with supervised learning only. The training data come from WebGen-Instruct, 6,667 website instructions decontaminated against the benchmark: the authors ran DeepSeek-V3 in Bolt.diy on 2,000 of them and kept the 600 trajectories whose websites scored at least 3 for appearance. WebGen-LM-7B therefore already knows the Bolt.diy output format, which makes it the natural small baseline for this benchmark: it is not a general model prompted to build websites, but a model distilled for exactly this scaffold.
 
 The memory model is deliberately different from the evaluator, so that reflection cannot copy the evaluator's grading behaviour. vLLM applies the model repository's generation configuration by default; WebGen-LM-7B ships with a repetition penalty that Bolt.diy never sends, so we disable it for the generator to match the paper's setting.
 
@@ -86,18 +88,38 @@ For each task with $n$ test cases, of which $p$ pass and $q$ are partial,
 \begin{equation}
 \text{accuracy} = \frac{p + 0.5\,q}{n}.
 \end{equation}
-We report accuracy over all test cases, the mean appearance score (1--5), and the number of \emph{zero-score} tasks. Because test cases within a task are not independent, comparisons are paired by task rather than by test case.
+We report accuracy over all test cases, the mean appearance score (1--5), and the number of \emph{zero-score} tasks. Because test cases within a task are not independent, comparisons are paired by task rather than by test case: for two arms we report the mean per-task difference in accuracy with a 95\% percentile bootstrap \gls{ci} obtained by resampling tasks~\cite{efron1993bootstrap}, together with the numbers of tasks won, lost and tied.
 
 \section{Experimental Design}
 \label{sec:design}
+The memory designs we built fall into three families, shown in \Cref{fig:families} and described in \Cref{chap:method}. \emph{Text memory} (v1--v4) stores lessons written in natural language and adds them to the prompt; its last version, v4, adds the requirement checklist. \emph{Code memory} (v5--v7) keeps the checklist and adds a code pool of examples taken from the chain's own working websites. The \emph{final} family (v8--v9.1) changes only how the code pool selects and updates its examples. One version of each family was run on all 101 tasks, v4, v7 and v9.1, and in the rest of this dissertation the three names refer to these runs. Versions that were stopped part-way or never run on all tasks are described only in the design history (\Cref{sec:history}).
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=5mm and 7mm, every node/.style={font=\small},
+  fam/.style={draw, rounded corners, align=center, text width=3.3cm, minimum height=16mm, inner sep=4pt},
+  base/.style={draw, rounded corners, align=center, text width=1.9cm, minimum height=16mm},
+  why/.style={font=\scriptsize\itshape, align=center, text width=2.2cm}, >=stealth]
+\node[base] (nm) {No Memory\\28.5\%};
+\node[fam, right=14mm of nm] (txt) {\textbf{Text memory}\\v1--v4\\lessons as text\\+ checklist (v4)\\30.9\%};
+\node[fam, draw=orange!80!black, right=14mm of txt] (code) {\textbf{Code memory}\\v5--v7\\+ code pool of\\verified fragments\\40.0\%};
+\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Final}\\v8--v9.1\\safer fragments,\\versioned entries\\\todo{v9.1}};
+\draw[->] (nm) -- (txt);
+\draw[->] (txt) -- node[why, above=1mm]{text not\\followed} (code);
+\draw[->] (code) -- node[why, above=1mm]{whole-file\\example\\$\rightarrow$ scaffold} (fin);
+\end{tikzpicture}
+\caption{The three families of memory. Each arrow names the failure that led to the next family. Accuracy is on the manifest order (101 tasks, one run).}
+\label{fig:families}
+\end{figure}
+
 \Cref{tab:design} lists every arm, the task orders in which it was run and the question it answers. All arms use WebGen-LM-7B with Bolt.diy under the official protocol, cover all 101 tasks and start from an empty memory; each arm is run once per order. The task orders are defined in \Cref{sec:order-design}.
 
 \begin{table}[ht]
 \centering
-\caption{Experimental design. Memory content is what is added to the generator's prompt; version numbers refer to the design history in \Cref{sec:history}.}
+\caption{Experimental design. Memory content is what is added to the generator's prompt; the families are those of \Cref{fig:families}.}
 \label{tab:design}
 \small
-\begin{tabularx}{\textwidth}{>{\raggedright}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright}X>{\raggedright}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.9cm}X>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
 \toprule
 Arm & Memory content & Task orders & Question \\
 \midrule
@@ -138,6 +160,6 @@ GPU 1 & Qwen2.5-VL-72B-Instruct-AWQ (memory) & 113 \\
 \end{tabular}
 \end{table}
 
-\paragraph{Code and data availability.} The code, configuration files and the archived run records (prompts, injected memory, scores and memory databases of every run) are kept in a private repository and are available from the author on request; they will be made public after examination.
+\paragraph{Code and data availability.} The code, configuration files and the archived run records (prompts, injected memory, scores and memory databases of every run) are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \texttt{archive/phase2-webgen-2026-10/}.
 
 The main constraint is compute. A task takes about twelve minutes with memory and six without, so one 101-task run takes about a day on our two GPUs. As in the original benchmark, each configuration is therefore run once per task order. We compensate by pairing comparisons by task, by repeating the No Memory baseline in three orders to measure its run-to-run variation, and by repeating the memory method across orders rather than within one.

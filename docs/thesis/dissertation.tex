@@ -15,6 +15,8 @@
 \usepackage{subcaption}
 \usepackage[inline]{enumitem}
 \usepackage[table,usenames,dvipsnames]{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usepackage{cleveref}
@@ -70,13 +72,13 @@
 
 \frontmatter
 \begin{abstract}
-Large language model (LLM) agents that generate websites solve every task from scratch: what went wrong on one website is forgotten before the next one starts. This dissertation asks whether a \emph{small} generator, the 7-billion-parameter WebGen-LM-7B, can improve across a sequence of WebGen-Bench tasks if it is given a long-term memory built from its own earlier attempts, without changing its weights or the official evaluation protocol.
+Agents that generate websites with large language models solve every task from scratch: what went wrong on one website is forgotten before the next one starts. This dissertation asks whether a \emph{small} generator, WebGen-LM-7B, can improve across a sequence of WebGen-Bench tasks when it is given a long-term memory built from its own earlier attempts, without changing its weights or the official evaluation protocol.
 
-We first reproduce the official No Memory baseline on a self-hosted cluster (28.5\% accuracy on 101 tasks versus 28.4\% reported). An analysis of its failures shows that most zero-score tasks are not hard tasks but blank pages caused by basic code errors, such as importing a package that is not installed, and that the model rarely follows advice written as text. A first text-based memory therefore helps early in the sequence but falls behind No Memory later, as generic advice accumulates in the prompt.
+We first reproduce the official No Memory baseline on a self-hosted cluster (28.5\% accuracy on 101 tasks versus 28.4\% reported). Its failures show that many zero-score tasks are blank pages caused by basic code errors, such as importing a package that is not installed, and that the model rarely follows advice written as text. A text-based memory therefore helps early in the sequence but falls behind No Memory later, as generic advice accumulates.
 
-Code memory keeps a requirement checklist that lists every requested feature and adds a code pool: once a code error recurs, the prompt carries a short verified code fragment taken from the chain's own successful websites. In a single run over all 101 tasks it reaches 40.0\% accuracy against 28.5\% for No Memory (mean paired gain 11.5 points, 95\% CI 6.0--16.9) and reduces zero-score tasks from 30 to 13. An ablation attributes most of the gain to the memory rather than to the checklist (+8.1 points, CI 2.9--13.2). Under shuffled task orders, however, a whole-file example in the code pool made the generator return the untouched starter project. The final version (v9.1) shows only verified lines of such files; it removes these blank sites in both shuffled orders and keeps a gain of 7.4 and 5.5 points over No Memory. \todo{Add v9.1 on the manifest order.} Gains are functional: appearance on sites that work is unchanged.
+Code memory adds a requirement checklist and a code pool: once a code error recurs, the prompt carries a short verified fragment from the chain's own successful websites. In a single run over all 101 tasks it reaches 40.0\% against 28.5\% (paired gain 11.5 points, 95\% CI 6.0--16.9) and cuts zero-score tasks from 30 to 13; an ablation attributes most of the gain to memory rather than to the checklist. Under shuffled task orders, a whole-file example made the generator return the untouched starter project. The final version (v9.1) shows only verified lines of such files; it removes these failures in both shuffled orders and keeps gains of 7.4 and 5.5 points. \todo{Add v9.1 on the manifest order.} Gains are functional; appearance on working sites is unchanged.
 
-The main lesson is that, for a small generator, \emph{what form} a memory takes matters more than how much is remembered: verified code fragments transfer where textual lessons do not. We discuss the limits of these single-run results, the cost of the evaluation, and the ethical considerations of self-improving code agents.
+The main lesson is that, for a small generator, the \emph{form} of memory matters more than its amount: verified code fragments transfer where textual lessons do not. We discuss the limits of these single-run results and the ethical considerations of self-improving code agents.
 \end{abstract}
 
 \begin{acknowledgements}
@@ -116,7 +118,7 @@ October, 2026
 \include{sections/7-Conclusion}
 
 \backmatter
-\bibliographystyle{plain}
+\bibliographystyle{plainurl}
 \bibliography{bibliography}
 
 \end{document}
