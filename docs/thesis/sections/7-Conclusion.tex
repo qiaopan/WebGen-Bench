@@ -9,8 +9,8 @@
 \paragraph{\ref{rq3}} The v7 advantage grows over the sequence (40.4\% vs 29.5\% on tasks 31--101, 38.3\% vs 26.0\% on the last 35), while v4 falls below No Memory after task 30, consistent with learning from accumulated experience. In two shuffled orders v7's gain fell to about 4.5 points because one code memory, a whole-file example, made the generator return the scaffold; with examples reduced to verified fragments (v9.1) the scaffolds disappeared and the gain was 7.4 points with domains adjacent (significant) and 5.5 points with domains mixed, so the benefit does not rely on same-domain neighbours. \todo{Manifest, seed 47 and interleaved order with v9.1.}
 
 \section{Future Work}
-A stronger generator from the same family (WebGen-LM-32B) would test whether the advantage of code over text depends on model capability. One further experiment would address the main remaining question:
+One further experiment would address the main remaining question:
 \begin{itemize}
   \item \textbf{Held-out evaluation.} Because the method was developed while observing results on this benchmark, freeze the method on the first 30 tasks and report the remaining 71 separately.
 \end{itemize}
-Further directions are re-grading with a second strong \gls{vlm} evaluator, integrating the memory with other coding agents (e.g.\ OpenHands, Aider) on a stratified subset of tasks, letting the memory model revise reflections and fragments until code-checkable criteria hold~\cite{madaan2023selfrefine,dhuliawala2023cove}, and transferring the approach to repository-level coding benchmarks such as SWE-bench.
+Further directions are integrating the memory with other coding agents (e.g.\ OpenHands, Aider) on a stratified subset of tasks, to show that the approach does not depend on Bolt.diy; re-grading with a second strong \gls{vlm} evaluator; repeating each order more than once to separate order effects from run-to-run variation; letting the memory model revise reflections and fragments until code-checkable criteria hold~\cite{madaan2023selfrefine,dhuliawala2023cove}, and transferring the approach to repository-level coding benchmarks such as SWE-bench.

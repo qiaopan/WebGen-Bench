@@ -128,6 +128,12 @@ Paired by task, checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI
 
 \todo{Fill in fixed-prefix row and the two differences involving it.}
 
+\section{A Stronger Generator}
+\label{sec:stronger}
+To test whether the advantage of code over text depends on the size of the generator, we repeat No Memory and the final version with WebGen-LM-32B from the same family, in the manifest order, keeping Bolt.diy, the memory pipeline and the evaluators unchanged. The 32B model is served in BF16, as in the original paper, where it reaches 38.2\% with Bolt.diy~\cite{lu2025webgenbench}; the two arms were run concurrently on two lanes, so both experienced the same infrastructure conditions.
+
+\todo{Table: 32B No Memory vs Final (v9.1) in the format of \Cref{tab:main}, with the paper's 32B row; paired difference with CI; whether textual lessons are followed more often by the 32B generator.}
+
 \section{Robustness to Task Order}
 \label{sec:order-design}
 WebGen-Bench is a static benchmark: tasks are solved independently and its main results are single runs without error bars, which the authors attribute to computational cost~\cite{lu2025webgenbench}. With memory, however, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
