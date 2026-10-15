@@ -26,7 +26,7 @@ We use all 101 WebGen-Bench tasks. They come from 20 application domains with tw
 
 \section{The Baseline: How One Task Is Generated and Scored}
 \label{sec:walkthrough}
-The baseline is the unmodified WebGen-Bench pipeline~\cite{lu2025webgenbench}, which we call \emph{No Memory}. We follow one task, 000006, through its four steps:
+The baseline is the unmodified WebGen-Bench pipeline~\cite{lu2025webgenbench}, which we call \emph{No Memory}. We use it as the baseline because it is exactly the setting reported in the paper, so our numbers can be checked against the published 28.4\% (we obtain 28.5\%, \Cref{sec:baseline-repro}), and because memory is then the only difference between arms. We follow one task, 000006, through its four steps:
 
 \noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
@@ -86,13 +86,13 @@ The memory model is deliberately different from the evaluator, so that reflectio
 
 \section{Metrics}
 \label{sec:metrics}
-We use the benchmark's own metrics. Over all test cases of an arm, \emph{Yes}, \emph{Partial}, \emph{No} and \emph{Start failed} are the percentages of the 647 cases with each outcome, and
+We use the benchmark's own metrics, so that the baseline can be compared directly with the published result. Over all test cases of an arm, \emph{Yes}, \emph{Partial}, \emph{No} and \emph{Start failed} are the percentages of the 647 cases with each outcome, and
 \begin{equation}
 \text{accuracy} = \text{Yes} + 0.5 \times \text{Partial},
 \end{equation}
 so a partially met case counts half and a site that never starts counts zero for all its cases. This is the official accuracy, pooled over test cases; for a single task the same formula gives its \emph{task accuracy} $(p + 0.5\,q)/n$ for $p$ passed and $q$ partial cases out of $n$. A \emph{zero-score} task is one where every case fails, usually because the page is blank. \emph{Appearance} is the mean 1--5 grade; in the main table tasks without a working site count as 0.
 
-Because cases within a task are not independent, we compare arms task by task: the mean per-task difference in task accuracy, with a 95\% percentile bootstrap \gls{ci} from resampling the 101 tasks~\cite{efron1993bootstrap}, and the numbers of tasks won, lost and tied. The interval reflects which tasks are in the benchmark, not the variation between repeated runs of a memory chain (about five points, \Cref{sec:fix}), so we say an interval ``excludes zero'' rather than calling a gain significant. Learning curves average task accuracy.
+Because cases within a task share one website and fail together when it does not start, they are not independent, so we compare arms task by task: the mean per-task difference in task accuracy, with a 95\% percentile bootstrap \gls{ci} from resampling the 101 tasks~\cite{efron1993bootstrap}, and the numbers of tasks won, lost and tied. The interval reflects which tasks are in the benchmark, not the variation between repeated runs of a memory chain (about five points, \Cref{sec:fix}), so we say an interval ``excludes zero'' rather than calling a gain significant. Learning curves average task accuracy.
 
 \section{Experimental Design}
 \label{sec:design}
@@ -140,6 +140,7 @@ Code memory (fragments) & as above, but code examples are verified fragments onl
 Memory never uses information from the current task itself (leave-one-task-out), and evaluation results are never fed back into the same task.
 
 \section{Reproducing the Baseline}
+\label{sec:baseline-repro}
 No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean appearance score of 2.35 (paper: 2.5 with GPT-4o) and 30 zero-score tasks. The near-identical aggregate accuracy is evidence that the self-hosted pipeline approximately reproduces the published baseline; the appearance grader differs, and task-level agreement cannot be measured because the paper's per-task outputs are not available.
 
 \section{Reproducibility and Constraints}
