@@ -131,7 +131,7 @@ The code pool is computed without an \gls{llm} for detection:
 \begin{table}[ht]
 \centering
 \small
-\caption{Constants of the final method. Several were revised in response to failure analysis on development runs, mainly seed 11 (\Cref{sec:fix}); all were fixed before the final evaluation runs, and none was set by a systematic search.}
+\caption{Constants of the final method not stated in the text. Some were revised after development runs (mainly seed 11, \Cref{sec:fix}); all were fixed before the final runs and none was tuned systematically.}
 \label{tab:params}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.2cm}X}
 \toprule
@@ -141,13 +141,9 @@ Lesson retrieval & bge-m3 embeddings; 5 candidates per requirement aspect (\Cref
 Lessons injected & at most 3, total length at most $0.5\times$ the requirement \\
 Common pool & 6 candidates, at most 3 kept; only entries with a code construct \\
 Deduplication & candidates with similarity $\ge 0.55$, then same root cause and fix judged by the memory model \\
-Retirement & at least 5 injections and utility $< 0.3$ \\
 Code-pool trigger & 2 tasks; 1 task for whole-site failures \\
-Code-pool source & earlier site with score $\ge 0.5$ that compiles \\
 Fragment & verbatim, at most 15 lines, no tag lines \\
 Code-pool slots & at most 3 per task, at most 1 for a missing package \\
-Memory model & Qwen2.5-VL-72B-Instruct-AWQ, at most 4096 output tokens \\
-Leakage control & a task never reads memory written from itself \\
 \bottomrule
 \end{tabularx}
 \end{table}
