@@ -50,7 +50,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \draw[->] (sa) -- node[above,font=\scriptsize]{write} (M1);
 \draw[->, dotted] (M1) -- node[left,font=\scriptsize]{next task} (M0);
 \end{tikzpicture}
-\caption[The memory flow of the final version (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$ and $M_i$: the same memory store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
+\caption[The memory flow of the final method.]{The memory flow of the final method. Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$ and $M_i$: the same memory store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
 \label{fig:memflow}
 \end{figure}
 
@@ -63,67 +63,7 @@ We began by inspecting the code that No Memory actually produced, rather than it
 
 \paragraph{Text is not followed.} In a targeted diagnostic, not a powered experiment, we took nine tasks that had produced blank pages, kept their original prompts, and added a single sentence, phrased in several ways (``add vue-router to package.json'', ``do not use vue-router'', ``put pages in App.vue with \texttt{ref} and \texttt{v-if}'', or the same sentence at both the start and the end). None recovered more than one task in three. Each phrasing was tried on three of the nine tasks; a task counted as recovered when the generated code imported no undeclared package and compiled. A ten-line code example of the same idea, tried on all nine, recovered seven. Because the text variants and the code example were tried on different subsets, this is indicative rather than conclusive; it suggested that memory might work better as code, in line with reports that small models follow instructions less reliably~\cite{harada2025curse,li2025smallmodels}.
 
-\section{Design History}
-\label{sec:history}
-The three families of \Cref{fig:families} were reached through the attempts in \Cref{tab:history}; unlike \Cref{tab:design}, which lists the arms compared, the table records how the method evolved. Versions are numbered in build order. v1 and v2 are early text-memory designs, v5 was a local prototype, and v8 and v9 were stopped part-way; only v4, v7 and v9.1 ran on all 101 tasks.
-
-\begin{table}[ht]
-\centering
-\small
-\caption{Design iterations. Each row addresses a failure observed in the previous row.}
-\label{tab:history}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}XXX}
-\toprule
-Attempt (version) & Problem addressed & Inspired by & Outcome \\
-\midrule
-Three-layer memory (v1--v2) & Traceable lessons & \cite{zhao2024expel,wang2023voyager,reasoningbank2025} & Abstract experiences too vague; kept concrete cases only \\
-Guidance compression & Injected text 5.7$\times$ the requirement; only the home page was built & \cite{harada2025curse,liu2024lost} & One task 0.25 $\rightarrow$ 0.83, but compression dropped required features \\
-Step-wise reflection & Guesses stored as lessons & \cite{zeller2009whyprograms,chen2023selfdebug,dhuliawala2023cove} & Better evidence; high run-to-run variance \\
-Dedup + utility (v3) & 34 near-identical lessons filled the pool & \cite{zhao2024expel,chhikara2025mem0,zhou2025memento} & Less repetition; blank pages unchanged \\
-Requirement checklist (v4) & Requirement drowned by guidance & \cite{wallace2024hierarchy,liu2024lost} & Strong early, worse than No Memory later \\
-Code pool (v5 prototype, v6) & Text not followed; generic entries & \cite{dai2026metis,wang2023voyager,wang2025awm} & A one-line example caused untouched scaffolds \\
-Fragments for missing imports (v7) & Example read as a finished file & -- & Best of the first round; missing-package entries still whole files \\
-v8 & Whole-file missing-package example caused scaffolds after a change of task order & \cite{wang2025awm,zheng2024synapse,ace2026} & All entry types fragments; scaffolds removed; example kept switching versions \\
-v9 & Rare whole-site failures learned too late; two slots too few & \cite{dai2026metis} & Scaffolds stay at zero; v-model memory never applied \\
-v9.1 (final) & Applicability condition never matched & -- & Final version (\Cref{sec:fix}) \\
-Short \gls{cot} (rejected) & Missing imports & \cite{li2025smallmodels} & 0/5 produced any files \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\paragraph{From text to code.} The first memory followed ExpeL-style reflection: after each task the memory model wrote cases (trigger, observation, cause, preventative action) with evidence, retrieved later as guidance. Reflection rules teach a method of investigation, never answers, so that the memory is learned rather than designed. After a scaffold bug was fixed (Bolt.diy treated a line break as ``send'' and dropped the rest of the prompt), long guidance made the model build only the home page, and compressing it dropped features. The checklist of v4 keeps every requested feature visible and attaches lessons to the item they concern; v4 beat No Memory on the first 30 tasks (39.3\% vs 26.0\%) but not on the last 71 (27.8\% vs 29.5\%). The code pool of v6 replaced text by code, but its one-line example wrapped in \texttt{<script setup>} tags looked like a finished empty component and produced untouched scaffolds; v7 therefore admits, for missing-import entries, only verbatim fragments without tag lines that include a line using the imported function. Missing-package entries in v7 still showed a complete \texttt{App.vue} of an earlier site, because their example had to demonstrate page switching without the missing package. In the manifest order this caused two scaffolds; under shuffled orders it caused many (\Cref{fig:scaffold}); v8 to v9.1 change only the code pool to fix this (\Cref{sec:fix}). A planning step before generation was rejected: in five of five tasks the generator wrote only the plan and lost Bolt.diy's file format.
-
-\begin{figure}[ht]
-\centering
-\begin{minipage}[t]{0.5\textwidth}\vspace{0pt}
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-CODE FROM EARLIER WEBSITES THAT WORKED:
-Missing package: imports a package that
-package.json does not declare. [...] Code
-that works:
-<script setup lang="ts">
-import { ref } from 'vue'
-import FoodDonationPage from
-  './pages/FoodDonationPage.vue'
-[... 3 more page imports ...]
-const activeTab = ref('donation')
-</script>
-<template>
-  <div class="app-container">
-    <header>
-      <h1>Food Distribution System</h1>
-      [... 30 lines: nav, four pages ...]
-</template>
-\end{lstlisting}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.46\textwidth}\vspace{0pt}
-\includegraphics[width=\linewidth]{figures/ex_scaffold.png}
-\end{minipage}
-\caption{Code memory (v7) on task 000041, an online trading site (seed-11 order). Left: part of the code-pool entry in the prompt, a complete \texttt{App.vue} from an earlier food-donation site. Right: the generator returned the untouched Vite starter project, and all five test cases failed. The final version shows only verified lines of such a file, without the \texttt{<script>} and \texttt{<template>} tags (\Cref{fig:prompt}).}
-\label{fig:scaffold}
-\end{figure}
-
-\section{Final Pipeline (v9.1)}
+\section{Final Method}
 \label{sec:pipeline}
 For each task, in order:
 \begin{enumerate}
@@ -160,7 +100,7 @@ Vue compile error: v-model on prop. [...] (4 tasks). Code that works:
 
 Build every checklist item; the notes only warn about mistakes earlier websites made.
 \end{lstlisting}
-\caption{The prompt the final version (v9.1) gave the generator for task 000041 (seed-11 order), shortened. The requirement comes first and stays binding; the checklist repeats it item by item with lessons attached; the code pool adds verified fragments with the number of earlier tasks that failed in the same way.}
+\caption{The prompt the final method gave the generator for task 000041 (seed-11 order), shortened. The requirement comes first and stays binding; the checklist repeats it item by item with lessons attached; the code pool adds verified fragments with the number of earlier tasks that failed in the same way.}
 \label{fig:prompt}
 \end{figure}
 
@@ -191,7 +131,7 @@ The code pool is computed without an \gls{llm} for detection:
 \begin{table}[ht]
 \centering
 \small
-\caption{Constants of the final configuration (v9.1). Several were revised in response to failure analysis on development runs, mainly seed 11 (\Cref{sec:fix}); all were fixed before the final evaluation runs, and none was set by a systematic search.}
+\caption{Constants of the final method. Several were revised in response to failure analysis on development runs, mainly seed 11 (\Cref{sec:fix}); all were fixed before the final evaluation runs, and none was set by a systematic search.}
 \label{tab:params}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.2cm}X}
 \toprule

@@ -20,29 +20,29 @@ Arm & Yes & Partial & No & Start fail. & Acc. & Appear. & Zero & Paired $\Delta$
 WebGen-LM-7B (paper)\textsuperscript{a} & 24.9 & 7.1 & 68.0 & 0.0 & 28.4 & 2.5 & -- & -- \\
 \midrule
 No Memory (ours) & 23.8 & 9.4 & 66.5 & 0.3 & 28.5 & 2.35 & 30 & -- \\
-Text memory (v4) & 25.2 & 11.4 & 62.6 & 0.8 & 30.9 & 2.57 & 20 & $+2.6$ [$-3.6$, 8.7] \\
+Text memory & 25.2 & 11.4 & 62.6 & 0.8 & 30.9 & 2.57 & 20 & $+2.6$ [$-3.6$, 8.7] \\
 Checklist only & 26.4 & 10.7 & 61.4 & 1.5 & 31.8 & 2.47 & 18 & $+3.4$ [$-2.2$, 8.7] \\
-Code memory (v7) & \textbf{34.5} & 11.1 & \textbf{53.2} & 1.2 & \textbf{40.0} & \textbf{2.83} & \textbf{13} & $\mathbf{+11.5}$ [6.0, 16.9] \\
-Final, verified fragments (v9.1) & \multicolumn{8}{c}{\todo{running}} \\
+Code memory (whole-file) & \textbf{34.5} & 11.1 & \textbf{53.2} & 1.2 & \textbf{40.0} & \textbf{2.83} & \textbf{13} & $\mathbf{+11.5}$ [6.0, 16.9] \\
+Code memory (fragments) & \multicolumn{8}{c}{\todo{running}} \\
 \bottomrule
 \multicolumn{9}{l}{\footnotesize \textsuperscript{a} Reported by Lu et al.~\cite{lu2025webgenbench}; appearance graded by GPT-4o, ours by Qwen2.5-VL-32B, so the two are not directly comparable.}
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
-Code memory (v7) raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. For scale, No Memory has no cross-task state, so changing the order should not change its prompts; its three runs under different orders (28.5\%, 27.9\% and 28.6\%, \Cref{sec:order-design}) give an approximate estimate of rerun variability, although they are not repeats of one order: its run-to-run spread of 0.7 points is far smaller than the 11.5-point gain of code memory. A Long Memory chain varies more than No Memory, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and v7 produced a graded site, the means are 3.25 and 3.22. \todo{Planned (existing data): split the gain into (a) tasks where only the memory arm produced a working site and (b) tasks where both arms worked, and report the paired gain and CI on (b). Do this for the final version once its manifest run is scored.}
+Whole-file code memory raises the share of passed test cases from 23.8\% to 34.5\% and halves the number of zero-score tasks; per task it beats No Memory on 54 tasks, loses on 24 and ties on 23. The gain over text memory is $+8.9$ points ($[2.9, 15.1]$; 53 wins, 29 losses, 19 ties). For neither text memory nor the checklist alone does the interval exclude zero. For scale, No Memory has no cross-task state, so changing the order should not change its prompts; its three runs under different orders (28.5\%, 27.9\% and 28.6\%, \Cref{sec:order-design}) give an approximate estimate of rerun variability, although they are not repeats of one order: its run-to-run spread of 0.7 points is far smaller than the 11.5-point gain of code memory. A Long Memory chain varies more than No Memory, because its memory diverges from the first task (\Cref{sec:fix}). Appearance in \Cref{tab:main} counts tasks without a working site as 0, so it rises when more sites work; on the 68 tasks where both No Memory and whole-file code memory produced a graded site, the means are 3.25 and 3.22. \todo{Planned (existing data): split the gain into (a) tasks where only the memory arm produced a working site and (b) tasks where both arms worked, and report the paired gain and CI on (b). Do this for the final version once its manifest run is scored.}
 
 \section{Learning Curve}
-\Cref{fig:curve} plots cumulative and rolling accuracy in execution order. v4 and v7 are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks v4 falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while v7 keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (v7) vs 26.0\% (No Memory) vs 23.2\% (v4).
+\Cref{fig:curve} plots cumulative and rolling accuracy in execution order. Text memory and whole-file code memory are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while code memory keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (code) vs 26.0\% (No Memory) vs 23.2\% (text).
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/learning_curve_v4_v7.png}
-\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, v4 and v7. \todo{Planned: add the final version.}}
+\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, text memory and whole-file code memory. \todo{Planned: add the final version.}}
 \label{fig:curve}
 \end{figure}
 
-\Cref{fig:gap} shows the same data as a paired gap to No Memory. Both memories lead early; between tasks 40 and 60 v4 falls up to 27 points below No Memory while v7 stays near or above zero, and from task 60 onwards v7 stays clearly positive.
+\Cref{fig:gap} shows the same data as a paired gap to No Memory. Both memories lead early; between tasks 40 and 60 text memory falls up to 27 points below No Memory while code memory stays near or above zero, and from task 60 onwards code memory stays clearly positive.
 
 \begin{figure}[ht]
 \centering
@@ -51,8 +51,8 @@ Code memory (v7) raises the share of passed test cases from 23.8\% to 34.5\% and
 \label{fig:gap}
 \end{figure}
 
-\section{Why v4 Declines and v7 Improves}
-\Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. In v4 such lessons appear in most tasks throughout and a separate ``General notes'' block becomes more frequent over time, while nothing addresses blank pages. In v7 these lessons are rarer and the code pool supplies a fragment in almost every task after it activates.
+\section{Why Text Memory Declines and Code Memory Improves}
+\Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. In text memory such lessons appear in most tasks throughout and a separate ``General notes'' block becomes more frequent over time, while nothing addresses blank pages. In code memory these lessons are rarer and the code pool supplies a fragment in almost every task after it activates.
 
 \begin{table}[ht]
 \centering
@@ -60,7 +60,7 @@ Code memory (v7) raises the share of passed test cases from 23.8\% to 34.5\% and
 \label{tab:prompt}
 \begin{tabular}{lcc}
 \toprule
-Prompt content & v4 & v7 \\
+Prompt content & Text & Code (whole-file) \\
 \midrule
 Tasks with a lesson without a code construct & 23 / 25 / 28 & 12 / 4 / 11 \\
 Tasks with a ``General notes'' block & 13 / 16 / 27 & 3 / 0 / 8 \\
@@ -78,7 +78,7 @@ Lessons attached to checklist items & 56 / 53 / 81 & 32 / 16 / 41 \\
 \label{tab:codeerr}
 \begin{tabular}{lccc}
 \toprule
-Problem & No Memory & v4 & v7 \\
+Problem & No Memory & Text & Code (whole-file) \\
 \midrule
 Whole-site break\textsuperscript{a} & 11 / 5 / 10 (26) & 2 / 5 / 12 (19) & 4 / 1 / 3 (\textbf{8}) \\
 Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 12 / 4 / 6 (22) \\
@@ -90,20 +90,20 @@ Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 12 / 4 / 6 (2
 These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
 
 \section{Error Analysis}
-Whole-site breaks fall from 26 tasks (No Memory) to 8 (v7), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22): the code pool prevents the error that blanks the whole site more reliably than the per-page one, which remains a basic error of the 7B generator. Counted per file, 27 of 592 generated Vue components in v7 (4.6\%) call a Vue function without importing it, against 27 of 586 (4.6\%) for No Memory. The omission occurs in \texttt{App.vue} and in child components alike, and is unrelated to whether a component uses \texttt{defineProps}/\texttt{defineEmits}; in the same file other imports are usually correct. The two arms show the same per-file rate, which is consistent with a slip rather than a misconception that an example could correct, though we have not shown this directly; a site with more components is more likely to contain one.
+Whole-site breaks fall from 26 tasks (No Memory) to 8 (code memory), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22): the code pool prevents the error that blanks the whole site more reliably than the per-page one, which remains a basic error of the 7B generator. Counted per file, 27 of 592 generated Vue components with code memory (4.6\%) call a Vue function without importing it, against 27 of 586 (4.6\%) for No Memory. The omission occurs in \texttt{App.vue} and in child components alike, and is unrelated to whether a component uses \texttt{defineProps}/\texttt{defineEmits}; in the same file other imports are usually correct. The two arms show the same per-file rate, which is consistent with a slip rather than a misconception that an example could correct, though we have not shown this directly; a site with more components is more likely to contain one.
 
-This slip was not reduced by a better example: a variant that showed both \texttt{ref} and \texttt{computed} removed it in one of four affected tasks. As the official protocol forbids repairing code after generation, we report it as a limitation of the generator. Ten of v7's 13 zero-score tasks are also zero for No Memory. \todo{Planned (existing data): list the cause of each remaining zero-score task of the final version (blank page, missing feature, budget exhausted) instead of calling them hard.}
+This slip was not reduced by a better example: a variant that showed both \texttt{ref} and \texttt{computed} removed it in one of four affected tasks. As the official protocol forbids repairing code after generation, we report it as a limitation of the generator. Ten of code memory's 13 zero-score tasks are also zero for No Memory. \todo{Planned (existing data): list the cause of each remaining zero-score task of the final version (blank page, missing feature, budget exhausted) instead of calling them hard.}
 
-\paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. We observed no meaningful difference on this common subset; because memory changes which tasks enter the subset, this does not show that memory has no effect on appearance. The three appearance figures in this dissertation use different denominators: 2.35 averages all 101 tasks with failures as 0 (\Cref{tab:main}), 3.25 averages tasks with a grade (\Cref{tab:ablation}), and 3.25 vs 3.22 is the paired subset. 
+\paragraph{Appearance.} Restricted to the 68 tasks where both arms produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for whole-file code memory. We observed no meaningful difference on this common subset; because memory changes which tasks enter the subset, this does not show that memory has no effect on appearance. The three appearance figures in this dissertation use different denominators: 2.35 averages all 101 tasks with failures as 0 (\Cref{tab:main}), 3.25 averages tasks with a grade (\Cref{tab:ablation}), and 3.25 vs 3.22 is the paired subset. 
 
 \section{Ablations: Checklist Only and Fixed Code Prefix}
 \label{sec:ablation}
-Two complementary ablations use the manifest order: a checklist-only control based on v7, and a retrospective fixed-code control using the code entries learned by v9.1:
+Two complementary ablations use the manifest order: a checklist-only control and a retrospective fixed-code control using the code entries learned by the final method:
 \begin{itemize}
-  \item \textbf{Checklist only:} v7 with memory reads and writes disabled; each task sees only the requirement checklist. Checklist only $-$ No Memory estimates the effect of requirement decomposition.
-  \item \textbf{Fixed code prefix:} checklist only, plus the code-pool entries that v9.1 had learned by the end of its manifest run (\Cref{sec:codepool}), injected from the first task with the same selection rule, still without memory. The code is not written by hand; it is the method's own learned content. Because it is taken from the end of a complete run, this control has access to experience that an online learner only gains later; it is a retrospective, oracle-style comparison rather than an online one. Fixed prefix $-$ checklist only estimates the effect of having this code in the prompt, and v9.1 $-$ fixed prefix the effect of accumulating experience and selecting it per task.
+  \item \textbf{Checklist only:} the code-memory configuration with memory reads and writes disabled; each task sees only the requirement checklist. Checklist only $-$ No Memory estimates the effect of requirement decomposition.
+  \item \textbf{Fixed code prefix:} checklist only, plus the code-pool entries that the final method had learned by the end of its manifest run (\Cref{sec:codepool}), injected from the first task with the same selection rule, still without memory. The code is not written by hand; it is the method's own learned content. Because it is taken from the end of a complete run, this control has access to experience that an online learner only gains later; it is a retrospective, oracle-style comparison rather than an online one. Fixed prefix $-$ checklist only estimates the effect of having this code in the prompt, and final method $-$ fixed prefix the effect of accumulating experience and selecting it per task.
 \end{itemize}
-If the fixed-code control performs similarly to v9.1, the contribution is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation. The comparison does not isolate accumulation alone, because the two conditions also differ in textual lessons and memory maintenance.
+If the fixed-code control performs similarly to the final method, the contribution is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation. The comparison does not isolate accumulation alone, because the two conditions also differ in textual lessons and memory maintenance.
 
 \Cref{tab:ablation} reports the checklist-only ablation over all 101 tasks; the fixed-prefix run is queued after the seed-47 order (expected about 10-18).
 
@@ -118,15 +118,15 @@ If the fixed-code control performs similarly to v9.1, the contribution is better
 No Memory & 26.0 & 29.5 & 28.5 & 30 & 3.25 \\
 Checklist only & 33.1 & 31.3 & 31.8 & 18 & 3.23 \\
 Fixed code prefix & \multicolumn{5}{c}{\todo{running}} \\
-v7 (checklist + memory) & 39.0 & 40.4 & 40.0 & 13 & 3.21 \\
-v9.1 (final) & \multicolumn{5}{c}{\todo{running}} \\
+Code memory (whole-file) & 39.0 & 40.4 & 40.0 & 13 & 3.21 \\
+Code memory (fragments) & \multicolumn{5}{c}{\todo{running}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Paired by task (a mean of per-task differences, so it can differ slightly from the difference of the pooled accuracies in \Cref{tab:ablation}), checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and v7 $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger share, with an interval that excludes zero, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred.
+Paired by task (a mean of per-task differences, so it can differ slightly from the difference of the pooled accuracies in \Cref{tab:ablation}), checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and whole-file code memory $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger share, with an interval that excludes zero, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred.
 
-\todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and v9.1 $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ v9.1, describe the contribution as automatically discovering effective prompt code; if v9.1 is clearly better, as accumulation and per-task selection.}
+\todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and final $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ final, describe the contribution as automatically discovering effective prompt code; if the final method is clearly better, as accumulation and per-task selection.}
 
 \section{Robustness to Task Order}
 \label{sec:order-design}
@@ -141,12 +141,12 @@ In the shuffled and interleaved orders, Long Memory and No Memory are run as pai
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments: accuracy (\%) of No Memory (NM), v7 and the final version v9.1, paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status: manifest (v9.1) running, expected 10-16; seed 47 running; interleaved queued. Fill in when complete.}}
+\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status: manifest (final method) running, expected 10-16; seed 47 running; interleaved queued. Fill in when complete.}}
 \label{tab:order}
 \small
 \begin{tabular}{llccccc}
 \toprule
-Kind & Order & NM & v7 & v9.1 & v9.1 $-$ NM & Zero NM / v7 / v9.1 \\
+Kind & Order & NM & WF & F & F $-$ NM & Zero NM / WF / F \\
 \midrule
 Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & -- & -- & 30 / 13 / -- \\
 Adjacent & Shuffled blocks (seed 11) & 27.9 & 33.1 & 35.4 & $+7.4$ [1.6, 13.1] & 29 / 21 / 16 \\
@@ -154,25 +154,55 @@ Adjacent & Shuffled blocks (seed 47) & -- & -- & -- & -- & -- \\
 Mixed & Random (seed 29) & 28.6 & 32.6 & 33.7 & $+5.5$ [$-0.5$, 11.6] & 29 / 21 / 18 \\
 Mixed & Interleaved & -- & -- & -- & -- & -- \\
 \bottomrule
-\multicolumn{7}{l}{\footnotesize v7 $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].}\\
+\multicolumn{7}{l}{\footnotesize WF $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].}\\
 \multicolumn{7}{l}{\footnotesize \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.}
 \end{tabular}
 \end{table}
 
-\paragraph{Development and validation.} Seed 11 was used to develop v8--v9.1 (\Cref{sec:fix}) and is therefore development data for the final version. The manifest, seed-29, seed-47 and interleaved runs of v9.1 started after v9.1 was frozen. All orders use the same 101 tasks, on which the earlier versions were developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
+\paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
 The first two shuffled orders give almost the same result (\Cref{tab:order}): Long Memory leads by about 4.5 points, with zero-score tasks reduced from 29 to 21, but neither confidence interval excludes zero, and the gain is far smaller than in the manifest order. No Memory is stable across its three runs (27.9--28.6\%), so the change is on the Long Memory side. Mixing domains does not remove the gain: the random order (seed 29) matches the shuffled-blocks order (seed 11), and from task 31 onwards Long Memory leads by 6.6 points in the random order (33.9\% vs 27.3\%). The gain is therefore not restricted to orders with adjacent same-domain tasks, although these results do not establish how much domain adjacency contributes.
 
-Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}). Long Memory returned the unmodified Vite scaffold on 19 tasks in seed 11 and 16 in seed 29, against none for No Memory in either order and two in the manifest order. Every scaffold occurred after the missing-package code memory, whose example was a complete \texttt{App.vue} of another site, began to be injected (task 36 in seed 11, task 19 in seed 29). This is the failure the v8 change targets (\Cref{sec:fix}).
+Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}). Long Memory returned the unmodified Vite scaffold on 19 tasks in seed 11 and 16 in seed 29, against none for No Memory in either order and two in the manifest order. Every scaffold occurred after the missing-package code memory, whose example was a complete \texttt{App.vue} of another site, began to be injected (task 36 in seed 11, task 19 in seed 29). \Cref{fig:scaffold} shows one such case; \Cref{sec:fix} describes the fix.
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}[t]{0.5\textwidth}\vspace{0pt}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that
+package.json does not declare. [...] Code
+that works:
+<script setup lang="ts">
+import { ref } from 'vue'
+import FoodDonationPage from
+  './pages/FoodDonationPage.vue'
+[... 3 more page imports ...]
+const activeTab = ref('donation')
+</script>
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Food Distribution System</h1>
+      [... 30 lines: nav, four pages ...]
+</template>
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\textwidth}\vspace{0pt}
+\includegraphics[width=\linewidth]{figures/ex_scaffold.png}
+\end{minipage}
+\caption{Code memory (whole-file) on task 000041, an online trading site (seed-11 order). Left: part of the code-pool entry in the prompt, a complete \texttt{App.vue} from an earlier food-donation site. Right: the generator returned the untouched Vite starter project, and all five test cases failed. The final method shows only verified lines of such a file, without the \texttt{<script>} and \texttt{<template>} tags (\Cref{fig:prompt}).}
+\label{fig:scaffold}
+\end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/order_gaps.png}
-\caption{Rolling 10-task mean of the per-task accuracy gap to the No Memory run of the same order, by execution order. Orange: code memory with a whole-file example (v7); blue: verified fragments only (v9.1). Positive values mean memory is better. The v7 dip after task 45 in seed 11 coincides with the scaffold outputs.}
+\caption{Rolling 10-task mean of the per-task accuracy gap to the No Memory run of the same order, by execution order. Orange: whole-file code memory; blue: the final method with fragments only. Positive values mean memory is better. The whole-file dip after task 45 in seed 11 coincides with the scaffold outputs.}
 \label{fig:order-gap}
 \end{figure}
 
-With the failure fixed (v9.1, \Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap}). Positive gains were observed with domains adjacent and with domains mixed, although the interval for the mixed order includes zero; on this evidence the gain does not rely on same-domain neighbours. Compared directly with v7, v9.1 is ahead by 3.0 and 1.0 points, which is within the run-to-run variation of a single run; the evidence for the fix is the removal of the scaffold failures, not a higher total. Missing Vue imports remain (23 and 27 tasks with at least one affected component, against 17 and 19 for v7): once the generator writes real pages instead of the scaffold, it has more opportunities for this slip.
+With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap}). Positive gains were observed with domains adjacent and with domains mixed, although the interval for the mixed order includes zero; on this evidence the gain does not rely on same-domain neighbours. Compared directly with whole-file code memory, the final method is ahead by 3.0 and 1.0 points, which is within the run-to-run variation of a single run; the evidence for the fix is the removal of the scaffold failures, not a higher total. Missing Vue imports remain (23 and 27 tasks with at least one affected component, against 17 and 19 for whole-file code memory): once the generator writes real pages instead of the scaffold, it has more opportunities for this slip.
 
 
 
@@ -182,12 +212,4 @@ With the failure fixed (v9.1, \Cref{sec:fix}), no scaffold occurred in either or
 
 \subsection{Fixing the Exposed Failure}
 \label{sec:fix}
-The fix was developed on seed 11 while the frozen v7 was used for all other experiments. It addresses three properties of the code pool in turn.
-
-\textit{Form of the example.} The scaffolds came from the one entry type that still showed a whole file. v8 therefore stores a fragment for every entry type. On the seven seed-11 tasks where v7 had returned the scaffold, accuracy rose from 3.6\% to 45.2\%, and no scaffold occurred in the 61 tasks of the partial run. Total accuracy on the other tasks is not informative here: their prompts already differed before the code pool, because memory chains diverge from the first task, and two runs of the same version can differ by about five points. Versions are therefore compared by mechanism counts.
-
-\textit{Stability and coverage.} In v8 the missing-import example was rebuilt whenever the counts of missed functions changed, and it switched between two versions. v9 replaces an entry only when the new example covers strictly more of the needed functions. It also creates entries for whole-site failures after one occurrence, because waiting for a second occurrence meant that rare problems were learned after they had already occurred, and it allows three slots instead of two.
-
-\textit{Applicability.} The compile-error entry of v9 carried an applicability condition that no requirement matched, so it was never injected. v9.1 applies compile-error entries to every Vue site and is the final version.
-
-The evidence for these changes comes from small targeted checks and partial runs on seed 11; it is debugging evidence. The full-benchmark evidence for the final version is the set of runs started after it was frozen (\Cref{tab:order}).
+The fix was developed on seed 11 while all other experiments used the frozen whole-file design. It changes only the code pool. Every entry type now shows a fragment rather than a file: on the seven seed-11 tasks where the whole-file design had returned the scaffold, accuracy rose from 3.6\% to 45.2\%, and no scaffold occurred. An entry is replaced only when its new example covers strictly more of the needed functions, so that the example does not switch back and forth. Whole-site failures create an entry after one occurrence, since waiting for a second meant that rare problems were learned after they had already done their damage, and three slots are allowed instead of two. Compile-error entries apply to every Vue site. Total accuracy on seed 11 is not used to judge these changes: memory chains diverge from the first task, and two runs of the same design can differ by about five points. This is debugging evidence; the full-benchmark evidence for the final method is the set of runs started after it was frozen (\Cref{tab:order}).

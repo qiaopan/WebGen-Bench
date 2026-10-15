@@ -16,7 +16,7 @@ def scores(d):
     return r
 
 out, panels = sys.argv[1], sys.argv[2:]
-colors = {"Code memory (v7)": "#E07B39", "Final (v9.1)": "#2A78D6"}
+colors = {"Code memory (whole-file)": "#E07B39", "Code memory (fragments)": "#2A78D6"}
 fig, axes = plt.subplots(len(panels), 1, figsize=(8, 2.6 * len(panels)), sharex=True, squeeze=False)
 for ax, spec in zip(axes[:, 0], panels):
     name, nm, lms = spec.split(":", 2)

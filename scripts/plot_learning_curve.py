@@ -5,8 +5,8 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 E = "outputs/experiment/"
 ARMS = [("No Memory", "cluster_nomem_webgenlm7b_r1", "#8a8a85"),
-        ("Long Memory v4", "cluster_longmem_v4_webgenlm7b_r1", "#eb6834"),
-        ("Long Memory v7", "cluster_longmem_v7_webgenlm7b_r1", "#2a78d6")]
+        ("Text memory", "cluster_longmem_v4_webgenlm7b_r1", "#eb6834"),
+        ("Code memory (whole-file)", "cluster_longmem_v7_webgenlm7b_r1", "#2a78d6")]
 def scores(d):
     r = {}
     for line in open(E + d + "/progress.jsonl"):
