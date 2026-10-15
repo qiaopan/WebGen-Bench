@@ -1,0 +1,281 @@
+\begin{thebibliography}{10}
+
+\bibitem{bai2025qwenvl}
+Shuai Bai et~al.
+\newblock {Qwen2.5-VL} technical report.
+\newblock {\em arXiv preprint arXiv:2502.13923}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2502.13923}.
+
+\bibitem{chen2024bgem3}
+Jianlv Chen et~al.
+\newblock {M3-Embedding}: Multi-linguality, multi-functionality,
+  multi-granularity text embeddings through self-knowledge distillation.
+\newblock {\em arXiv preprint arXiv:2402.03216}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2402.03216}.
+
+\bibitem{chen2023selfdebug}
+Xinyun Chen, Maxwell Lin, Nathanael Sch{\"a}rli, and Denny Zhou.
+\newblock Teaching large language models to self-debug.
+\newblock {\em arXiv preprint arXiv:2304.05128}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2304.05128}.
+
+\bibitem{chhikara2025mem0}
+Prateek Chhikara et~al.
+\newblock {Mem0}: Building production-ready {AI} agents with scalable long-term
+  memory.
+\newblock {\em arXiv preprint}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2504.19413}.
+
+\bibitem{dai2026metis}
+Zijie Dai et~al.
+\newblock Metis: Bridging text and code memory for self-evolving agents.
+\newblock {\em arXiv preprint arXiv:2606.24151}, 2026.
+\newblock URL: \url{https://arxiv.org/abs/2606.24151}.
+
+\bibitem{deng2023mind2web}
+Xiang Deng et~al.
+\newblock {Mind2Web}: Towards a generalist agent for the web.
+\newblock In {\em Advances in Neural Information Processing Systems}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2306.06070}.
+
+\bibitem{dhuliawala2023cove}
+Shehzaad Dhuliawala et~al.
+\newblock Chain-of-verification reduces hallucination in large language models.
+\newblock {\em arXiv preprint arXiv:2309.11495}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2309.11495}.
+
+\bibitem{du2025contextlength}
+Yufeng Du, Minyang Tian, et~al.
+\newblock Context length alone hurts {LLM} performance despite perfect
+  retrieval.
+\newblock In {\em Findings of EMNLP}, 2025.
+\newblock arXiv:2510.05381.
+\newblock URL: \url{https://arxiv.org/abs/2510.05381}.
+
+\bibitem{efron1993bootstrap}
+Bradley Efron and Robert~J. Tibshirani.
+\newblock {\em An Introduction to the Bootstrap}.
+\newblock Chapman and Hall/CRC, 1993.
+\newblock URL: \url{https://doi.org/10.1201/9780429246593}.
+
+\bibitem{harada2025curse}
+Keno Harada et~al.
+\newblock Curse of instructions: Large language models cannot follow multiple
+  instructions at once.
+\newblock {\em arXiv preprint}, 2025.
+\newblock URL: \url{https://openreview.net/forum?id=R6q67CDBCH}.
+
+\bibitem{he2024webvoyager}
+Hongliang He, Wenlin Yao, Kaixin Ma, Wenhao Yu, Yong Dai, Hongming Zhang,
+  Zhenzhong Lan, and Dong Yu.
+\newblock {WebVoyager}: Building an end-to-end web agent with large multimodal
+  models.
+\newblock In {\em Proceedings of ACL}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2401.13919}.
+
+\bibitem{hui2024qwencoder}
+Binyuan Hui et~al.
+\newblock {Qwen2.5-Coder} technical report.
+\newblock {\em arXiv preprint arXiv:2409.12186}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2409.12186}.
+
+\bibitem{jaroslawicz2025ifscale}
+Daniel Jaroslawicz et~al.
+\newblock How many instructions can {LLMs} follow at once?
+\newblock {\em arXiv preprint}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2507.11538}.
+
+\bibitem{jimenez2024swebench}
+Carlos~E. Jimenez et~al.
+\newblock {SWE-bench}: Can language models resolve real-world {GitHub} issues?
+\newblock In {\em International Conference on Learning Representations}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2310.06770}.
+
+\bibitem{kim2026mtl}
+Kangsan Kim, Minki Kang, Taeil Kim, Yanlai Yang, Mengye Ren, and Sung~Ju Hwang.
+\newblock Memory transfer learning: How memories are transferred across domains
+  in coding agents.
+\newblock {\em arXiv preprint arXiv:2604.14004}, 2026.
+\newblock URL: \url{https://arxiv.org/abs/2604.14004}.
+
+\bibitem{kwon2023vllm}
+Woosuk Kwon et~al.
+\newblock Efficient memory management for large language model serving with
+  {PagedAttention}.
+\newblock In {\em Proceedings of the 29th Symposium on Operating Systems
+  Principles}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2309.06180}.
+
+\bibitem{li2025smallmodels}
+Yuetai Li et~al.
+\newblock Small models struggle to learn from strong reasoners.
+\newblock {\em arXiv preprint}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2502.12143}.
+
+\bibitem{liu2024lost}
+Nelson~F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua,
+  Fabio Petroni, and Percy Liang.
+\newblock Lost in the middle: How language models use long contexts.
+\newblock {\em Transactions of the Association for Computational Linguistics},
+  12:157--173, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2307.03172}.
+
+\bibitem{lu2025webgenbench}
+Zimu Lu et~al.
+\newblock {WebGen-Bench}: Evaluating {LLMs} on generating interactive and
+  functional websites from scratch.
+\newblock {\em arXiv preprint}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2505.03733}.
+
+\bibitem{madaan2023selfrefine}
+Aman Madaan et~al.
+\newblock Self-refine: Iterative refinement with self-feedback.
+\newblock In {\em Advances in Neural Information Processing Systems}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2303.17651}.
+
+\bibitem{reasoningbank2025}
+Siru Ouyang, Jun Yan, I-Hung Hsu, Yanfei Chen, Ke~Jiang, Zifeng Wang, Rujun
+  Han, Long~T. Le, Samira Daruki, Xiangru Tang, Vishy Tirumalashetty, George
+  Lee, Mahsan Rofouei, Hangfei Lin, Jiawei Han, Chen-Yu Lee, and Tomas Pfister.
+\newblock {ReasoningBank}: Scaling agent self-evolving with reasoning memory.
+\newblock In {\em Proceedings of ICLR}, 2026.
+\newblock arXiv:2509.25140.
+\newblock URL: \url{https://arxiv.org/abs/2509.25140}.
+
+\bibitem{packer2023memgpt}
+Charles Packer et~al.
+\newblock {MemGPT}: Towards {LLMs} as operating systems.
+\newblock {\em arXiv preprint arXiv:2310.08560}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2310.08560}.
+
+\bibitem{park2023generative}
+Joon~Sung Park, Joseph~C. O'Brien, Carrie~J. Cai, Meredith~Ringel Morris, Percy
+  Liang, and Michael~S. Bernstein.
+\newblock Generative agents: Interactive simulacra of human behavior.
+\newblock In {\em Proceedings of UIST}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2304.03442}.
+
+\bibitem{shi2023distracted}
+Freda Shi, Xinyun Chen, Kanishka Misra, Nathan Scales, David Dohan, Ed~Chi,
+  Nathanael Sch{\"a}rli, and Denny Zhou.
+\newblock Large language models can be easily distracted by irrelevant context.
+\newblock In {\em Proceedings of ICML}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2302.00093}.
+
+\bibitem{shinn2023reflexion}
+Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik
+  Narasimhan, and Shunyu Yao.
+\newblock Reflexion: Language agents with verbal reinforcement learning.
+\newblock In {\em Advances in Neural Information Processing Systems}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2303.11366}.
+
+\bibitem{shu2026agentcl}
+Yiheng Shu, Bernal Jim{\'e}nez~Guti{\'e}rrez, Saisri~Padmaja Jonnalagedda,
+  Yuguang Yao, Huan Sun, and Yu~Su.
+\newblock {AgentCL}: Toward rigorous evaluation of continual learning in
+  language agents.
+\newblock {\em arXiv preprint arXiv:2606.02461}, 2026.
+\newblock URL: \url{https://arxiv.org/abs/2606.02461}.
+
+\bibitem{si2024design2code}
+Chenglei Si et~al.
+\newblock {Design2Code}: Benchmarking multimodal code generation for automated
+  front-end engineering.
+\newblock {\em arXiv preprint arXiv:2403.03163}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2403.03163}.
+
+\bibitem{sung2026superlibrary}
+Daegyu Sung, Yukyeong Lee, Geon Park, Yumin Choi, and Sung~Ju Hwang.
+\newblock Super library agent: Joint generation and maintenance of multiple
+  applications beyond the single codebase.
+\newblock In {\em Findings of the Association for Computational Linguistics:
+  EMNLP 2026}, 2026.
+\newblock arXiv:2608.29310.
+\newblock URL: \url{https://arxiv.org/abs/2608.29310}.
+
+\bibitem{suzgun2026cheatsheet}
+Mirac Suzgun, Mert Yuksekgonul, Federico Bianchi, Dan Jurafsky, and James Zou.
+\newblock Dynamic cheatsheet: Test-time learning with adaptive memory.
+\newblock In {\em Proceedings of EACL}, 2026.
+\newblock URL: \url{https://arxiv.org/abs/2504.07952}.
+
+\bibitem{wallace2024hierarchy}
+Eric Wallace, Kai Xiao, Reimar Leike, Lilian Weng, Johannes Heidecke, and Alex
+  Beutel.
+\newblock The instruction hierarchy: Training {LLMs} to prioritize privileged
+  instructions.
+\newblock {\em arXiv preprint arXiv:2404.13208}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2404.13208}.
+
+\bibitem{wang2023voyager}
+Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu,
+  Linxi Fan, and Anima Anandkumar.
+\newblock Voyager: An open-ended embodied agent with large language models.
+\newblock {\em arXiv preprint arXiv:2305.16291}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2305.16291}.
+
+\bibitem{wang2025awm}
+Zora~Zhiruo Wang, Jiayuan Mao, Daniel Fried, and Graham Neubig.
+\newblock Agent workflow memory.
+\newblock In {\em Proceedings of ICML}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2409.07429}.
+
+\bibitem{wei2025evomemory}
+Tianxin Wei, Noveen Sachdeva, Benjamin Coleman, Zhankui He, et~al.
+\newblock Evo-memory: Benchmarking {LLM} agent test-time learning with
+  self-evolving memory.
+\newblock {\em arXiv preprint arXiv:2511.20857}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2511.20857}.
+
+\bibitem{zeller2009whyprograms}
+Andreas Zeller.
+\newblock {\em Why Programs Fail: A Guide to Systematic Debugging}.
+\newblock Morgan Kaufmann, 2 edition, 2009.
+\newblock URL: \url{https://doi.org/10.1016/B978-0-12-374515-6.X0000-7}.
+
+\bibitem{ace2026}
+Qizheng Zhang, Changran Hu, Shubhangi Upasani, Boyuan Ma, Fenglu Hong,
+  Vamsidhar Kamanuru, Jay Rainton, Chen Wu, Mengmeng Ji, Hanchen Li, Urmish
+  Thakker, James Zou, and Kunle Olukotun.
+\newblock Agentic context engineering: Evolving contexts for self-improving
+  language models.
+\newblock In {\em Proceedings of ICLR}, 2026.
+\newblock arXiv:2510.04618.
+\newblock URL: \url{https://arxiv.org/abs/2510.04618}.
+
+\bibitem{zhao2024expel}
+Andrew Zhao, Daniel Huang, Quentin Xu, Matthieu Lin, Yong-Jin Liu, and Gao
+  Huang.
+\newblock {ExpeL}: {LLM} agents are experiential learners.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2308.10144}.
+
+\bibitem{zheng2023judge}
+Lianmin Zheng et~al.
+\newblock Judging {LLM}-as-a-judge with {MT-Bench} and {Chatbot Arena}.
+\newblock In {\em Advances in Neural Information Processing Systems, Datasets
+  and Benchmarks Track}, 2023.
+\newblock URL: \url{https://arxiv.org/abs/2306.05685}.
+
+\bibitem{zheng2024synapse}
+Longtao Zheng, Rundong Wang, Xinrun Wang, and Bo~An.
+\newblock Synapse: Trajectory-as-exemplar prompting with memory for computer
+  control.
+\newblock In {\em Proceedings of ICLR}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2306.07863}.
+
+\bibitem{zhou2025memento}
+Huichi Zhou et~al.
+\newblock Memento: Fine-tuning {LLM} agents without fine-tuning {LLMs}.
+\newblock {\em arXiv preprint}, 2025.
+\newblock URL: \url{https://arxiv.org/abs/2508.16153}.
+
+\bibitem{zhou2024webarena}
+Shuyan Zhou et~al.
+\newblock {WebArena}: A realistic web environment for building autonomous
+  agents.
+\newblock In {\em International Conference on Learning Representations}, 2024.
+\newblock URL: \url{https://arxiv.org/abs/2307.13854}.
+
+\end{thebibliography}
