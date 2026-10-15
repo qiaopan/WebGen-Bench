@@ -1,9 +1,9 @@
 \chapter{Results}
 \label{chap:results}
 
-All results in this chapter come from a single run per arm over all 101 tasks in manifest order. Accuracy pools all test cases (as in the official script); the learning curve averages per-task accuracy, so its end points differ slightly.
+Each arm is a single run over all 101 tasks. \Crefrange{sec:main}{sec:ablation} use the manifest order; \Cref{sec:order-design} repeats the comparison in other orders. Accuracy pools all test cases (as in the official script); the learning curves average per-task accuracy, so their end points differ slightly.
 
-\section{Main Comparison}
+\section{Main Comparison}\label{sec:main}
 \Cref{tab:main} compares the three arms on the same tasks.
 
 \begin{table}[ht]
@@ -83,9 +83,7 @@ These counts are correlational. Disentangling the contribution of each component
 \section{Error Analysis}
 Whole-site breaks fall from 26 tasks (No Memory) to 8 (v7), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22): the code pool prevents the error that blanks the whole site more reliably than the per-page one, which remains a basic error of the 7B generator. Counted per file, 27 of 592 generated Vue components in v7 (4.6\%) call a Vue function without importing it, against 27 of 586 (4.6\%) for No Memory. The omission occurs in \texttt{App.vue} and in child components alike, and is unrelated to whether a component uses \texttt{defineProps}/\texttt{defineEmits}; in the same file other imports are usually correct. It behaves like a random slip at a roughly constant per-file rate rather than a misconception, so a site with more components is more likely to contain one.
 
-\paragraph{An attempted fix.} We tested a variant (v8) that rebuilds the code-pool example whenever the set of frequently missed functions changes, so that it shows both \texttt{ref} and \texttt{computed} (the v7 example was built at task 6 and only ever showed \texttt{ref}). Replacing only the code-pool section of the original v7 prompts, missing imports disappeared in one of four affected tasks and remained in the other three; two high-scoring regression tasks were unaffected. Because a random slip is not corrected by an example, and repairing generated code after generation is not allowed under the official protocol, we kept v7 as the final version and report this error rate as a limitation of the generator. Ten of v7's 13 zero-score tasks are also zero for No Memory, suggesting that most remaining failures are genuinely hard tasks for this generator.
-
-Two v7 tasks returned the unmodified scaffold. A local diagnosis traced both to an example that was a complete \texttt{App.vue} file from another site; reducing it to a verified fragment restored real output on one task. This fix is not part of the frozen v7 run. The order experiment later exposed the same failure at scale (\Cref{sec:order-design}), and v8 combines both changes: missing-package entries keep only a verified fragment, following the practice of abstracting example-specific content out of reusable procedures~\cite{wang2025awm,zheng2024synapse} and the observation that irrelevant context distracts models~\cite{shi2023distracted}, and the missing-import example is rebuilt as new failures accumulate, as in memories that are edited rather than only appended~\cite{zhao2024expel,chhikara2025mem0,suzgun2026cheatsheet,ace2026}.
+This slip was not reduced by a better example: a variant that showed both \texttt{ref} and \texttt{computed} removed it in one of four affected tasks. As the official protocol forbids repairing code after generation, we report it as a limitation of the generator. Ten of v7's 13 zero-score tasks are also zero for No Memory, so most remaining failures are hard tasks for this generator.
 
 \paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. The improvement is therefore functional; memory makes more sites work but does not make working sites look better.
 
@@ -94,7 +92,7 @@ Two v7 tasks returned the unmodified scaffold. A local diagnosis traced both to 
 Two ablations separate the contributions of the components, both with the v7 configuration and the manifest order:
 \begin{itemize}
   \item \textbf{Checklist only:} v7 with memory reads and writes disabled; each task sees only the requirement checklist. Checklist only $-$ No Memory estimates the effect of requirement decomposition.
-  \item \textbf{Fixed code prefix:} checklist only, plus the two code-pool entries that v7 had learned by the end of its run (\Cref{sec:codepool}), injected from the first task with the same selection rule, still without memory. The code is not written by hand; it is v7's own learned content. Fixed prefix $-$ checklist only estimates the effect of having this code in the prompt, and v7 $-$ fixed prefix the effect of accumulating experience and selecting it per task.
+  \item \textbf{Fixed code prefix:} checklist only, plus the code-pool entries that v9.1 had learned by the end of its manifest run (\Cref{sec:codepool}), injected from the first task with the same selection rule, still without memory. The code is not written by hand; it is the method's own learned content. Fixed prefix $-$ checklist only estimates the effect of having this code in the prompt, and v9.1 $-$ fixed prefix the effect of accumulating experience and selecting it per task.
 \end{itemize}
 If the fixed prefix matches v7, the contribution of the method is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation.
 
@@ -112,6 +110,7 @@ No Memory & 26.0 & 29.5 & 28.5 & 30 & 3.25 \\
 Checklist only & 33.1 & 31.3 & 31.8 & 18 & 3.23 \\
 Fixed code prefix & \multicolumn{5}{c}{\todo{running}} \\
 v7 (checklist + memory) & 39.0 & 40.4 & 40.0 & 13 & 3.21 \\
+v9.1 (final) & \multicolumn{5}{c}{\todo{running}} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -120,15 +119,9 @@ Paired by task, checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI
 
 \todo{Fill in fixed-prefix row and the two differences involving it.}
 
-\section{A Stronger Generator}
-\label{sec:stronger}
-To test whether the advantage of code over text depends on the capability of the generator, we repeat the main comparison with WebGen-LM-32B from the same model family, keeping Bolt.diy, the memory pipeline, the memory model and the evaluators unchanged, with the two arms run as alternating pairs in the manifest order. WebGen-LM-14B is not a useful contrast: with Bolt.diy it reaches 29.4\% against 28.4\% for the 7B model, while the 32B model reaches 38.2\%~\cite{lu2025webgenbench}. Because each user may hold two GPUs and the 32B evaluator already occupies most of one, the 32B generator is served with FP8 weight quantization. Both arms use the same FP8 model, so the comparison between them is fair, but its absolute scores are not directly comparable with the BF16 results of the original paper. Note that the 7B generator with v7 memory (40.0\%) already exceeds the published 32B result without memory.
-
-\todo{Fill in: 32B FP8 No Memory vs Long Memory accuracy, paired difference with CI, zero-score tasks; whether textual lessons are used more by the 32B generator.}
-
 \section{Overview of All Runs}
 \label{sec:runs}
-\Cref{tab:runs} lists every complete run, what it tests and its result. All runs use WebGen-LM-7B with Bolt.diy under the official protocol and cover all 101 tasks; each is a single run. v8 and v9, development versions stopped part-way (\Cref{sec:fix}), are not listed.
+\Cref{tab:runs} lists every complete run. All use WebGen-LM-7B with Bolt.diy under the official protocol and cover all 101 tasks; each is a single run. v8 and v9, stopped part-way (\Cref{sec:fix}), are not listed.
 
 \begin{table}[ht]
 \centering
@@ -158,14 +151,12 @@ v9.1 & Seed 29 & Does the fix hold with domains mixed? & 33.7 & $+5.5$ [$-0.5$, 
 \label{sec:order-design}
 WebGen-Bench is a static benchmark: tasks are solved independently and its main results are single runs without error bars, which the authors attribute to computational cost~\cite{lu2025webgenbench}. With memory, however, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
 
-We therefore compare two kinds of order, each run twice, every run starting from an empty memory and covering all 101 tasks:
+We therefore compare two kinds of order, each run twice, every run starting from an empty memory:
 \begin{description}
   \item[Domains adjacent.] The order of the 20 domain blocks and the order of tasks within each block are shuffled, with seed 11 and seed 47. The manifest order, used for the main results, also belongs to this kind.
   \item[Domains mixed.] A uniformly random order of all 101 tasks (seed 29), and an interleaved order that takes one task from each domain in turn, so that consecutive tasks always come from different domains.
 \end{description}
-The runs are scheduled by priority (seed 11, seed 29, seed 47, interleaved), so that one run of each kind is available first.
-
-In every order, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first (ABBA), so that drift in infrastructure or evaluator load affects both arms equally. No Memory is not expected to depend on order; its five runs (the original and one per order) instead measure run-to-run noise, against which the Long Memory gain can be judged. The checklist-only ablation does not read or write memory and is therefore run only once. Results are reported per order as task-level paired differences with bootstrap \glspl{ci}, and by domain, source of the injected experience (same or other domain) and position.
+In every order, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first (ABBA), so that drift in infrastructure or evaluator load affects both arms equally. No Memory should not depend on order; its five runs instead measure run-to-run noise. The checklist-only ablation does not use memory and is run once. Results are task-level paired differences with bootstrap \glspl{ci}.
 
 \begin{table}[ht]
 \centering
@@ -213,6 +204,6 @@ With the failure fixed (v9.1, \Cref{sec:fix}), no scaffold occurred in either or
 
 \subsection{Fixing the Exposed Failure}
 \label{sec:fix}
-We tested the fix on seed 11 without changing the frozen v7 used for all other experiments. v8 stores only a verified fragment for missing-package entries and rebuilds the missing-import example as new failures accrue. On the 61 tasks v8 completed, it removed all scaffolds; on the seven tasks where v7 had returned the scaffold its accuracy rose from 3.6\% to 45.2\%. On the other 54 tasks v8 scored 31.8\% against 36.9\% for v7, but 51 of these 54 prompts already differed before the code pool (the memory model decomposes requirements and writes reflections differently in each run, so the two memory chains diverge from the first task); two runs of the same Long Memory version can therefore differ by about five points in total accuracy. We therefore judge versions by mechanism counts rather than total accuracy.
+We tested the fix on seed 11, keeping the frozen v7 for the other experiments. v8 stores only a verified fragment for missing-package entries and rebuilds the missing-import example as new failures accrue. On the 61 tasks v8 completed, it removed all scaffolds; on the seven tasks where v7 had returned the scaffold its accuracy rose from 3.6\% to 45.2\%. On the other 54 tasks v8 scored 31.8\% against 36.9\% for v7, but 51 of these 54 prompts already differed before the code pool (the memory model decomposes requirements and writes reflections differently in each run, so the two memory chains diverge from the first task); two runs of the same Long Memory version can therefore differ by about five points in total accuracy. We therefore judge versions by mechanism counts rather than total accuracy.
 
 v8 was stopped because its missing-import example alternated between two versions. v9 replaces the example only when the new one covers strictly more of the needed functions, creates a code memory for whole-site failures (missing package, compile error) after one occurrence, raises the slot limit from two to three, injects at most one missing-package entry per task, and rejects repair examples that reduce to a bare wrapper. A generation check on 31 seed-11 tasks (the 19 scaffold tasks, four whole-site failures and eight high-scoring tasks, code inspected without evaluation) produced no scaffold. The full v9 run was stopped after 45 tasks (36.1\% vs 37.9\% for v7 on those tasks, paired difference $-3.0$, 95\% CI [$-11.3$, 5.8]): its v-model code memory was never injected, because the memory model wrote the condition as requirements ``with props that need to be updated locally'', which no requirement states. v9.1 treats compile-error entries, like missing imports, as applicable to every Vue site; on the three tasks v9 lost to this error, regeneration no longer produced it. v9.1 is the final version and is used for all remaining order experiments; its results are reported in \Cref{tab:order}.
