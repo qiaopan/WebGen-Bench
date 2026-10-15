@@ -1174,10 +1174,10 @@ wish to left align your text}
   \begin{minipage}[c]{\textwidth}
     \small
     \begin{center}
-      \textsc{A thesis submitted in fulfilment of the requirements for the degree of} \par 
+      \textsc{A dissertation submitted in partial fulfilment of the requirements for the degree of} \par 
       \textsc{\@degreetitle} \textsc{in} \textsc{\@subjectarea,} \par  
       \textsc{the University of Auckland, \@degreedate.} \par 
-      \textsc{This thesis is for examination purposes only and is confidential to the examination process.}
+      \textsc{This dissertation is for examination purposes only and is confidential to the examination process.}
     \end{center}
   \end{minipage}
 \end{lrbox}
