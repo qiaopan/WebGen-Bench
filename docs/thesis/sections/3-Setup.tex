@@ -102,8 +102,8 @@ The memory designs we built fall into three families, shown in \Cref{fig:familie
   why/.style={font=\scriptsize\itshape, align=center, text width=2.2cm}, >=stealth]
 \node[base] (nm) {No Memory\\28.5\%};
 \node[fam, right=14mm of nm] (txt) {\textbf{Text memory}\\v1--v4\\lessons as text\\+ checklist (v4)\\30.9\%};
-\node[fam, draw=orange!80!black, right=14mm of txt] (code) {\textbf{Code memory}\\v5--v7\\+ code pool of\\verified fragments\\40.0\%};
-\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Final}\\v8--v9.1\\safer fragments,\\versioned entries\\\todo{v9.1}};
+\node[fam, draw=orange!80!black, right=14mm of txt] (code) {\textbf{Code memory}\\v5--v7\\+ code pool:\\fragments and\\whole-file examples\\40.0\%};
+\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Final}\\v8--v9.1\\fragments for all\\entry types,\\versioned entries\\\todo{v9.1}};
 \draw[->] (nm) -- (txt);
 \draw[->] (txt) -- node[why, above=1mm]{text not\\followed} (code);
 \draw[->] (code) -- node[why, above=1mm]{whole-file\\example\\$\rightarrow$ scaffold} (fin);

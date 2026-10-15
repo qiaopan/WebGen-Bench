@@ -128,11 +128,11 @@ Paired by task, checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI
 
 \todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and v9.1 $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ v9.1, describe the contribution as automatically discovering effective prompt code; if v9.1 is clearly better, as accumulation and per-task selection.}
 
-\section{A Stronger Generator}
+\section{Generalisation to a Larger Generator}
 \label{sec:stronger}
-To test whether the advantage of code over text depends on the size of the generator, we repeat No Memory and the final version with WebGen-LM-32B from the same family, in the manifest order, keeping Bolt.diy, the memory pipeline and the evaluators unchanged. The 32B model is served in BF16, as in the original paper, where it reaches 38.2\% with Bolt.diy~\cite{lu2025webgenbench}; the two arms were run concurrently on two lanes, so both experienced the same infrastructure conditions.
+Does the memory framework also improve a larger generator from the same family? We repeat No Memory and the final version with WebGen-LM-32B, in the manifest order, keeping Bolt.diy, the memory pipeline and the evaluators unchanged. The 32B model is served in BF16, as in the original paper, where it reaches 38.2\% with Bolt.diy~\cite{lu2025webgenbench}; the two arms run concurrently on two lanes, so both experience the same infrastructure conditions. Deployment differs from the 7B runs: the 32B generator shares the second GPU with the memory model, which is restarted with a smaller memory share (0.42 of the GPU instead of 0.80, with the 32B model given 0.54); the evaluator and the 7B lanes stay on the first GPU. This comparison shows whether the full memory helps a stronger generator; it does not by itself show whether a larger model makes better use of text than of code, because the 32B runs have no text-memory arm. That question is left to future work.
 
-\todo{Status: 32B runs scheduled for the weekend of 10-17 on the second GPU. Table: 32B No Memory vs Final (v9.1) in the format of \Cref{tab:main}, with the paper's 32B row; paired difference with CI; whether textual lessons are followed more often by the 32B generator. This is the only test of whether the code-over-text finding is specific to the 7B model.}
+\todo{Status: 32B runs scheduled for the weekend of 10-17 on the second GPU. Table: 32B No Memory vs Final (v9.1) in the format of \Cref{tab:main}, with the paper's 32B row; paired difference with CI; and the share of zero-score tasks.}
 
 \section{Robustness to Task Order}
 \label{sec:order-design}
