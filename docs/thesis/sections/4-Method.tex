@@ -13,20 +13,48 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \caption{Cross-task memory for one run (final version).}
 \label{alg:pipeline}
 \begin{algorithmic}[1]
-\State $M \gets \emptyset$
+\State $M \gets \emptyset$; \quad $F \gets \emptyset$ \Comment{lessons; code facts of earlier sites}
 \For{$i = 1,\dots,n$}
   \State $L \gets \textsc{Checklist}(r_i)$ \Comment{memory model splits the requirement}
-  \State attach to $L$ the lessons in $M$ judged to apply to $r_i$
-  \State $P \gets$ up to three code-pool fragments whose trigger holds
+  \State attach to $L$ the lessons in $M$ judged a hard match for $r_i$ (at most three)
+  \State $C \gets \textsc{ActivateEntries}(F)$ \Comment{trigger: 2 tasks, or 1 if site-breaking}
+  \State $P \gets \textsc{SelectAndVerify}(C, \{y_j : j<i,\ a_j \ge 0.5\})$ \Comment{at most three fragments}
   \State $x_i \gets r_i \oplus L \oplus P$; \quad $y_i \gets G(x_i)$; \quad $a_i \gets E(y_i)$
-  \State reflect on $(y_i,\tau_i,a_i)$; add new lessons to $M$ after deduplication
-  \State record code facts of $y_i$; create or version code-pool entries from earlier sites with $a \ge 0.5$
+  \State reflect on $(y_i,\tau_i,a_i)$; add lessons to $M$ after deduplication; update utilities
+  \State $F \gets F \cup \textsc{StaticAnalyse}(y_i)$; \quad \textsc{UpdateVersion}$(C, F)$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
 
+\noindent\textsc{StaticAnalyse} compiles every component of a site with \texttt{@vue/compiler-sfc} and records undeclared package imports, Vue functions used without import, and compile errors. \textsc{ActivateEntries} turns each recorded problem into a code-pool entry once its trigger holds. \textsc{SelectAndVerify} takes, for each active entry, the key lines that the memory model picks from an earlier successful site and accepts them only if they are verbatim, at most 15 lines, free of \texttt{<script>}/\texttt{<template>} tag lines, and include the needed import and a line that uses it; after two failed picks a rule-based extraction is used. \textsc{UpdateVersion} adds a new version of an entry only when its example covers strictly more of the needed functions, and keeps the old one. \Cref{sec:codepool} gives the details and \Cref{tab:params} the constants.
 
-\todo{Planned: a pipeline figure for v9.1 that separates the read path (checklist, lesson retrieval, code pool, prompt) from the write path after evaluation (reflection, deduplication, code facts, versioned entries), and shows that the current task's evaluation never reaches its own prompt.}
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[every node/.style={font=\small},
+  box/.style={draw, rounded corners, align=center, minimum height=10mm, text width=2.4cm},
+  mem/.style={draw, rounded corners, fill=gray!12, align=center, minimum height=10mm, text width=2.4cm}, >=stealth]
+\node[mem] (M0) at (0,0) {Memory $M_{i-1}$\\lessons, code pool};
+\node[box] (req) at (3.4,1.6) {Requirement $r_i$};
+\node[box] (pr) at (3.4,0) {Prompt $x_i$:\\$r_i$ + checklist\\+ lessons + fragments};
+\node[box] (gen) at (6.8,0) {Generator\\(7B)};
+\node[box] (ev) at (10.2,0) {Evaluator};
+\node[box] (sa) at (6.8,-2.2) {Static analysis\\(code facts)};
+\node[box] (ref) at (10.2,-2.2) {Reflection,\\dedup, utility};
+\node[mem] (M1) at (0,-2.2) {Memory $M_i$\\for task $t_{i+1}$};
+\draw[->, dashed] (M0) -- node[above,font=\scriptsize]{read} (pr);
+\draw[->] (req) -- (pr);
+\draw[->] (pr) -- (gen);
+\draw[->] (gen) -- node[above,font=\scriptsize]{$y_i$} (ev);
+\draw[->] (gen) -- (sa);
+\draw[->] (ev) -- node[right,font=\scriptsize]{$\tau_i, a_i$} (ref);
+\draw[->] (ref.south) -- ++(0,-0.45) -| (M1.south);
+\draw[->] (sa) -- node[above,font=\scriptsize]{write} (M1);
+\draw[->, dotted] (M1) -- node[left,font=\scriptsize]{next task} (M0);
+\end{tikzpicture}
+\caption[The final pipeline (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
+\label{fig:pipeline}
+\end{figure}
+
 
 \section{Starting Point: Why No Memory Fails}
 \label{sec:nm-failures}
@@ -151,7 +179,7 @@ The code pool is computed without an \gls{llm} for detection:
   \item \textbf{Fragment selection.} The memory model picks the key lines; code then verifies that the lines are verbatim from the source file, contain at most 15 lines, contain no \texttt{<script>}/\texttt{<template>} tag lines, and include the import of the most frequently missed function plus a line that calls it. If the model fails twice, a rule-based extraction is used. An entry is updated by adding a new version only when the new example covers strictly more of the needed functions; the old version is kept for provenance~\cite{ace2026}.
   \item \textbf{Slots.} At most three entries per task, at most one of them for a missing package.
 \end{itemize}
-\textit{Verified} in this dissertation means only that a fragment is verbatim from a source file that compiles and comes from a site with score $\ge 0.5$; it does not mean that the fragment is correct for the new task. Because the triggers are general, the code pool behaves partly like a learned prompt prefix: once active, many later tasks receive the same fragment. The fixed-prefix ablation (\Cref{sec:ablation}) separates this from learning. \todo{Planned (appendix, no new run): retrieval and storage details: entry fields, embedding input, number of candidates, similarity threshold, injection budget, mean injected tokens per task, and the applicability and reflection prompts.}
+\textit{Verified} in this dissertation means only that a fragment is verbatim from a source file that compiles and comes from a site with score $\ge 0.5$; it does not mean that the fragment is correct for the new task. Because the triggers are general, the code pool behaves partly like a learned prompt prefix: once active, many later tasks receive the same fragment. The fixed-prefix ablation (\Cref{sec:ablation}) separates this from learning. \Cref{tab:params} lists the constants of the final configuration. \todo{Planned (existing data): mean injected tokens per task and one stored entry as an example.}
 
 \subsection{Memory Hygiene}
 \begin{itemize}
@@ -160,3 +188,27 @@ The code pool is computed without an \gls{llm} for detection:
   \item \textbf{Utility and retirement.} For each lesson we count injections $u$ and recurrences $r$ (the same problem reappearing after injection), and compute utility $(u - r + 1)/(u + 2)$~\cite{zhou2025memento,zhao2024expel}. Ranking uses support $\times$ severity $\times$ utility; a lesson injected at least five times with utility below 0.3 is no longer injected. Utility is a heuristic: a task after injection that does not repeat the problem may not have needed the lesson, and a lesson used on hard tasks can be penalised. The constants (two occurrences, five injections, 0.3) are design choices that were not tuned.
   \item \textbf{No hand-written conclusions.} Instructions to the reflection model describe how to investigate (follow the code path, trace styles from element to global stylesheet, list candidate causes and rule them out) but never what the answer is.
 \end{itemize}
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Constants of the final configuration (v9.1). All are design choices; none was tuned on results.}
+\label{tab:params}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.2cm}X}
+\toprule
+Parameter & Value \\
+\midrule
+Lesson retrieval & bge-m3 embeddings; 5 candidates per requirement aspect, at most 3 aspects; similarity $\ge 0.35$; only hard matches kept \\
+Lessons injected & at most 3, total length at most $0.5\times$ the requirement \\
+Common pool & 6 candidates, at most 3 kept; only entries with a code construct \\
+Deduplication & candidates with similarity $\ge 0.55$, then same root cause and fix judged by the memory model \\
+Retirement & at least 5 injections and utility $< 0.3$ \\
+Code-pool trigger & 2 tasks; 1 task for whole-site failures \\
+Code-pool source & earlier site with score $\ge 0.5$ that compiles \\
+Fragment & verbatim, at most 15 lines, no tag lines \\
+Code-pool slots & at most 3 per task, at most 1 for a missing package \\
+Memory model & Qwen2.5-VL-72B-Instruct-AWQ, at most 4096 output tokens \\
+Leakage control & a task never reads memory written from itself \\
+\bottomrule
+\end{tabularx}
+\end{table}

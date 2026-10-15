@@ -45,25 +45,25 @@ Reflection on failed attempts is related to self-correction methods such as Self
 
 \section{Research Gap}
 \label{sec:gap}
-\Cref{tab:related} compares the closest studies along the dimensions that matter for this dissertation. Three gaps follow from it. First, cross-task memory has been studied almost only with large agents; whether a small generator benefits, and from which form of memory, is untested. Second, on WebGen-Bench the only cross-task study targets maintainability with a strong backbone on single-topic suites, and reports no significant change in functional accuracy. Third, memory results are usually reported for a single task order, although the memory available to a task depends on the tasks before it. This dissertation addresses all three: it measures the effect of memory on functional accuracy for a 7B generator under the official protocol, compares textual, checklist and code forms of memory, and repeats the comparison under different task orders with task-paired confidence intervals.
+\Cref{tab:related} compares the closest studies along the dimensions that matter for this dissertation. Three gaps follow from it. First, cross-task memory has been studied almost only with large agents; whether a small generator benefits, and from which form of memory, is untested. Second, on WebGen-Bench the only cross-task study targets maintainability with a strong backbone on single-topic suites, and reports no significant change in functional accuracy. Third, memory results are usually reported for a single task order, although the memory available to a task depends on the tasks before it. This dissertation addresses all three: it measures the effect of memory on functional accuracy for a 7B generator under the official single-attempt protocol, compares textual, checklist and code forms of memory, and repeats the comparison under different task orders with task-paired confidence intervals.
 
 \begin{table}[ht]
 \centering
-\caption{Closest related studies. Small: the model that uses the memory has 7B parameters or fewer. Websites: evaluated on website-generation tasks. Order: results compared across task orders.}
-\label{tab:related} \todo{Planned: add columns for memory form, source, update rule, retrieval and consumer, and mark ``not evaluated'' separately from a shown limitation.}
+\caption{Closest related studies. Update: how the memory changes across tasks. Consumer: the model that uses the memory. Order: results compared across task orders. ``no'' means not evaluated, not a shown limitation.}
+\label{tab:related}
 \small
-\begin{tabularx}{\textwidth}{>{\raggedright}>{\raggedright\arraybackslash}p{3.9cm}>{\raggedright}X ccc}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X ccc}
 \toprule
-Study & Memory form & Small & Websites & Order \\
+Study & Memory form & Update & Consumer & Websites & Order \\
 \midrule
-ExpeL~\cite{zhao2024expel} & textual insights & no & no & no \\
-ReasoningBank~\cite{reasoningbank2025} & reasoning strategies & no & no & no \\
-Voyager~\cite{wang2023voyager} & executable skills & no & no & no \\
-Metis~\cite{dai2026metis} & text + executed code tools & no & no & no \\
-Memory Transfer Learning~\cite{kim2026mtl} & four representations & no & no & no \\
-Super Library Agent~\cite{sung2026superlibrary} & shared component library & no & 24 tasks & no \\
-Evo-Memory~\cite{wei2025evomemory} & benchmark of memory methods & -- & no & yes \\
-\textbf{This work} & checklist + code fragments + text & \textbf{7B} & \textbf{101 tasks} & \textbf{yes} \\
+ExpeL~\cite{zhao2024expel} & textual insights & add, edit, up/down-vote & large & no & no \\
+ReasoningBank~\cite{reasoningbank2025} & reasoning strategies & append from successes and failures & large & no & no \\
+Voyager~\cite{wang2023voyager} & executable skills & add verified skills & large & no & no \\
+Metis~\cite{dai2026metis} & text + executed code tools & promote recurring procedures & large & no & no \\
+Memory Transfer Learning~\cite{kim2026mtl} & four representations & fixed (transfer study) & large & no & no \\
+Super Library Agent~\cite{sung2026superlibrary} & shared component library & library grows with tasks & large & 24 tasks & no \\
+Evo-Memory~\cite{wei2025evomemory} & benchmark of memory methods & varies & various & no & yes \\
+\textbf{This work} & checklist + code fragments + text & dedup, utility retirement, versioned code & \textbf{7B} & \textbf{101 tasks} & \textbf{yes} \\
 \bottomrule
 \end{tabularx}
 \end{table}
