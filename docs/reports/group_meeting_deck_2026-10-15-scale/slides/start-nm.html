@@ -1,0 +1,14 @@
+<section id="start-nm" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">研究起点 · 先看 No Memory 错在哪里</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700;line-height:1.2">从基线的失败类型出发，决定记忆该记什么</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #2A78D6;padding:32px 0 0 0"><p style="font-size:72px;font-weight:700">30 / 101</p><p style="font-size:28px;color:#4A5568;line-height:1.4">No Memory 整题 0 分的任务</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #2A78D6;padding:32px 0 0 0"><p style="font-size:72px;font-weight:700">41%</p><p style="font-size:28px;color:#4A5568;line-height:1.4">前 30 题的失败来自白屏（页面打不开）</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #2A78D6;padding:32px 0 0 0"><p style="font-size:72px;font-weight:700">49%</p><p style="font-size:28px;color:#4A5568;line-height:1.4">后 71 题的失败是评测员交互次数用完</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<p style="flex:1;font-size:28px;line-height:1.5;color:#4A5568"><b>第一阶段还发现：</b>prompt 单薄时，小模型常原样交回模板（8 题中 5 题）；页面写了却没有导航入口。</p>
+<p style="flex:1;font-size:28px;line-height:1.5;color:#4A5568"><b>由此的思路：</b>记忆优先针对高频、可预防的失败（白屏、缺入口、缺 import），而不是泛泛地"写得更好"。</p>
+</div>
+<aside>我们没有直接上方法，而是先看不带记忆的基线错在哪里。No Memory 101 题里有 30 题整题 0 分；前 30 题的失败里，41% 是白屏，页面根本打不开；后 71 题的失败里，有一半是评测员交互次数用完，这属于评测限制，记忆很难修。第一阶段还看到，prompt 太单薄时，小模型常常原样交回模板，或者页面写了却没有导航入口。所以我们的思路是：记忆优先针对高频、可以预防的失败，而不是泛泛地教它写得更好。</aside>
+</section>

@@ -1,0 +1,15 @@
+<section id="scale" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:88px 128px 120px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">实验规模 · 论文里放哪些</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:48px;font-weight:700">11 次完整运行，约 1,100 个网站、7,000 多项检查</h2>
+<table style="font-family:'Noto Sans SC', Arial, sans-serif;color:#14213D;font-size:24px">
+<tr><th style="width:22%;text-align:left">类别</th><th style="width:48%;text-align:left">运行（每次 101 题）</th><th style="width:12%;text-align:right">次数</th><th style="width:18%;text-align:left">状态</th></tr>
+<tr><td>基线</td><td>No Memory：原顺序 / 种子 11 / 种子 29</td><td style="text-align:right">3</td><td>完成</td></tr>
+<tr><td>主结果</td><td>v4（文字记忆）、v7（代码记忆），原顺序</td><td style="text-align:right">2</td><td>完成</td></tr>
+<tr><td>消融</td><td>只有清单（不读写记忆），原顺序</td><td style="text-align:right">1</td><td>完成</td></tr>
+<tr><td>顺序鲁棒性</td><td>v7、v9.1 × 种子 11 / 种子 29</td><td style="text-align:right">4</td><td>完成</td></tr>
+<tr><td>最终方法</td><td>v9.1，原顺序</td><td style="text-align:right">1</td><td>10-16 完成</td></tr>
+<tr><td style="color:#6A7179">后台继续</td><td style="color:#6A7179">种子 47、交错顺序、固定前缀、32B 生成器</td><td style="text-align:right;color:#6A7179">—</td><td style="color:#6A7179">交稿前完成就加，否则写未来工作</td></tr>
+</table>
+<p style="font-size:24px;color:#6A7179">参照往年 MAI 范文：20 个故事 × 3 种方法；4 个问答基准 × 2 个模型；1 个自建数据集。我们的实验量已足够，后续重点是写作。v8、v9 中途停止，只作诊断。</p>
+<aside>这一页说明论文里放哪些实验。一共 11 次完整运行，每次 101 道题，加起来约 1,100 个网站、7,000 多项功能检查。No Memory 跑了三种顺序，用来量化基线本身的波动；原顺序上有文字记忆 v4 和代码记忆 v7 两个主结果；一个只有清单的消融，用来区分需求拆解和记忆的贡献；v7 和修复后的 v9.1 各在两种打乱顺序上跑一次，检验顺序鲁棒性；最终方法 v9.1 在原顺序上的结果明天完成。其余实验在后台继续，交稿前完成就加进论文，否则写成未来工作。对照往年的范文，实验规模已经足够，接下来的重点是写作。</aside>
+</section>

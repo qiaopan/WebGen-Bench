@@ -1,0 +1,18 @@
+<section id="pipeline" data-section="方法" data-transition="fade" style="background:#FBFBF8;color:#14213D;font-family:'Noto Sans SC', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<p style="font-size:28px;color:#2A78D6;font-weight:700">方法总览</p>
+<h2 style="font-family:'Noto Serif SC', Georgia, serif;font-size:60px;font-weight:700">每做完一题，就为下一题留下经验</h2>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:30px;font-weight:700">① 需求清单</h3><p style="font-size:24px;color:#4A5568;line-height:1.4">记忆模型把需求逐条拆开</p></div>
+<x-icon name="Play" style="color:#2A78D6;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:30px;font-weight:700">② 检索经验</h3><p style="font-size:24px;color:#4A5568;line-height:1.4">功能经验挂到条目；通用池只留具体写法</p></div>
+<x-icon name="Play" style="color:#2A78D6;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:30px;font-weight:700">③ 代码池</h3><p style="font-size:24px;color:#4A5568;line-height:1.4">≤2 段代码片段</p></div>
+<x-icon name="Play" style="color:#2A78D6;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#14213D;color:#F4F1EA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:30px;font-weight:700">④ 生成 + 评测</h3><p style="font-size:24px;color:#C9D3E3;line-height:1.4">7B 一次生成，官方评测</p></div>
+<x-icon name="Play" style="color:#2A78D6;width:40px;height:40px"></x-icon>
+<div style="flex:1;background:#EEF3FA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:30px;font-weight:700">⑤ 反思入库</h3><p style="font-size:24px;color:#4A5568;line-height:1.4">去重、效用、写代码池（Zhao et al., 2024）</p></div>
+</div>
+<p style="font-size:28px;color:#4A5568;line-height:1.5">留一任务（leave-one-task-out）：检索永远排除当前任务自己的记录，评测结果不回流到同一题。</p>
+<p style="font-family:'Noto Sans SC', Arial, sans-serif;position:absolute;left:128px;bottom:56px;font-size:24px;color:#6A7179">参考：ExpeL（Zhao et al., 2024）、ReasoningBank（Ouyang et al., 2026）：从成功和失败轨迹中提炼可复用经验</p>
+<aside>方法分五步。第一，记忆模型把需求逐条拆成清单。第二，检索功能经验，挂到对应的清单条目下面；通用池只保留有具体写法的条目。第三，代码池最多给两段代码片段。第四，7B 模型只生成一次，用官方评测。第五，反思入库，同时做去重、更新效用、更新代码池。第五步的产物会被下一题的第二、三步读到，这就是跨任务。另外我们严格做 leave-one-task-out，检索永远排除当前任务自己的记录，评测结果也不会回流到同一题。</aside>
+</section>
