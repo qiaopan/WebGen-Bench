@@ -2,7 +2,27 @@
 \label{chap:setup}
 
 \section{Benchmark and Protocol}
-We use all 101 WebGen-Bench tasks in the benchmark's manifest order, which groups tasks into 20 domain blocks. We follow the official protocol: the generator produces the project once, there is no repair loop, and a project is passed to evaluation as soon as its dependencies install and the development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier phase of this project used a stricter build gate (\texttt{vue-tsc}) and a more generous repair loop; those results are not comparable with the paper and are not reported as main results.
+We use all 101 WebGen-Bench tasks. They come from 20 application domains of unequal size, from eight tasks each (company brochures, learning platforms, discussion forums, e-commerce) down to two (personal blogs, streaming, email clients). The benchmark's manifest order groups tasks into domain blocks; \Cref{sec:order-design} adds shuffled orders. We follow the official protocol: the generator produces the project once, there is no repair loop, and a project is passed to evaluation as soon as its dependencies install and the development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier phase of this project used a stricter build gate (\texttt{vue-tsc}) and a more generous repair loop; those results are not comparable with the paper and are not reported as main results.
+
+\Cref{fig:pipeline} shows one task in the pipeline. The memory module is the only component that differs between arms; the generator, the scaffold, the tester and the scoring are shared.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=6mm and 9mm, every node/.style={font=\small},
+  box/.style={draw, rounded corners, align=center, minimum height=10mm, inner sep=4pt},
+  mem/.style={box, draw=blue!70!black, fill=blue!6}, >=stealth]
+\node[box] (req) {Requirement\\(task $t$)};
+\node[box, right=of req] (gen) {Generator\\WebGen-LM-7B\\in Bolt.diy};
+\node[box, right=of gen] (site) {Website\\(started once)};
+\node[box, right=of site] (eval) {Tester and grader\\Qwen2.5-VL-32B};
+\node[mem, below=12mm of gen, xshift=18mm] (bank) {Memory bank: checklist, code pool, lessons\\Qwen2.5-VL-72B + bge-m3};
+\draw[->] (req) -- (gen); \draw[->] (gen) -- (site); \draw[->] (site) -- (eval);
+\draw[->, blue!70!black] (eval.south) |- node[pos=0.25, right, align=left, font=\scriptsize]{reflect\\after task $t$} (bank.east);
+\draw[->, blue!70!black] (bank.west) -| node[pos=0.75, left, align=right, font=\scriptsize]{memory for\\task $t{+}1$} (req.south);
+\end{tikzpicture}
+\caption{One task in the pipeline. Black: the official WebGen-Bench setup (No Memory). Blue: the memory module, which reflects after each task and adds text to the prompt of later tasks only.}
+\label{fig:pipeline}
+\end{figure}
 
 \section{Models and Roles}
 All models are self-hosted on the university CS ML cluster (two NVIDIA H200 GPUs per job, served with vLLM). No commercial \gls{llm} service is called. \Cref{tab:roles} lists the roles.
@@ -37,9 +57,15 @@ We report accuracy over all test cases, the mean appearance score (1--5), and th
 \begin{description}
   \item[No Memory] The requirement alone. No retrieval, no reflection, no memory writes.
   \item[Long Memory (v4, v7)] The requirement plus memory content, written from the chain's own earlier tasks (\Cref{chap:method}).
+  \item[Long Memory (v9.1)] The final method: v7 with every code example reduced to a verified fragment (\Cref{sec:fix}).
   \item[Checklist only] v7 with memory writing disabled, so each task sees only the requirement checklist. This isolates the effect of the prompt restructuring from that of memory.
 \end{description}
 Memory never uses information from the current task itself (leave-one-task-out), and evaluation results are never fed back into the same task.
 
 \section{Reproducing the Baseline}
 No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean appearance score of 2.34 (paper: 2.5 with GPT-4o) and 30 zero-score tasks. The close match in accuracy gives us confidence that the self-hosted pipeline is faithful to the official one.
+
+\section{Reproducibility and Constraints}
+Every run starts from an empty memory and stores its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts and scores; the key files of every run are archived in the project repository. The generator is decoded deterministically, so differences between arms come from the prompt rather than from sampling, although the \gls{gui} tester is not deterministic.
+
+The main constraint is compute. A task takes about twelve minutes with memory and six without, so one 101-task run takes about a day on our two GPUs. As in the original benchmark, each configuration is therefore run once per task order. We compensate by pairing comparisons by task, by repeating the No Memory baseline in three orders to measure its run-to-run variation, and by repeating the memory method across orders rather than within one.
