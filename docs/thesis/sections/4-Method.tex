@@ -13,27 +13,26 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \caption{Cross-task memory for one run (final version).}
 \label{alg:pipeline}
 \begin{algorithmic}[1]
-\State $M \gets \emptyset$; \quad $F \gets \emptyset$ \Comment{lessons; code facts of earlier sites}
+\State $S_0=(M_0,F_0,C_0) \gets (\emptyset,\emptyset,\emptyset)$ \Comment{lessons, code facts, versioned code pool}
 \For{$i = 1,\dots,n$}
-  \State $L \gets \textsc{Checklist}(r_i)$ \Comment{memory model splits the requirement}
-  \State attach to $L$ the lessons in $M$ judged a hard match for $r_i$ (same trigger and state change; at most three)
-  \State $C \gets \textsc{ActivateEntries}(F)$ \Comment{trigger: 2 tasks, or 1 if site-breaking}
-  \State $P \gets \textsc{SelectAndVerify}(C, \{y_j : j<i,\ a_j \ge 0.5\})$ \Comment{at most three fragments}
-  \State $x_i \gets r_i \oplus L \oplus P$; \quad $y_i \gets G(x_i)$; \quad $a_i \gets E(y_i)$
-  \State reflect on $(y_i,\tau_i,a_i)$; add lessons to $M$ after deduplication; update utilities
-  \State $F \gets F \cup \textsc{StaticAnalyse}(y_i)$; \quad \textsc{UpdateVersion}$(C, F)$
+  \State $L \gets \textsc{Checklist}(r_i)$ with at most three hard-match lessons from $M_{i-1}$
+  \State $P \gets \textsc{SelectActive}(C_{i-1}, r_i)$ \Comment{$\le 3$ active entries}
+  \State $x_i \gets r_i \oplus L \oplus P$; \quad $y_i \gets G(x_i)$; \quad $(a_i,\tau_i) \gets E(y_i)$
+  \State $M_i \gets \textsc{Reflect}(M_{i-1}, r_i, y_i, \tau_i, a_i)$ \Comment{deduplicate; update utilities}
+  \State $F_i \gets F_{i-1} \cup \textsc{StaticAnalyse}(y_i)$
+  \State $C_i \gets \textsc{UpdatePool}(C_{i-1}, F_i, \{y_j : j\le i,\ a_j \ge 0.5\})$ \Comment{activate, verify, version}
 \EndFor
 \end{algorithmic}
 \end{algorithm}
 
-\noindent\textsc{StaticAnalyse} compiles every component of a site with \texttt{@vue/compiler-sfc} and records undeclared package imports, Vue functions used without import, and compile errors. \textsc{ActivateEntries} turns each recorded problem into a code-pool entry once its trigger holds. \textsc{SelectAndVerify} takes, for each active entry, the key lines that the memory model picks from an earlier successful site and accepts them only if they are verbatim, at most 15 lines, free of \texttt{<script>}/\texttt{<template>} tag lines, and include the needed import and a line that uses it; after two failed picks a rule-based extraction is used. \textsc{UpdateVersion} adds a new version of an entry only when its example covers strictly more of the needed functions, and keeps the old one. \Cref{sec:codepool} gives the details and \Cref{tab:params} the constants.
+\noindent \Cref{fig:memflow} shows the same loop as a diagram. \textsc{StaticAnalyse} compiles every component of a site with \texttt{@vue/compiler-sfc} and records undeclared package imports, Vue functions used without import, and compile errors. \textsc{UpdatePool} activates an entry for each recorded problem whose trigger holds (two tasks, or one for a whole-site failure) and, for each new or changed entry, takes the key lines that the memory model picks from an earlier successful site and accepts them only if they are verbatim, at most 15 lines, free of \texttt{<script>}/\texttt{<template>} tag lines, and include the needed import and a line that uses it; after two failed picks a rule-based extraction is used. A new version of an entry is added only when its example covers strictly more of the needed functions; the old version is kept but no longer injected. All three parts of the state persist in the run's database. \Cref{sec:codepool} gives the details and \Cref{tab:params} the constants.
 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[every node/.style={font=\small},
   box/.style={draw, rounded corners, align=center, minimum height=10mm, text width=2.4cm},
   mem/.style={draw, rounded corners, fill=gray!12, align=center, minimum height=10mm, text width=2.4cm}, >=stealth]
-\node[mem] (M0) at (0,0) {Memory $M_{i-1}$\\lessons, code pool};
+\node[mem] (M0) at (0,0) {Memory $M_{i-1}$\\lessons, facts,\\code pool};
 \node[box] (req) at (3.4,1.6) {Requirement $r_i$};
 \node[box] (pr) at (3.4,0) {Prompt $x_i$:\\$r_i$ + checklist\\+ lessons + fragments};
 \node[box] (gen) at (6.8,0) {Generator\\(7B)};
@@ -51,8 +50,8 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \draw[->] (sa) -- node[above,font=\scriptsize]{write} (M1);
 \draw[->, dotted] (M1) -- node[left,font=\scriptsize]{next task} (M0);
 \end{tikzpicture}
-\caption[The final pipeline (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$ and $M_i$: the same memory store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
-\label{fig:pipeline}
+\caption[The memory flow of the final version (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$ and $M_i$: the same memory store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
+\label{fig:memflow}
 \end{figure}
 
 
@@ -62,7 +61,7 @@ We began by inspecting the code that No Memory actually produced, rather than it
 
 \paragraph{Blank pages from basic errors.} Bolt.diy's Vue template declares only \texttt{vue} as a dependency, and WebGen-LM-7B never edits \texttt{package.json} (0 of 81 inspected responses). When it imports \texttt{vue-router} or uses a Vue function such as \texttt{ref} without importing it, the whole site renders as a blank page and every test case fails. In an early Long Memory run, 26 of 74 tasks were blank, 19 of them because of an undeclared \texttt{vue-router} import. Many zero-score tasks therefore fail before their functional difficulty can be assessed: the site does not render because of a basic error that the model repeats.
 
-\paragraph{Text is not followed.} In a targeted diagnostic, not a powered experiment, we took nine tasks that had produced blank pages, kept their original prompts, and added a single sentence, phrased in several ways (``add vue-router to package.json'', ``do not use vue-router'', ``put pages in App.vue with \texttt{ref} and \texttt{v-if}'', or the same sentence at both the start and the end). None recovered more than one task in three. Each phrasing was tried on three of the nine tasks; a task counted as recovered when the generated code imported no undeclared package and compiled. A ten-line code example of the same idea, tried on all nine, recovered seven. This matches the observation that small models follow long textual guidance poorly~\cite{harada2025curse,li2025smallmodels} and suggested that memory should be delivered as code.
+\paragraph{Text is not followed.} In a targeted diagnostic, not a powered experiment, we took nine tasks that had produced blank pages, kept their original prompts, and added a single sentence, phrased in several ways (``add vue-router to package.json'', ``do not use vue-router'', ``put pages in App.vue with \texttt{ref} and \texttt{v-if}'', or the same sentence at both the start and the end). None recovered more than one task in three. Each phrasing was tried on three of the nine tasks; a task counted as recovered when the generated code imported no undeclared package and compiled. A ten-line code example of the same idea, tried on all nine, recovered seven. Because the text variants and the code example were tried on different subsets, this is indicative rather than conclusive; it suggested that memory might work better as code, in line with reports that small models follow instructions less reliably~\cite{harada2025curse,li2025smallmodels}.
 
 \section{Design History}
 \label{sec:history}
@@ -129,7 +128,7 @@ const activeTab = ref('donation')
 For each task, in order:
 \begin{enumerate}
   \item \textbf{Requirement checklist.} The memory model splits the requirement into items (\Cref{sec:checklist}).
-  \item \textbf{Retrieve lessons.} The memory model also splits the requirement into at most three functional \emph{aspects} (a feature and the user action that triggers it) and appearance aspects; these are the retrieval queries. Functional lessons are retrieved by similarity and judged for applicability by the memory model as a hard match (same user trigger and same state change), a soft transfer (same kind of interaction) or a reject; only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
+  \item \textbf{Retrieve lessons.} The memory model also splits the requirement into at most three functional \emph{aspects} (a feature and the user action that triggers it) and appearance aspects; these are the retrieval queries. Functional lessons are retrieved by similarity and judged for applicability by the memory model as a hard match (same user trigger and same state change), a soft transfer (same kind of interaction) or a reject; the query is the aspect written as feature, user trigger, expected state change and a domain-free interaction pattern, and it is compared with the stored case (trigger, observation, cause, preventive action); only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
   \item \textbf{Code pool.} At most three verified fragments whose trigger condition holds (\Cref{sec:codepool}).
   \item \textbf{Generate and evaluate.} One generation by WebGen-LM-7B; official functional and appearance evaluation.
   \item \textbf{Reflect and store.} The memory model reflects on the evaluated task; new lessons are deduplicated against existing ones, utilities are updated, and code facts are computed for the code pool.
@@ -173,9 +172,9 @@ The original requirement remains at the top of the prompt and is declared bindin
 \label{sec:codepool}
 The code pool is computed without an \gls{llm} for detection:
 \begin{itemize}
-  \item \textbf{Problem facts.} After each task, code analysis of the generated site records undeclared imports (\texttt{import:<package>}: an import statement whose package \texttt{package.json} does not declare), Vue functions used without import (\texttt{vue-api}: a Vue function name followed by \texttt{(} or \texttt{<} in a script that neither imports nor defines it), both found by pattern matching on the source, and compile errors obtained by compiling each \gls{sfc} with \texttt{@vue/compiler-sfc} exactly as Vite would.
+  \item \textbf{Problem facts.} After each task, code analysis of the generated site records undeclared imports (\texttt{import:<package>}: an import statement whose package \texttt{package.json} does not declare), Vue functions used without import (\texttt{vue-api}: a Vue function name followed by \texttt{(} or \texttt{<} in a script that neither imports nor defines it), both found by pattern matching on the source, and compile errors from compiling each \gls{sfc}'s script and template together with \texttt{@vue/compiler-sfc}, as Vite's Vue plugin does (without type checking or bundling).
   \item \textbf{Trigger.} A problem key becomes active after it has appeared in two different tasks, following Metis's rule of promoting a procedure only after it recurs~\cite{dai2026metis}. Whole-site failures that code detects objectively (an undeclared package, a compile error) become active after one occurrence. Missing-import and compile-error entries apply to every Vue site; other entries are applied only if the memory model judges their condition to hold for the requirement.
-  \item \textbf{Source.} The example comes from the chain's own earlier websites that scored at least 0.5 and compile. The threshold of 0.5 is a design choice (at least half the checks passed), not a tuned value. Successful sites supply \emph{how} to write it; failed sites decide \emph{when} it is needed~\cite{reasoningbank2025}.
+  \item \textbf{Source.} The example comes from the chain's own earlier websites that scored at least 0.5, compile and have no undeclared import, preferring the highest-scoring site. The threshold of 0.5 is a design choice (at least half the checks passed), not a tuned value. Successful sites supply \emph{how} to write it; failed sites decide \emph{when} it is needed~\cite{reasoningbank2025}.
   \item \textbf{Fragment selection.} The memory model picks the key lines; code then verifies that the lines are verbatim from the source file, contain at most 15 lines, contain no \texttt{<script>}/\texttt{<template>} tag lines, and include the import of the most frequently missed function plus another line that calls it (the same pattern: its name followed by \texttt{(} or \texttt{<}). If the model fails twice, a rule-based extraction is used. An entry is updated by adding a new version only when the new example covers strictly more of the needed functions; the old version is kept for provenance~\cite{ace2026}.
   \item \textbf{Slots.} At most three entries per task, at most one of them for a missing package.
 \end{itemize}
