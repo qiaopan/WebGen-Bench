@@ -51,7 +51,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \draw[->] (sa) -- node[above,font=\scriptsize]{write} (M1);
 \draw[->, dotted] (M1) -- node[left,font=\scriptsize]{next task} (M0);
 \end{tikzpicture}
-\caption[The final pipeline (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
+\caption[The final pipeline (v9.1).]{The final pipeline (v9.1). Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. The two memory boxes are the same store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -129,7 +129,7 @@ const activeTab = ref('donation')
 For each task, in order:
 \begin{enumerate}
   \item \textbf{Requirement checklist.} The memory model splits the requirement into items (\Cref{sec:checklist}).
-  \item \textbf{Retrieve lessons.} Functional lessons are retrieved by similarity and judged for applicability by the memory model; only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
+  \item \textbf{Retrieve lessons.} The memory model also splits the requirement into at most three functional \emph{aspects} (a feature and the user action that triggers it) and appearance aspects; these are the retrieval queries. Functional lessons are retrieved by similarity and judged for applicability by the memory model; only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
   \item \textbf{Code pool.} At most three verified fragments whose trigger condition holds (\Cref{sec:codepool}).
   \item \textbf{Generate and evaluate.} One generation by WebGen-LM-7B; official functional and appearance evaluation.
   \item \textbf{Reflect and store.} The memory model reflects on the evaluated task; new lessons are deduplicated against existing ones, utilities are updated, and code facts are computed for the code pool.
@@ -173,10 +173,10 @@ The original requirement remains at the top of the prompt and is declared bindin
 \label{sec:codepool}
 The code pool is computed without an \gls{llm} for detection:
 \begin{itemize}
-  \item \textbf{Problem facts.} After each task, code analysis of the generated site records undeclared imports (\texttt{import:<package>}), Vue functions used without import (\texttt{vue-api}), and compile errors obtained by compiling each \gls{sfc} with \texttt{@vue/compiler-sfc} exactly as Vite would.
+  \item \textbf{Problem facts.} After each task, code analysis of the generated site records undeclared imports (\texttt{import:<package>}: an import statement whose package \texttt{package.json} does not declare), Vue functions used without import (\texttt{vue-api}: a Vue function name followed by \texttt{(} or \texttt{<} in a script that neither imports nor defines it), both found by pattern matching on the source, and compile errors obtained by compiling each \gls{sfc} with \texttt{@vue/compiler-sfc} exactly as Vite would.
   \item \textbf{Trigger.} A problem key becomes active after it has appeared in two different tasks, following Metis's rule of promoting a procedure only after it recurs~\cite{dai2026metis}. Whole-site failures that code detects objectively (an undeclared package, a compile error) become active after one occurrence. Missing-import and compile-error entries apply to every Vue site; other entries are applied only if the memory model judges their condition to hold for the requirement.
   \item \textbf{Source.} The example comes from the chain's own earlier websites that scored at least 0.5 and compile. The threshold of 0.5 is a design choice (at least half the checks passed), not a tuned value. Successful sites supply \emph{how} to write it; failed sites decide \emph{when} it is needed~\cite{reasoningbank2025}.
-  \item \textbf{Fragment selection.} The memory model picks the key lines; code then verifies that the lines are verbatim from the source file, contain at most 15 lines, contain no \texttt{<script>}/\texttt{<template>} tag lines, and include the import of the most frequently missed function plus a line that calls it. If the model fails twice, a rule-based extraction is used. An entry is updated by adding a new version only when the new example covers strictly more of the needed functions; the old version is kept for provenance~\cite{ace2026}.
+  \item \textbf{Fragment selection.} The memory model picks the key lines; code then verifies that the lines are verbatim from the source file, contain at most 15 lines, contain no \texttt{<script>}/\texttt{<template>} tag lines, and include the import of the most frequently missed function plus another line that calls it (the same pattern: its name followed by \texttt{(} or \texttt{<}). If the model fails twice, a rule-based extraction is used. An entry is updated by adding a new version only when the new example covers strictly more of the needed functions; the old version is kept for provenance~\cite{ace2026}.
   \item \textbf{Slots.} At most three entries per task, at most one of them for a missing package.
 \end{itemize}
 \textit{Verified} in this dissertation means only that a fragment is verbatim from a source file that compiles and comes from a site with score $\ge 0.5$; it does not mean that the fragment is correct for the new task. Because the triggers are general, the code pool behaves partly like a learned prompt prefix: once active, many later tasks receive the same fragment. The fixed-prefix ablation (\Cref{sec:ablation}) separates this from learning. \Cref{tab:params} lists the constants of the final configuration. \todo{Planned (existing data): mean injected tokens per task and one stored entry as an example.}
@@ -198,7 +198,7 @@ The code pool is computed without an \gls{llm} for detection:
 \toprule
 Parameter & Value \\
 \midrule
-Lesson retrieval & bge-m3 embeddings; 5 candidates per requirement aspect, at most 3 aspects; similarity $\ge 0.35$; only hard matches kept \\
+Lesson retrieval & bge-m3 embeddings; 5 candidates per requirement aspect (\Cref{sec:pipeline}), at most 3 functional aspects; similarity $\ge 0.35$; only hard matches kept \\
 Lessons injected & at most 3, total length at most $0.5\times$ the requirement \\
 Common pool & 6 candidates, at most 3 kept; only entries with a code construct \\
 Deduplication & candidates with similarity $\ge 0.55$, then same root cause and fix judged by the memory model \\
