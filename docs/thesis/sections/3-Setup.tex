@@ -53,13 +53,29 @@ For each task with $n$ test cases, of which $p$ pass and $q$ are partial,
 \end{equation}
 We report accuracy over all test cases, the mean appearance score (1--5), and the number of \emph{zero-score} tasks. Because test cases within a task are not independent, comparisons are paired by task rather than by test case.
 
-\section{Arms}
-\begin{description}
-  \item[No Memory] The requirement alone. No retrieval, no reflection, no memory writes.
-  \item[Long Memory (v4, v7)] The requirement plus memory content, written from the chain's own earlier tasks (\Cref{chap:method}).
-  \item[Long Memory (v9.1)] The final method: v7 with every code example reduced to a verified fragment (\Cref{sec:fix}).
-  \item[Checklist only] v7 with memory writing disabled, so each task sees only the requirement checklist. This isolates the effect of the prompt restructuring from that of memory.
-\end{description}
+\section{Experimental Design}
+\label{sec:design}
+\Cref{tab:design} lists every arm, the task orders in which it was run and the question it answers. All arms use WebGen-LM-7B with Bolt.diy under the official protocol, cover all 101 tasks and start from an empty memory; each arm is run once per order. The task orders are defined in \Cref{sec:order-design}.
+
+\begin{table}[ht]
+\centering
+\caption{Experimental design. Memory content is what is added to the generator's prompt; version numbers refer to the design history in \Cref{sec:history}.}
+\label{tab:design}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright}p{2.9cm}>{\raggedright}X>{\raggedright}p{2.6cm}>{\raggedright\arraybackslash}X}
+\toprule
+Arm & Memory content & Task orders & Question \\
+\midrule
+No Memory & none (requirement only) & manifest, seeds 11, 29, 47, interleaved & Does the baseline reproduce the paper, and how much does it vary between runs? \\
+Text memory (v4) & checklist with textual lessons & manifest & Does textual memory help a small generator? \\
+Checklist only & checklist; memory neither read nor written & manifest & How much does decomposing the requirement add? \\
+Code memory (v7) & checklist, lessons and code examples & manifest, seeds 11, 29 & Does code memory help, and does it survive a change of order? \\
+Fixed code prefix & checklist and the final code memories from task 1; no memory & manifest & Is the gain learning, or just code in the prompt? \\
+Final (v9.1) & as v7, code examples are verified fragments only & manifest, seeds 11, 29, 47, interleaved & Does the final method hold across task orders? \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 Memory never uses information from the current task itself (leave-one-task-out), and evaluation results are never fed back into the same task.
 
 \section{Reproducing the Baseline}

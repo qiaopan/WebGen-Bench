@@ -128,34 +128,6 @@ Paired by task, checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI
 
 \todo{Fill in fixed-prefix row and the two differences involving it.}
 
-\section{Overview of All Runs}
-\label{sec:runs}
-\Cref{tab:runs} lists every complete run. All use WebGen-LM-7B with Bolt.diy under the official protocol and cover all 101 tasks; each is a single run. v8 and v9, stopped part-way (\Cref{sec:fix}), are not listed.
-
-\begin{table}[ht]
-\centering
-\caption{All complete runs. Accuracy in \%; difference to the No Memory run of the same order, paired by task, with 95\% bootstrap \gls{ci}.}
-\label{tab:runs}
-\small
-\begin{tabular}{lllccc}
-\toprule
-Arm & Order & Question & Acc. & vs.\ No Memory & Zero \\
-\midrule
-No Memory & Manifest & Does the baseline reproduce the paper? & 28.5 & -- & 30 \\
-Text memory (v4) & Manifest & Does textual memory help? & 30.9 & below NM after task 30 & 20 \\
-Code memory (v7) & Manifest & Does code memory help? & 40.0 & $+11.5$ [6.0, 16.9] & 13 \\
-Checklist only & Manifest & How much does the checklist add? & 31.8 & $+3.4$ [$-2.2$, 8.7] & 18 \\
-Code memory (v7) & Seed 11 & Does it hold with another order? & 33.1 & $+4.4$ [$-1.9$, 10.6] & 21 \\
-Code memory (v7) & Seed 29 & Does it hold with domains mixed? & 32.6 & $+4.5$ [$-2.2$, 11.3] & 21 \\
-Final (v9.1) & Seed 11 & Does the fix hold with another order? & 35.4 & $+7.4$ [1.6, 13.1] & 16 \\
-Final (v9.1) & Seed 29 & Does the fix hold with domains mixed? & 33.7 & $+5.5$ [$-0.5$, 11.6] & 18 \\
-\bottomrule
-\multicolumn{6}{l}{\footnotesize No Memory in the same order: seed 11 27.9\% (29 zero), seed 29 28.6\% (29 zero).}
-\end{tabular}
-\end{table}
-
-\todo{Add v9.1 manifest, seed 47 and interleaved rows when complete.}
-
 \section{Robustness to Task Order}
 \label{sec:order-design}
 WebGen-Bench is a static benchmark: tasks are solved independently and its main results are single runs without error bars, which the authors attribute to computational cost~\cite{lu2025webgenbench}. With memory, however, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
@@ -193,21 +165,14 @@ Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}). Lo
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{figures/gap_order_seed11.png}\\[4pt]
-\includegraphics[width=\textwidth]{figures/gap_order_seed29.png}
-\caption{Rolling 10-task mean of the per-task accuracy gap (v7 minus No Memory) by execution order, for seed 11 (domains adjacent, top) and seed 29 (random, bottom). The drop after task 45 in seed 11 coincides with the scaffold outputs.}
+\includegraphics[width=\textwidth]{figures/order_gaps.png}
+\caption{Rolling 10-task mean of the per-task accuracy gap to the No Memory run of the same order, by execution order. Orange: code memory with a whole-file example (v7); blue: verified fragments only (v9.1). Positive values mean memory is better. The v7 dip after task 45 in seed 11 coincides with the scaffold outputs.}
 \label{fig:order-gap}
 \end{figure}
 
-With the failure fixed (v9.1, \Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap-v91}). The gain is similar with domains adjacent and mixed, so it does not depend on same-domain neighbours. Compared directly with v7, v9.1 is ahead by 3.0 and 1.0 points, which is within the run-to-run variation of a single run; the evidence for the fix is the removal of the scaffold failures, not a higher total. Missing Vue imports remain (23 and 27 tasks with at least one affected component, against 17 and 19 for v7): once the generator writes real pages instead of the scaffold, it has more opportunities for this slip.
+With the failure fixed (v9.1, \Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap}). The gain is similar with domains adjacent and mixed, so it does not depend on same-domain neighbours. Compared directly with v7, v9.1 is ahead by 3.0 and 1.0 points, which is within the run-to-run variation of a single run; the evidence for the fix is the removal of the scaffold failures, not a higher total. Missing Vue imports remain (23 and 27 tasks with at least one affected component, against 17 and 19 for v7): once the generator writes real pages instead of the scaffold, it has more opportunities for this slip.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\textwidth]{figures/gap_order_seed11_v91.png}\\[4pt]
-\includegraphics[width=\textwidth]{figures/gap_order_seed29_v91.png}
-\caption{Rolling 10-task mean of the per-task accuracy gap (v9.1 minus No Memory) for seed 11 (top) and seed 29 (bottom). The dip around tasks 50--58 in seed 11 reaches about $-9$ points, against $-32$ for v7 (\Cref{fig:order-gap}).}
-\label{fig:order-gap-v91}
-\end{figure}
+
 
 \todo{Manifest (v9.1), seed 47 and interleaved order: whether the gain holds in all orders and whether the interleaved order is clearly worse.}
 
