@@ -2,7 +2,7 @@
 \label{chap:setup}
 
 \section{Benchmark and Protocol}
-We use all 101 WebGen-Bench tasks. They come from 20 application domains of unequal size, from eight tasks each (company brochures, learning platforms, discussion forums, e-commerce) down to two (personal blogs, streaming, email clients). The benchmark's manifest order groups tasks into domain blocks; \Cref{sec:order-design} adds shuffled orders. We follow the official protocol: the generator produces the project once, there is no repair loop, and a project is passed to evaluation as soon as its dependencies install and the development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier phase of this project used a stricter build gate (\texttt{vue-tsc}) and a more generous repair loop; those results are not comparable with the paper and are not reported as main results.
+We use all 101 WebGen-Bench tasks. They come from 20 application domains with two to eight tasks each. The benchmark's manifest order groups tasks into domain blocks; \Cref{sec:order-design} adds shuffled orders. We follow the official protocol: the generator produces the project once, there is no repair loop, and a project is passed to evaluation as soon as its dependencies install and the development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier phase of this project used a stricter build gate (\texttt{vue-tsc}) and a more generous repair loop; those results are not comparable with the paper and are not reported as main results.
 
 \Cref{fig:pipeline} shows one task in the evaluation pipeline. The memory module is the only component that differs between arms; the generator, the scaffold, the tester and the scoring are shared.
 
@@ -74,7 +74,7 @@ Embeddings & bge-m3~\cite{chen2024bgem3} \\
 \end{tabularx}
 \end{table}
 
-\paragraph{The generator.} WebGen-LM is a family of website-generation models (7B, 14B and 32B) released with WebGen-Bench~\cite{lu2025webgenbench}. Each is Qwen2.5-Coder-Instruct~\cite{hui2024qwencoder} of the same size, fine-tuned with supervised learning only. The training data come from WebGen-Instruct, 6,667 website instructions decontaminated against the benchmark: the authors ran DeepSeek-V3 in Bolt.diy on 2,000 of them and kept the 600 trajectories whose websites scored at least 3 for appearance. WebGen-LM-7B therefore already knows the Bolt.diy output format, which makes it the natural small baseline for this benchmark: it is not a general model prompted to build websites, but a model distilled for exactly this scaffold.
+\paragraph{The generator.} WebGen-LM-7B, released with WebGen-Bench~\cite{lu2025webgenbench}, is Qwen2.5-Coder-7B-Instruct~\cite{hui2024qwencoder} fine-tuned on Bolt.diy trajectories for instructions decontaminated against the benchmark. It already knows the Bolt.diy output format, which makes it the natural small baseline: a model distilled for exactly this scaffold.
 
 The memory model is deliberately different from the evaluator, so that reflection cannot copy the evaluator's grading behaviour. vLLM applies the model repository's generation configuration by default; WebGen-LM-7B ships with a repetition penalty that Bolt.diy never sends, so we disable it for the generator to match the paper's setting.
 
@@ -140,4 +140,4 @@ Every run starts from an empty memory and stores its configuration file, task or
 
 \paragraph{Code and data availability.} The code, configuration files and the archived run records (prompts, injected memory, scores and memory databases of every run) are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \texttt{archive/phase2-webgen-2026-10/}.
 
-The main constraint is compute. A task takes about twelve minutes with memory and six without, so one 101-task run takes about a day on our two GPUs. As in the original benchmark, each configuration is therefore run once per task order. We compensate by pairing comparisons by task, by repeating the No Memory baseline in three orders to measure its run-to-run variation, and by repeating the memory method across orders rather than within one.
+The main constraint is compute: a task takes about twelve minutes with memory and six without, so one 101-task run takes about a day. As in the original benchmark, each configuration is run once per order; comparisons are paired by task, and No Memory is repeated across orders to measure run-to-run variation.

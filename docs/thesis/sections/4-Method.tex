@@ -25,7 +25,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \end{algorithmic}
 \end{algorithm}
 
-\noindent \Cref{fig:memflow} shows the same loop as a diagram. \textsc{StaticAnalyse} compiles every component of a site with \texttt{@vue/compiler-sfc} and records undeclared package imports, Vue functions used without import, and compile errors. \textsc{UpdatePool} activates an entry for each recorded problem whose trigger holds (two tasks, or one for a whole-site failure) and, for each new or changed entry, takes the key lines that the memory model picks from an earlier successful site and accepts them only if they are verbatim, at most 15 lines, free of \texttt{<script>}/\texttt{<template>} tag lines, and include the needed import and a line that uses it; after two failed picks a rule-based extraction is used. A new version of an entry is added only when its example covers strictly more of the needed functions; the old version is kept but no longer injected. All three parts of the state persist in the run's database. \Cref{sec:codepool} gives the details and \Cref{tab:params} the constants.
+\noindent \Cref{fig:memflow} shows the same loop as a diagram. \textsc{StaticAnalyse} records undeclared imports, Vue functions used without import and compile errors; \textsc{UpdatePool} activates, verifies and versions code-pool entries as described in \Cref{sec:codepool}. All three parts of the state persist in the run database; \Cref{tab:params} lists the constants.
 
 \begin{figure}[ht]
 \centering
@@ -100,7 +100,7 @@ Vue compile error: v-model on prop. [...] (4 tasks). Code that works:
 
 Build every checklist item; the notes only warn about mistakes earlier websites made.
 \end{lstlisting}
-\caption{The prompt the final method gave the generator for task 000041 (seed-11 order), shortened. The requirement comes first and stays binding; the checklist repeats it item by item with lessons attached; the code pool adds verified fragments with the number of earlier tasks that failed in the same way.}
+\caption{The final method's prompt for task 000041 (seed 11), shortened: requirement, checklist with attached lessons, and verified code fragments.}
 \label{fig:prompt}
 \end{figure}
 
