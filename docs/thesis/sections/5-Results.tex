@@ -38,7 +38,7 @@ Code memory (v7) raises the share of passed test cases from 23.8\% to 34.5\% and
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/learning_curve_v4_v7.png}
-\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, v4 and v7. \todo{Planned: mark when each code-pool entry became active, and add the final version.}}
+\caption{Cumulative and rolling-10 accuracy by execution order for No Memory, v4 and v7. \todo{Planned: add the final version.}}
 \label{fig:curve}
 \end{figure}
 
@@ -94,7 +94,7 @@ Whole-site breaks fall from 26 tasks (No Memory) to 8 (v7), whereas pages with a
 
 This slip was not reduced by a better example: a variant that showed both \texttt{ref} and \texttt{computed} removed it in one of four affected tasks. As the official protocol forbids repairing code after generation, we report it as a limitation of the generator. Ten of v7's 13 zero-score tasks are also zero for No Memory. \todo{Planned (existing data): list the cause of each remaining zero-score task of the final version (blank page, missing feature, budget exhausted) instead of calling them hard.}
 
-\paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. We observed no meaningful difference on this common subset; because memory changes which tasks enter the subset, this does not show that memory has no effect on appearance. The three appearance figures in this dissertation use different denominators: 2.35 averages all 101 tasks with failures as 0 (\Cref{tab:main}), 3.25 averages tasks with a grade (\Cref{tab:ablation}), and 3.25 vs 3.22 is the paired subset. \todo{Planned: paired difference with CI on the common subset.}
+\paragraph{Appearance.} Restricted to the 68 tasks where both No Memory and v7 produced a working site with an appearance grade, the mean appearance score is 3.25 for No Memory and 3.22 for v7. We observed no meaningful difference on this common subset; because memory changes which tasks enter the subset, this does not show that memory has no effect on appearance. The three appearance figures in this dissertation use different denominators: 2.35 averages all 101 tasks with failures as 0 (\Cref{tab:main}), 3.25 averages tasks with a grade (\Cref{tab:ablation}), and 3.25 vs 3.22 is the paired subset. 
 
 \section{Ablations: Checklist Only and Fixed Code Prefix}
 \label{sec:ablation}
@@ -127,12 +127,6 @@ v9.1 (final) & \multicolumn{5}{c}{\todo{running}} \\
 Paired by task (a mean of per-task differences, so it can differ slightly from the difference of the pooled accuracies in \Cref{tab:ablation}), checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and v7 $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger share, with an interval that excludes zero, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred.
 
 \todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and v9.1 $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ v9.1, describe the contribution as automatically discovering effective prompt code; if v9.1 is clearly better, as accumulation and per-task selection.}
-
-\section{Generalisation to a Larger Generator}
-\label{sec:stronger}
-Does the memory framework also improve a larger generator from the same family? We repeat No Memory and the final version with WebGen-LM-32B, in the manifest order, keeping Bolt.diy, the memory pipeline and the evaluators unchanged. The 32B model is served in BF16, as in the original paper, where it reaches 38.2\% with Bolt.diy~\cite{lu2025webgenbench}; the two arms run concurrently on two lanes, so both experience the same infrastructure conditions. Deployment differs from the 7B runs: the 32B generator shares the second GPU with the memory model, which is restarted with a smaller memory share (0.42 of the GPU instead of 0.80, with the 32B model given 0.54); the evaluator and the 7B lanes stay on the first GPU. This comparison shows whether the full memory helps a stronger generator; it does not by itself show whether a larger model makes better use of text than of code, because the 32B runs have no text-memory arm. That question is left to future work.
-
-\todo{Status: 32B runs scheduled for the weekend of 10-17 on the second GPU. Table: 32B No Memory vs Final (v9.1) in the format of \Cref{tab:main}, with the paper's 32B row; paired difference with CI; and the share of zero-score tasks.}
 
 \section{Robustness to Task Order}
 \label{sec:order-design}
@@ -184,7 +178,7 @@ With the failure fixed (v9.1, \Cref{sec:fix}), no scaffold occurred in either or
 
 \todo{Status: manifest running (expected 10-16), seed 47 running, interleaved queued. Report whether the gain holds in all orders and whether the interleaved order is clearly worse; add one summary figure of the gain and CI per order, with a shared y-axis across the order plots.}
 
-\todo{Planned (existing data, final version): (1) a per-domain table of the gain over the 20 domains; (2) memory use over time: entries injected per task, injected tokens, size of the memory, first activation of each code-pool entry; (3) one complete case of transfer (failure, reflection, stored entry, why it was retrieved, injected text, change in code, outcome) and one of negative transfer (\Cref{fig:scaffold}).}
+\todo{Planned (existing data, final version): one complete case of transfer (failure, stored entry, why it was retrieved, injected text, change in code, outcome), a few lines; negative transfer is \Cref{fig:scaffold}.}
 
 \subsection{Fixing the Exposed Failure}
 \label{sec:fix}
