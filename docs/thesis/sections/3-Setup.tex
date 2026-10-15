@@ -53,7 +53,7 @@ to honeydew, with components using dark olive green.
 \end{subfigure}\hfill
 \begin{subfigure}[t]{0.48\textwidth}\centering
 \includegraphics[width=\linewidth]{figures/ex_working_site.png}
-\caption{Final memory (v9.1): score 1.0.}
+\caption{Code memory (fragments): score 1.0.}
 \end{subfigure}
 \caption{The first screenshot the tester received for task 000006 (seed-11 order). (a) An undeclared package stops the whole site. (b) The numbered dashed boxes are drawn by the tester to name the elements it can click; they are not part of the website.}
 \label{fig:walkthrough}
@@ -92,7 +92,7 @@ We report accuracy over all test cases, the mean appearance score (1--5), and th
 
 \section{Experimental Design}
 \label{sec:design}
-The memory designs we built fall into three families, shown in \Cref{fig:families} and described in \Cref{chap:method}. \emph{Text memory} (v1--v4) stores lessons written in natural language and adds them to the prompt; its last version, v4, adds the requirement checklist. \emph{Code memory} (v5--v7) keeps the checklist and adds a code pool of examples taken from the chain's own working websites. The \emph{final} family (v8--v9.1) changes only how the code pool selects and updates its examples. One version of each family was run on all 101 tasks, v4, v7 and v9.1, and in the rest of this dissertation the three names refer to these runs. Versions that were stopped part-way or never run on all tasks are described only in the design history (\Cref{sec:history}).
+We compare three memory designs, shown in \Cref{fig:families} and described in \Cref{chap:method}. \emph{Text memory} stores lessons written in natural language and attaches them to a requirement checklist. \emph{Code memory (whole-file)} keeps the checklist and adds a code pool of examples taken from the chain's own working websites; some of these examples are complete files. \emph{Code memory (fragments)}, the final method, shows only short verified fragments. The method was refined over several iterations; only these three designs were run on all 101 tasks, and only they are reported.\footnote{In the code repository these runs are labelled v4, v7 and v9.1.}
 
 \begin{figure}[ht]
 \centering
@@ -101,14 +101,14 @@ The memory designs we built fall into three families, shown in \Cref{fig:familie
   base/.style={draw, rounded corners, align=center, text width=1.9cm, minimum height=16mm},
   why/.style={font=\scriptsize\itshape, align=center, text width=2.2cm}, >=stealth]
 \node[base] (nm) {No Memory\\28.5\%};
-\node[fam, right=14mm of nm] (txt) {\textbf{Text memory}\\v1--v4\\lessons as text\\(v4: + checklist)\\30.9\%};
-\node[fam, draw=orange!80!black, right=14mm of txt] (code) {\textbf{Code memory}\\v5--v7\\+ code pool:\\fragments and\\whole-file examples\\40.0\%};
-\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Final}\\v8--v9.1\\fragments for all\\entry types,\\versioned entries\\\todo{v9.1}};
+\node[fam, right=14mm of nm] (txt) {\textbf{Text memory}\\checklist +\\textual lessons\\30.9\%};
+\node[fam, draw=orange!80!black, right=14mm of txt] (code) {\textbf{Code memory}\\\textbf{(whole-file)}\\+ code pool, some\\examples whole files\\40.0\%};
+\node[fam, draw=blue!70!black, right=14mm of code] (fin) {\textbf{Code memory}\\\textbf{(fragments)}\\final method:\\verified fragments only\\\todo{result}};
 \draw[->] (nm) -- (txt);
 \draw[->] (txt) -- node[why, above=1mm]{text not\\followed} (code);
 \draw[->] (code) -- node[why, above=1mm]{whole-file\\example\\$\rightarrow$ scaffold} (fin);
 \end{tikzpicture}
-\caption{The three families of memory. Each arrow names the failure that led to the next family. Accuracy is on the manifest order (101 tasks, one run).}
+\caption{The three memory designs. Each arrow names the failure that motivated the next design. Accuracy is on the manifest order (101 tasks, one run).}
 \label{fig:families}
 \end{figure}
 
@@ -116,7 +116,7 @@ The memory designs we built fall into three families, shown in \Cref{fig:familie
 
 \begin{table}[ht]
 \centering
-\caption{Experimental design. Memory content is what is added to the generator's prompt; the families are those of \Cref{fig:families}.}
+\caption{Experimental design. Memory content is what is added to the generator's prompt; the designs are those of \Cref{fig:families}.}
 \label{tab:design}
 \small
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.9cm}X>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
@@ -124,11 +124,11 @@ The memory designs we built fall into three families, shown in \Cref{fig:familie
 Arm & Memory content & Task orders & Question \\
 \midrule
 No Memory & none (requirement only) & manifest, seeds 11, 29, 47, interleaved & Does the baseline reproduce the paper, and how much does it vary between runs? \\
-Text memory (v4) & checklist with textual lessons & manifest & Does textual memory help a small generator? \\
+Text memory & checklist with textual lessons & manifest & Does textual memory help a small generator? \\
 Checklist only & checklist; memory neither read nor written & manifest & How much does decomposing the requirement add? \\
-Code memory (v7) & checklist, lessons and code examples & manifest, seeds 11, 29 & Does code memory help, and does it survive a change of order? \\
+Code memory (whole-file) & checklist, lessons and code examples, some complete files & manifest, seeds 11, 29 & Does code memory help, and does it survive a change of order? \\
 Fixed code prefix & checklist and the final code memories from task 1; no memory & manifest & Is the gain learning, or just code in the prompt? \\
-Final (v9.1) & as v7, code examples are verified fragments only & manifest, seeds 11, 29, 47, interleaved & Does the final method hold across task orders? \\
+Code memory (fragments) & as above, but code examples are verified fragments only & manifest, seeds 11, 29, 47, interleaved & Does the final method hold across task orders? \\
 \bottomrule
 \end{tabularx}
 \end{table}

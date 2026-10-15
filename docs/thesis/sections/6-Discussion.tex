@@ -2,7 +2,7 @@
 \label{chap:discussion}
 
 \section{The Role of Memory Representation}
-Across the diagnostic and the full runs, this small generator responded more reliably to short code fragments than to accumulated textual lessons. Because v4 and v7 differ in more than representation, this is a cross-version observation, not a controlled comparison. This agrees with Metis's finding that code memory complements text memory~\cite{dai2026metis}, and adds that for a 7B generator the format of the memory can decide whether it helps at all. The form of the code also matters: a fragment that looked like a complete file was copied as a finished answer, producing an untouched scaffold.
+Across the diagnostic and the full runs, this small generator responded more reliably to short code fragments than to accumulated textual lessons. Because the text and code designs differ in more than representation, this is a cross-version observation, not a controlled comparison. This agrees with Metis's finding that code memory complements text memory~\cite{dai2026metis}, and adds that for a 7B generator the format of the memory can decide whether it helps at all. The form of the code also matters: a fragment that looked like a complete file was copied as a finished answer, producing an untouched scaffold.
 
 This contrasts with strong models, for which text memory transfers more reliably than code~\cite{dai2026metis,kim2026mtl}. The mechanisms differ (Metis executes its code; we show code to the generator), but together the results suggest that the best form of memory depends on the capability of the model that consumes it.
 
@@ -35,7 +35,7 @@ The generator is small, but the system is not. Each Long Memory task takes about
 \paragraph{Economy and society.} Tools that let small, locally hosted models build working websites lower the cost of software creation and keep data on local infrastructure, which may benefit small organisations. They may also reduce demand for routine front-end work. Generated websites still require human review for correctness and accessibility.
 \paragraph{Use of AI tools.} AI tools were used to assist with programming the experimental pipeline and analysis scripts, and to provide comments on drafts. All text was written by the author, who decided which suggestions to adopt. All numbers were computed by the scripts in the public repository and checked by the author. \todo{Author: this statement holds only after the final text has been rewritten in your own words; check it against what was actually done before submission.}
 
-\paragraph{Research integrity.} We report negative results (short \gls{cot}, the scaffold regression in v6, v4's decline) and invalidated our own earlier results when a delivery bug was found.
+\paragraph{Research integrity.} We report negative results (text memory's decline, the scaffold failure of whole-file examples) and invalidated our own earlier results when a delivery bug was found.
 
 \section{Project Management}
 The project was organised in versions. The cluster ran one frozen version at a time; new ideas were tested locally on small samples and with static code checks, and a version was replaced only when the new one was shown to be better. Decisions and their evidence were recorded continuously in a decision log, which made it possible to reconstruct why each component exists.
