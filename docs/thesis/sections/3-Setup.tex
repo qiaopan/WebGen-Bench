@@ -24,6 +24,39 @@ We use all 101 WebGen-Bench tasks. They come from 20 application domains of uneq
 \label{fig:pipeline}
 \end{figure}
 
+\section{How One Task Is Generated and Scored}
+\label{sec:walkthrough}
+This section follows one task through the unmodified system, so that it is clear what the memory later changes. Task 000006 asks for a solar dashboard:
+
+\begin{lstlisting}
+Please implement a solar dashboard to display real-time and historical solar
+data. The dashboard should have functionalities for real-time data display,
+historical data query, and chart analysis. [...] Configure the background color
+to honeydew, with components using dark olive green.
+\end{lstlisting}
+
+\paragraph{Generation.} Under No Memory this text is the entire prompt. Bolt.diy is an open-source browser-based coding agent: it opens a starter project (for Vue, a Vite + Vue + TypeScript template whose \texttt{package.json} declares only \texttt{vue}), sends the requirement to the generator, and writes every file of the model's reply into the project. It then installs the dependencies and starts the development server. The generator has one reply; nothing in the official protocol inspects or repairs the code.
+
+\paragraph{Functional testing.} Each task comes with hidden test cases, on average six. For task 000006 the first two are ``Verify the display of real-time solar power generation data'' and ``Test the display of real-time power consumption data'', each with an expected result. A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} receives one test case at a time. At each step it sees a screenshot in which every interactive element carries a numbered box (\Cref{fig:walkthrough}b), chooses an action such as clicking element 1 or typing into a field, and finally answers YES, PARTIAL or NO. The agent has a fixed step budget; if it runs out before reaching the target, the case counts as failed.
+
+\paragraph{Appearance grading.} A vision model grades a full-page screenshot from 1 to 5 for layout, colour and completeness.
+
+\Cref{fig:walkthrough} shows what the tester saw for this task in two runs. Under No Memory the model imported the chart library \texttt{vue-chartjs}, which the template does not declare; Vite cannot resolve the import, the page shows only the error overlay, and all test cases fail. With the final memory the generator built the three requested views without the undeclared package, and all test cases passed.
+
+\begin{figure}[ht]
+\centering
+\begin{subfigure}[t]{0.48\textwidth}\centering
+\includegraphics[width=\linewidth]{figures/ex_blank_page.png}
+\caption{No Memory: score 0.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.48\textwidth}\centering
+\includegraphics[width=\linewidth]{figures/ex_working_site.png}
+\caption{Final memory (v9.1): score 1.0.}
+\end{subfigure}
+\caption{The first screenshot the tester received for task 000006 (seed-11 order). (a) An undeclared package stops the whole site. (b) The numbered dashed boxes are drawn by the tester to name the elements it can click; they are not part of the website.}
+\label{fig:walkthrough}
+\end{figure}
+
 \section{Models and Roles}
 All models are self-hosted on the university CS ML cluster (two NVIDIA H200 GPUs per job, served with vLLM). No commercial \gls{llm} service is called. \Cref{tab:roles} lists the roles.
 
@@ -104,5 +137,7 @@ GPU 1 & Qwen2.5-VL-72B-Instruct-AWQ (memory) & 113 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\paragraph{Code and data availability.} The code, configuration files and the archived run records (prompts, injected memory, scores and memory databases of every run) are kept in a private repository and are available from the author on request; they will be made public after examination.
 
 The main constraint is compute. A task takes about twelve minutes with memory and six without, so one 101-task run takes about a day on our two GPUs. As in the original benchmark, each configuration is therefore run once per task order. We compensate by pairing comparisons by task, by repeating the No Memory baseline in three orders to measure its run-to-run variation, and by repeating the memory method across orders rather than within one.
