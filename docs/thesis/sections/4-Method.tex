@@ -7,7 +7,7 @@ A run processes the tasks $t_1,\dots,t_n$ ($n=101$) in a fixed order. Task $t_i$
 \begin{equation}
 x_i = r_i \oplus f(r_i, M_{i-1}), \qquad M_i = u\bigl(M_{i-1}, r_i, y_i, \tau_i, a_i\bigr),
 \end{equation}
-where $M_0=\emptyset$, $f$ selects and formats memory for the current requirement, $\oplus$ appends text after the requirement, $\tau_i$ is the evaluator transcript, and $u$ reflects on the finished task and updates the memory. Two constraints make the comparison fair: $f$ only reads $M_{i-1}$, which is built from earlier tasks, so the hidden evaluation of $t_i$ never reaches its own prompt; and $G$, $E$ and the protocol are identical across arms. The question is whether the mean of $a_i$ is higher with memory than with $x_i=r_i$, and which design of $f$ and $u$ achieves it. \Cref{alg:pipeline} gives the final design, which \Cref{sec:pipeline} specifies in full; \Cref{sec:nm-failures} first explains the failures that motivated it.
+where $M_0=\emptyset$, $f$ selects and formats memory for the current requirement, $\oplus$ appends text after the requirement, $\tau_i$ is the evaluator transcript, and $u$ updates the memory after the task. Because $f$ reads only $M_{i-1}$, the evaluation of $t_i$ never reaches its own prompt, and $G$, $E$ and the protocol are identical across arms. \Cref{alg:pipeline} and \Cref{fig:memflow} give the final design (\Cref{sec:pipeline}); \Cref{sec:nm-failures} first explains the failures that motivated it.
 
 \begin{algorithm}[ht]
 \caption{Cross-task memory for one run (final version).}
@@ -25,7 +25,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \end{algorithmic}
 \end{algorithm}
 
-\noindent \Cref{fig:memflow} shows the same loop as a diagram. \textsc{StaticAnalyse} records undeclared imports, Vue functions used without import and compile errors; \textsc{UpdatePool} activates, verifies and versions code-pool entries as described in \Cref{sec:codepool}. All three parts of the state persist in the run database; \Cref{tab:params} lists the constants.
+\noindent \textsc{StaticAnalyse} records undeclared imports, Vue functions used without import and compile errors; \textsc{UpdatePool} is described in \Cref{sec:codepool}, and \Cref{tab:params} lists the constants.
 
 \begin{figure}[ht]
 \centering
@@ -50,7 +50,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \draw[->] (sa) -- node[above,font=\scriptsize]{write} (M1);
 \draw[->, dotted] (M1) -- node[left,font=\scriptsize]{next task} (M0);
 \end{tikzpicture}
-\caption[The memory flow of the final method.]{The memory flow of the final method. Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$ and $M_i$: the same memory store before and after task $t_i$. The evaluation of task $t_i$ only reaches the memory used by later tasks, never its own prompt.}
+\caption[The memory flow of the final method.]{The memory flow of the final method. Dashed arrows read the memory built from earlier tasks; the lower row writes memory after evaluation. $r_i$: requirement; $y_i$: generated site; $\tau_i$: evaluator transcript; $a_i$: score; $M_{i-1}$, $M_i$: memory before and after $t_i$.}
 \label{fig:memflow}
 \end{figure}
 
@@ -124,8 +124,8 @@ The code pool is computed without an \gls{llm} for detection:
 \begin{itemize}
   \item \textbf{Concrete only.} Common-pool entries without a code construct (for example \texttt{@click}, \texttt{v-if}, an \texttt{import} line) are dropped. Rewriting may generalise the \emph{condition} under which a lesson applies but not the \emph{action}.
   \item \textbf{Deduplication at storage time.} A new lesson is compared with similar stored lessons; if the memory model judges it to share the same root cause and fix, it is recorded as support for the old lesson instead of a new entry~\cite{chhikara2025mem0}.
-  \item \textbf{Utility and retirement.} For each lesson we count injections $u$ and recurrences $r$ (the same problem reappearing after injection), and compute utility $(u - r + 1)/(u + 2)$~\cite{zhou2025memento,zhao2024expel}. Ranking uses support $\times$ severity $\times$ utility; a lesson injected at least five times with utility below 0.3 is no longer injected. Utility is a heuristic: a task after injection that does not repeat the problem may not have needed the lesson, and a lesson used on hard tasks can be penalised. The constants (two occurrences, five injections, 0.3) are design choices that were not tuned.
-  \item \textbf{No hand-written conclusions.} Instructions to the reflection model describe how to investigate (follow the code path, trace styles from element to global stylesheet, list candidate causes and rule them out) but never what the answer is.
+  \item \textbf{Utility and retirement.} For each lesson we count injections $u$ and recurrences $r$ (the same problem reappearing after injection), and compute utility $(u - r + 1)/(u + 2)$~\cite{zhou2025memento,zhao2024expel}. Ranking uses support $\times$ severity $\times$ utility; a lesson injected at least five times with utility below 0.3 is no longer injected. Utility is a heuristic and its constants were not tuned.
+  \item \textbf{No hand-written conclusions.} Reflection instructions describe how to investigate, never what the answer is.
 \end{itemize}
 
 \begin{table}[ht]

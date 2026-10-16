@@ -36,7 +36,7 @@ The final method with fragments reaches 35.2\% against 28.5\% for No Memory (pai
 The intermediate whole-file design scored higher in this order (40.0\%, $+11.5$ [6.0, 16.9]; $-4.4$ [$-9.8$, 1.0] for the final method against it), but this advantage did not carry over to other orders (\Cref{sec:order-design}). Appearance in \Cref{tab:main} counts tasks without a working site as 0; on the 66 tasks where both No Memory and the final method produced a graded site, the means are 3.23 and 3.24.
 
 \section{Learning Curve}
-\Cref{fig:curve} plots cumulative and rolling accuracy in execution order. Text memory and whole-file code memory are similar on the first 30 tasks (39.3\% and 39.0\%, versus 26.0\% for No Memory), when the code pool has few active entries. On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while code memory keeps its level (40.4\%, 9 zero-score tasks). On the last 35 tasks the gap is 38.3\% (code) vs 26.0\% (No Memory) vs 23.2\% (text).
+\Cref{fig:curve} plots cumulative and rolling accuracy in execution order. On the first 30 tasks text memory and the final method are both above No Memory (39.3\% and 35.0\%, versus 26.0\%). On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while the final method keeps its level (35.3\%, 14 zero-score tasks; whole-file code memory 40.4\%). On the last 35 tasks the final method scores 33.8\%, against 26.0\% for No Memory and 23.2\% for text memory.
 
 \begin{figure}[ht]
 \centering
@@ -45,7 +45,7 @@ The intermediate whole-file design scored higher in this order (40.0\%, $+11.5$ 
 \label{fig:curve}
 \end{figure}
 
-\section{Why Text Memory Declines and Code Memory Improves}
+\section{Why Text Memory Declines and Code Memory Holds}
 \Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. Such lessons and a ``General notes'' block remain frequent in text memory; in code memory they are rarer, and a fragment is injected in almost every task once the pool activates.
 
 \begin{table}[ht]
@@ -54,11 +54,11 @@ The intermediate whole-file design scored higher in this order (40.0\%, $+11.5$ 
 \label{tab:prompt}
 \begin{tabular}{lcc}
 \toprule
-Prompt content & Text & Code (whole-file) \\
+Prompt content & Text & Code (fragments) \\
 \midrule
-Tasks with a lesson without a code construct & 23 / 25 / 28 & 12 / 4 / 11 \\
-Tasks with a ``General notes'' block & 13 / 16 / 27 & 3 / 0 / 8 \\
-Tasks with a code-pool fragment & 0 / 0 / 0 & 25 / 30 / 41 \\
+Tasks with a lesson without a code construct & 28 / 26 / 38 & 11 / 7 / 19 \\
+Tasks with a ``General notes'' block & 13 / 16 / 27 & 6 / 3 / 4 \\
+Tasks with a code-pool fragment & 0 / 0 / 0 & 24 / 30 / 41 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -70,19 +70,20 @@ Tasks with a code-pool fragment & 0 / 0 / 0 & 25 / 30 / 41 \\
 \label{tab:codeerr}
 \begin{tabular}{lccc}
 \toprule
-Problem & No Memory & Text & Code (whole-file) \\
+Problem & No Memory & Text & Code (fragments) \\
 \midrule
-Whole-site break\textsuperscript{a} & 11 / 5 / 10 (26) & 2 / 5 / 12 (19) & 4 / 1 / 3 (\textbf{8}) \\
-Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 12 / 4 / 6 (22) \\
+Whole-site break\textsuperscript{a} & 11 / 5 / 10 (26) & 2 / 5 / 12 (19) & 4 / 4 / 9 (\textbf{17}) \\
+Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 6 / 5 / 10 (21) \\
 \bottomrule
-\multicolumn{4}{l}{\footnotesize \textsuperscript{a} An undeclared package import or a Vue compile error.}
+\multicolumn{4}{l}{\footnotesize \textsuperscript{a} An undeclared package import or a Vue compile error. Final method: two sites without code facts are omitted;}\\
+\multicolumn{4}{l}{\footnotesize whole-file code memory had 8 breaks and 22 missing imports.}
 \end{tabular}
 \end{table}
 
 These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
 
 \section{Error Analysis}
-Whole-site breaks fall from 26 tasks (No Memory) to 8 (code memory), whereas pages with a missing Vue import are about as frequent as without memory (23 vs 22). Per file the rate is the same in both arms (27 of 592 vs 27 of 586 components, 4.6\%), and a variant example showing both \texttt{ref} and \texttt{computed} fixed one of four affected tasks; we report it as a residual error of the generator, since the protocol forbids repair. Ten of code memory's 13 zero-score tasks are also zero for No Memory.
+Whole-site breaks fall from 26 tasks to 17 with the final method (8 with whole-file code memory), whereas missing Vue imports are as frequent as without memory (4.6\% of components in both arms); since the protocol forbids repair, we report this as a residual generator error.
 
 The final method has 20 zero-score tasks, 11 of them also zero for No Memory. Nine import an undeclared package (\texttt{vue-router} in six; a chart, a chess and an editor library in the others), three hit a Vue compile error (\texttt{v-model} on a file input or a prop), three call a Vue function without importing it, and five render but fail every test case. Only one returned the starter project. Undeclared \texttt{vue-router} imports occur in seven tasks against three with whole-file code memory, although a fragment for this problem was injected in 88 tasks once it activated: in this order a fragment prevented the import less reliably than a complete file did, while in the shuffled orders the complete file caused scaffolds (\Cref{sec:order-design}).
 
@@ -116,20 +117,18 @@ Code memory (fragments) & 35.0 & 35.3 & 35.2 & 20 & 3.25 \\
 \end{tabular}
 \end{table}
 
-Paired by task (a mean of per-task differences, so it can differ slightly from the difference of the pooled accuracies in \Cref{tab:ablation}), checklist only $-$ No Memory is $+3.4$ points (bootstrap 95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties), and whole-file code memory $-$ checklist only is $+8.1$ ($[2.9, 13.2]$; 46/28/27). Requirement decomposition therefore mainly prevents whole-site failures (zero-score tasks fall from 30 to 18) but does not reliably raise accuracy, and its advantage shrinks from $+7.1$ points in the first 30 tasks to $+1.8$ afterwards. Memory contributes the larger share, with an interval that excludes zero, and its advantage over the checklist grows from $+5.9$ to $+9.1$ points between the two segments, consistent with the code pool becoming active only after a problem has recurred. For the final method the difference to checklist only is smaller, $+3.7$ ([$-1.8$, 9.1]), so on its own it does not show that the memory adds to the checklist; the fixed-prefix comparison will separate the two.
+Paired by task, checklist only $-$ No Memory is $+3.4$ points (95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties): requirement decomposition mainly prevents whole-site failures (zero-score tasks 30 $\to$ 18) but does not reliably raise accuracy. The final method $-$ checklist only is $+3.7$ ($[-1.8, 9.1]$; 42/37/22), positive in all three segments of the run but with an interval that includes zero (whole-file: $+8.1$, $[2.9, 13.2]$); the fixed-prefix comparison will separate the two.
 
 \todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and final $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ final, describe the contribution as automatically discovering effective prompt code; if the final method is clearly better, as accumulation and per-task selection.}
 
 \section{Robustness to Task Order}
 \label{sec:order-design}
-With memory, the order of tasks determines which experience is available, so a single order is not sufficient evidence. In particular, in the manifest order tasks of the same domain are adjacent, so a later task can always draw on a just-solved, similar website; a gain could therefore reflect a curriculum effect rather than general learning.
-
-We therefore compare two kinds of order, each run twice, every run starting from an empty memory:
+With memory, the order decides which experience is available; in the manifest order same-domain tasks are adjacent, so a gain could be a curriculum effect. We therefore compare two kinds of order, each run twice from an empty memory:
 \begin{description}
   \item[Domains adjacent.] The order of the 20 domain blocks and the order of tasks within each block are shuffled, with seed 11 and seed 47. The manifest order, used for the main results, also belongs to this kind.
   \item[Domains mixed.] A uniformly random order of all 101 tasks (seed 29), and an interleaved order that takes one task from each domain in turn, so that consecutive tasks always come from different domains.
 \end{description}
-In the shuffled and interleaved orders, Long Memory and No Memory are run as pairs on each task, alternating which arm runs first (ABBA), to reduce confounding from infrastructure drift and evaluator load. The manifest-order arms were run at different times and are reported separately. No Memory should not depend on order; its runs instead measure run-to-run noise (three completed, two running). The checklist-only ablation does not use memory and is run once. Results are task-level paired differences with bootstrap \glspl{ci}.
+In these orders the two arms run as pairs on each task, alternating which runs first (ABBA). No Memory proved stable: generation is deterministic, and three runs scored 28.5, 27.9 and 28.6\% with 30, 29 and 29 zero-score tasks, so to save compute it was stopped after 14 tasks of the interleaved order, which is compared with the existing No Memory scores per task.
 
 \begin{table}[ht]
 \centering
@@ -155,7 +154,7 @@ Mixed & Interleaved & -- & -- & -- & -- & -- \\
 
 In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The random order matches the shuffled-blocks order, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
 
-Both runs lose much of their gain to the same failure (\Cref{fig:order-gap}): Long Memory returned the unmodified Vite scaffold on 19 tasks (seed 11) and 16 (seed 29), all after a missing-package entry whose example was another site's complete \texttt{App.vue} began to be injected; No Memory never did. \Cref{fig:scaffold} shows one case; \Cref{sec:fix} describes the fix.
+Both runs lose much of their gain to one failure (\Cref{fig:order-gap,fig:scaffold}): Long Memory returned the unmodified scaffold on 19 (seed 11) and 16 (seed 29) tasks, all after a complete \texttt{App.vue} from another site began to be injected; No Memory never did.
 
 \begin{figure}[ht]
 \centering
@@ -194,13 +193,13 @@ const activeTab = ref('donation')
 \label{fig:order-gap}
 \end{figure}
 
-With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap}). Positive gains were observed with domains adjacent and with domains mixed, although the interval for the mixed order includes zero; on this evidence the gain does not rely on same-domain neighbours. Compared directly with whole-file code memory, the final method is ahead by 3.0 and 1.0 points, which is within the run-to-run variation of a single run; the evidence for the fix is the removal of the scaffold failures, not a higher total. Missing Vue imports remain (23 and 27 tasks with at least one affected component, against 17 and 19 for whole-file code memory): once the generator writes real pages instead of the scaffold, it has more opportunities for this slip.
+With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap}). The gain is positive with domains adjacent and mixed (the mixed interval includes zero), so it does not rely on same-domain neighbours. Against whole-file code memory the final method is ahead by only 3.0 and 1.0 points, within run-to-run variation; the evidence for the fix is the removal of the scaffolds. Missing Vue imports remain (23 and 27 tasks, against 17 and 19): real pages give more opportunities for this slip.
 
 
 
-\todo{Status: seed 47 running (about 60/101), interleaved queued. Report whether the gain holds in all orders and whether the interleaved order is clearly worse; add one summary figure of the gain and CI per order, with a shared y-axis across the order plots.}
+\todo{Status: seed 47 running (about 60/101), interleaved queued. Report whether the gain holds in all orders and whether the interleaved order is clearly worse.}
 
-\todo{Planned (existing data, final version): one complete case of transfer (failure, stored entry, why it was retrieved, injected text, change in code, outcome), a few lines; negative transfer is \Cref{fig:scaffold}.}
+\paragraph{A positive case.} In the manifest order, task 000030 (13th) imported \texttt{vue-router}, which the template does not declare, and every test case failed. Static analysis recorded the undeclared import, and the code pool stored a page-switch fragment (a \texttt{ref}, navigation buttons and \texttt{v-if}, about 15 lines) taken from the 3rd task, a site that had scored 0.92 without a router. Its condition, a requirement with several pages to switch between, held for task 000059 (29th), a study-group site with four sections. Without memory the generator imported \texttt{vue-router} and the site did not start (0 of 5 test cases; checklist only also 0); with the fragment it switched sections with \texttt{ref} and \texttt{v-if} and scored 0.70.\footnote{No Memory code is taken from the seed-11 run; generation is deterministic, and both repeated No Memory runs import \texttt{vue-router} on the same 24 tasks.} The same fragment did not prevent the import in six of the 88 tasks that received it.
 
 \subsection{Fixing the Exposed Failure}
 \label{sec:fix}
