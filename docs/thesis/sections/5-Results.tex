@@ -97,7 +97,7 @@ Two complementary ablations use the manifest order: a checklist-only control and
 \end{itemize}
 If the fixed-code control performs similarly to the final method, the contribution is better described as automatically discovering effective prompt code from the agent's own failures and successes than as continual accumulation. The comparison does not isolate accumulation alone, because the two conditions also differ in textual lessons and memory maintenance.
 
-\Cref{tab:ablation} reports the checklist-only ablation over all 101 tasks; the fixed-prefix run is queued after the seed-47 order (expected about 10-18).
+\Cref{tab:ablation} reports the checklist-only ablation over all 101 tasks; the fixed-prefix run follows the interleaved order (expected about 18 Oct).
 
 \begin{table}[ht]
 \centering
@@ -120,7 +120,7 @@ Code memory (fragments) & 35.0 & 35.3 & 35.2 & 20 & 3.25 \\
 
 Paired by task, checklist only $-$ No Memory is $+3.4$ points (95\% CI $[-2.2, 8.7]$; 51 wins, 27 losses, 23 ties): requirement decomposition mainly prevents whole-site failures (zero-score tasks 30 $\to$ 18) but does not reliably raise accuracy. The final method $-$ checklist only is $+3.7$ ($[-1.8, 9.1]$; 42/37/22), positive in all three segments of the run but with an interval that includes zero (whole-file: $+8.1$, $[2.9, 13.2]$); the fixed-prefix comparison will separate the two.
 
-\todo{Status: fixed-prefix run queued after seed 47. Fill in its row and the differences fixed prefix $-$ checklist only and final $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ final, describe the contribution as automatically discovering effective prompt code; if the final method is clearly better, as accumulation and per-task selection.}
+\todo{Status: fixed-prefix run queued after the interleaved order (about 18 Oct). Fill in its row and the differences fixed prefix $-$ checklist only and final $-$ fixed prefix. Wording depends on the result: if fixed prefix $\approx$ final, describe the contribution as automatically discovering effective prompt code; if the final method is clearly better, as accumulation and per-task selection.}
 
 \section{Robustness to Task Order}
 \label{sec:order-design}

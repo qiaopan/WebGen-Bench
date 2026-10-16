@@ -85,7 +85,7 @@ The checklist-only ablation is complete: No Memory / checklist-only / v7 achieve
 - Order robustness: Long Memory and No Memory run task-by-task in ABBA order under shuffled schedules; two of four orders are done (see above). Two runs of the same Long Memory version can differ by about five points in total accuracy.
 - The generator and framework are currently fixed to WebGen-LM-7B and Bolt.diy.
 - A fixed-prefix ablation separates accumulated memory from a code prefix present from task one.
-- A stronger generator comparison is planned with WebGen-LM-32B under the same Bolt, memory, and evaluation pipeline.
+- A stronger generator (WebGen-LM-32B) under the same pipeline is left to future work.
 - The method may overfit WebGen-Bench because it was iterated on this benchmark.
 
 ## Repository map

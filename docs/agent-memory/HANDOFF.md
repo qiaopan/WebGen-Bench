@@ -36,17 +36,13 @@
 - 种子 29（随机）101 题：No Memory 28.6% / v7 32.6%，配对 +4.5（CI [−2.2, 11.3]），零分 29 / 21；前 30 题 31.6 / 29.5，第 31–101 题 27.3 / 33.9。v7 有 16 个脚手架（No Memory 0），全部在"缺包"整文件示例第 19 题开始注入之后；种子 11 为 19 个、第 36 题起。种子 11、29 及 v8、v9（停止）已归档进 git（`archive/phase2-webgen-2026-10/cluster_order_*`）。分析脚本 `scripts/analyze_order_run.py`（配对差、CI、零分、脚手架数、gap 图）。
 - PPT（artifact v36）：`order-1`、`order-2` 填好并配 gap 图，`order-3/4` 标运行中，新增 `order-fix`（脚手架原因与 v8/v9/v9.1），`conclusion` 填好消融和顺序结论。论文 `tab:order` 两行、第 5 章新增顺序结果与 `sec:fix`（v8/v9/v9.1），第 7 章 RQ3。README 新增顺序表。
 
-### 待办清单（2026-10-13 重写；做完一项就删掉）
-**10-13 午后改队列（见 DECISIONS 同日“最终方法改为 v9.1”）：** v9.1 种子 11（约 10-14 中午）→ v9.1 种子 29 → v9.1 原顺序 → v9.1 种子 47 成对 → v9.1 交错成对（约 10-21）。下面第 1、2、5、6 项中的 v7 运行已关闭，改为对应的 v9.1 运行；第 4 项提前为最优先：种子 11 约 50 题时核对脚手架/v-model/注入，异常就停队列。
-1. **种子 47 跑完（10-14）：** 拉取（rsync 该两目录）→ `scripts/analyze_order_run.py cluster_order_blocks47_longmem_v7 cluster_order_blocks47_nomem --plot docs/reports/gap_order_seed47.png` → 上传图、填 PPT `order-3`、论文 `tab:order`、README 表 → 归档。
-2. **交错跑完（10-15 傍晚，组会前一晚）：** 同上，填 `order-4`；更新 `conclusion` 与论文第 5、7 章"两类顺序各 2 次"的结论；`order-fix` 表加两行脚手架数与注入起点。
-3. **组会（10-16 周五）前：** 核对 PPT 渲染（参考文献页是否溢出）、参考文献逐条核对（ACE 作者待查）、封面姓名/导师/日期。
-4. **v9.1 跑完（约 10-16 晚）：** 与同顺序 v7、No Memory、v8（61 题）、v9（45 题）按题配对；只看机制：脚手架、vue-router 白屏、v-model 编译错次数，代码记忆建立时间与版本数；填论文 `sec:fix` 的 todo 与 PPT `order-fix`。总分只作参考（运行间波动约 5 个点）。若效果明显且 32B 后作业有余量（约 10 月底），可加 v9.1 种子 29（只跑 Long Memory），由用户决定。
-5. **固定前缀跑完（约 10-17）：** 填 `tab:ablation` 固定前缀行与 PPT `abl`。
-6. **切换 32B 时（约 10-17）：** 查 worker 日志 `SWITCH_DONE/SWITCH_FAILED`、`nvidia-smi`、第一个 32B 任务；若 `FILLER_HALT` 要处理。跑完后填 `sec:stronger` 与 PPT `stronger`；提醒用户删除 32B 权重（73 GB，由用户执行）。
-7. **作业 23385 约 11-05 到期**；之前把所有运行拉回本地并归档。删除任何集群输出目录前，先注释 `filler.conf` 中指向它的行。
-8. **本地另一会话的未提交改动**（中英文 README、`.en.md`）处理完后：切回最新 main，重新打包 `docs/thesis_overleaf.zip`（本机无 TeX，论文在 Overleaf 编译）。
-9. **交论文（11-16）前：** 致谢、全文通读、清掉所有 `\todo`。
+### 待办清单（2026-10-16 重写；**交论文：10-19 周一**；做完一项就删掉）
+**队列（10-16 23:15 对调后）：** 主队列：交错 v9.1（53/101，约 10-17 11:00）→ 固定前缀消融 v9.1（约 10-18 清晨）；lane2：种子 47 v9.1（91/101，约 10-17 02:00）→ 原顺序 v9.1 r2（约 10-18 上午）。均只跑 Long Memory；备份 `filler.conf.bak-before-swap-r2-fixed`（两条队列各一份）。
+1. **种子 47、交错跑完（10-17）：** 拉取并归档 → `scripts/analyze_order_run.py`（与已有 No Memory 按题配对；种子 47 No Memory 有 92 题、交错 14 题，其余用确定性的已有 No Memory 分数，论文写明）→ 填论文 `tab:order` 两行和第 5、7 章结论、README 表。
+2. **固定前缀、r2 跑完（10-18）：** 填 `tab:ablation` 固定前缀行；r2 与原顺序 v9.1 第一次的差值写进第 6 章"单次运行"一条（清掉该 `\todo`）。
+3. **10-18 晚 / 10-19：** 全文通读、清掉所有 `\todo`、致谢；重新打包 `docs/thesis_overleaf.zip`，在 Overleaf 编译检查。字数口径：封面、致谢、目录、图表目录不计，参考文献计；10-16 PDF 约 11,580 词（摘要 335 + 正文约 10,040 + 参考文献 1,201）。
+4. 32B 不再在交论文前做（时间不够），论文写为未来工作。
+5. 删除任何集群输出目录前，先注释 `filler.conf` 中指向它的行。作业 23385 的 30 天上限（11-05）只是资源期限，不是截止日。
 
 ### 2026-10-13：周五（10-16）英文汇报版与参考文献核对
 - 英文 10 分钟版 PPT：https://claude.ai/artifact/BWDmn48YPwAzEiL8KbKXx1 ，源文件 `docs/reports/group_meeting_deck_2026-10-16_en/`（13 页；只用 Arial/Georgia，避免导出 .pptx 乱码；讲稿约 550 词，基本照念页面文字）。学习曲线改为 No Memory / 只有清单 / v4 / v7 四条线，消融页改为柱状图（配对差与 CI）；画图脚本 `plot4.py`。
@@ -93,7 +89,7 @@
 
 ### 2026-10-08：投稿评估与后续计划（用户讨论）
 - 评估：作为硕士论文已扎实；投稿现在够 workshop，主会还差关键实验。主要质疑：只有一个 7B 生成器/基准/框架；代码池可能等于固定前缀；在同一基准上迭代（过拟合）；记忆模型 72B 强于生成器；与 Metis 的区别要写准。
-- 计划：先按时交论文（11-16）；之后补 ①固定前缀消融 ②WebGen-LM-14B ③留出验证（前 30 定版、后 71 报告，无需新跑），短期投 workshop，补完考虑 ACL/EMNLP Findings。会议截稿日期待查当期征稿。已写进 PPT 下一步页、论文 Future Work、README。
+- 计划：先按时交论文（10-16 更正：10-19 周一交）；之后补 ①固定前缀消融 ②WebGen-LM-14B ③留出验证（前 30 定版、后 71 报告，无需新跑），短期投 workshop，补完考虑 ACL/EMNLP Findings。会议截稿日期待查当期征稿。已写进 PPT 下一步页、论文 Future Work、README。
 
 ### 2026-10-08：顺序实验已排队（集群）
 - 顺序文件 `data/experiment_splits/task_orders/{blocks_seed11,random_seed29,blocks_seed47,interleave}.json`（`scripts/make_task_orders.py`；同领域相邻对数：manifest 81/100，blocks 81，random 6，interleave 0）。
