@@ -129,11 +129,11 @@ With memory, the order decides which experience is available; in the manifest or
   \item[Domains adjacent.] The order of the 20 domain blocks and the order of tasks within each block are shuffled, with seed 11 and seed 47. The manifest order, used for the main results, also belongs to this kind.
   \item[Domains mixed.] A uniformly random order of all 101 tasks (seed 29), and an interleaved order that takes one task from each domain in turn, so that consecutive tasks always come from different domains.
 \end{description}
-In these orders the two arms run as pairs on each task, alternating which runs first (ABBA). No Memory proved stable: generation is deterministic, and three runs scored 28.5, 27.9 and 28.6\% with 30, 29 and 29 zero-score tasks, so to save compute it was stopped after 14 tasks of the interleaved order, which is compared with the existing No Memory scores per task.
+In these orders the two arms run as pairs on each task, alternating which runs first (ABBA). No Memory proved stable: generation is deterministic, and three runs scored 28.5, 27.9 and 28.6\% with 30, 29 and 29 zero-score tasks, so to save compute no further No Memory runs were made: it was stopped after 14 tasks of the interleaved order and after 90 tasks of seed 47. From then on only Long Memory runs, and these orders are compared with the existing No Memory scores per task.
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status: seed 47 running, interleaved queued.}}
+\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status (16 Oct): final method seed 47 at 91/101 and interleaved at 52/101; both Long Memory only from now on.}}
 \label{tab:order}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -156,7 +156,7 @@ Mixed & Interleaved & -- & -- & -- & -- & -- \\
 
 \paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
-In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The random order matches the shuffled-blocks order, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
+In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The whole-file design was itself developed on the manifest order: each step from text memory to whole-file code memory followed an inspection of failures in that run. Its 40.0\% there is therefore likely optimistic, a development-set effect rather than a property of the order, since it falls by about 7 points in both shuffled orders while No Memory does not move. The final method, frozen before all its runs except seed 11, varies less (33.7--35.4\% in the three complete orders). The random order matches the shuffled-blocks order, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
 
 Both runs lose much of their gain to one failure (\Cref{fig:order-gap,fig:scaffold}): Long Memory returned the unmodified scaffold on 19 (seed 11) and 16 (seed 29) tasks, all after a complete \texttt{App.vue} from another site began to be injected; No Memory never did.
 
@@ -201,7 +201,7 @@ With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (1
 
 
 
-\todo{Status: seed 47 running (about 60/101), interleaved queued. Report whether the gain holds in all orders and whether the interleaved order is clearly worse.}
+\todo{Status (16 Oct): seed 47 at 91/101 (39.4\% so far), interleaved at 52/101 (38.9\% so far); expected complete about 17--18 Oct. Report whether the gain holds in all orders and whether the interleaved order is clearly worse.}
 
 \paragraph{A positive case.} In the manifest order, task 000030 (13th) imported \texttt{vue-router}, which the template does not declare, and every test case failed. Static analysis recorded the undeclared import, and the code pool stored a page-switch fragment (a \texttt{ref}, navigation buttons and \texttt{v-if}, about 15 lines) taken from the 3rd task, a site that had scored 0.92 without a router. Its condition, a requirement with several pages to switch between, held for task 000059 (29th), a study-group site with four sections. Without memory the generator imported \texttt{vue-router} and the site did not start (0 of 5 test cases; checklist only also 0); with the fragment it switched sections with \texttt{ref} and \texttt{v-if} and scored 0.70.\footnote{No Memory code is taken from the seed-11 run; generation is deterministic, and both repeated No Memory runs import \texttt{vue-router} on the same 24 tasks.} The same fragment did not prevent the import in six of the 88 tasks that received it.
 
