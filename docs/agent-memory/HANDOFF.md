@@ -36,6 +36,11 @@
 - 种子 29（随机）101 题：No Memory 28.6% / v7 32.6%，配对 +4.5（CI [−2.2, 11.3]），零分 29 / 21；前 30 题 31.6 / 29.5，第 31–101 题 27.3 / 33.9。v7 有 16 个脚手架（No Memory 0），全部在"缺包"整文件示例第 19 题开始注入之后；种子 11 为 19 个、第 36 题起。种子 11、29 及 v8、v9（停止）已归档进 git（`archive/phase2-webgen-2026-10/cluster_order_*`）。分析脚本 `scripts/analyze_order_run.py`（配对差、CI、零分、脚手架数、gap 图）。
 - PPT（artifact v36）：`order-1`、`order-2` 填好并配 gap 图，`order-3/4` 标运行中，新增 `order-fix`（脚手架原因与 v8/v9/v9.1），`conclusion` 填好消融和顺序结论。论文 `tab:order` 两行、第 5 章新增顺序结果与 `sec:fix`（v8/v9/v9.1），第 7 章 RQ3。README 新增顺序表。
 
+### 2026-10-16 晚：五个顺序的中期对比
+- 脚本 `scripts/analyze_all_orders.py OUT.png`（No Memory 缺的题用原顺序 r1 的同题分数补，生成是确定性的）；图 `docs/reports/gap_all_orders.png`，已进论文 `fig:gap-all`，`tab:order` 填了种子 47（92 题）、交错（54 题）两行中期值。
+- v9.1 − No Memory：原顺序 +7.1 [1.0, 13.1]；种子 11 +7.4 [1.6, 13.1]；种子 29 +5.5 [−0.5, 11.6]；种子 47 +10.4 [4.3, 16.6]；交错 +6.8 [−1.1, 14.7]。v9.1 − v7：原顺序 −4.4 [−9.7, 1.1]，种子 11 +3.0 [−3.0, 9.0]，种子 29 +1.0 [−5.0, 7.0]。即 v9.1 每个顺序都高于 No Memory；只在 v7 开发所用的原顺序上低于 v7。
+- 种子 47、交错的中期数据只拉了 `progress.jsonl` 等三个文件到 `outputs/experiment/`；跑完后再用 `scripts/archive_phase2_runs.py` 归档。
+
 ### 待办清单（2026-10-16 重写；**交论文：10-19 周一**；做完一项就删掉）
 **队列（10-16 23:15 对调后）：** 主队列：交错 v9.1（53/101，约 10-17 11:00）→ 固定前缀消融 v9.1（约 10-18 清晨）；lane2：种子 47 v9.1（91/101，约 10-17 02:00）→ 原顺序 v9.1 r2（约 10-18 上午）。均只跑 Long Memory；备份 `filler.conf.bak-before-swap-r2-fixed`（两条队列各一份）。
 1. **种子 47、交错跑完（10-17）：** 拉取并归档 → `scripts/analyze_order_run.py`（与已有 No Memory 按题配对；种子 47 No Memory 有 92 题、交错 14 题，其余用确定性的已有 No Memory 分数，论文写明）→ 填论文 `tab:order` 两行和第 5、7 章结论、README 表。
