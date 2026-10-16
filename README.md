@@ -87,6 +87,13 @@ The checklist-only ablation is complete: No Memory / checklist-only / v7 achieve
 - A fixed-prefix ablation separates accumulated memory from a code prefix present from task one.
 - A stronger generator (WebGen-LM-32B) under the same pipeline is left to future work.
 - The method may overfit WebGen-Bench because it was iterated on this benchmark.
+- Likely reviewer questions (submission roadmap):
+  - Does the gain come from accumulated memory or a fixed code prompt? Fixed-prefix ablation running (~10-18).
+  - Is the gain stable across task orders? Seed 47 and interleaved orders running; all orders so far positive.
+  - Does it hold beyond these 101 tasks? Needs a held-out set after freezing; not before submission.
+  - Does the 7B finding generalise? Needs a second generator (WebGen-LM-32B); future work.
+  - Is the extra computation worth it? Per-task wall time (~6 vs ~12 min) reported with paired gains.
+  - Do checklist and code memory interact? Only partly answered (memory +8.1 given checklist); stated as a limitation.
 
 ## Repository map
 
