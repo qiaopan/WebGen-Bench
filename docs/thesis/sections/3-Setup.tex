@@ -2,9 +2,9 @@
 \label{chap:setup}
 
 \section{Benchmark and Protocol}
-We use all 101 WebGen-Bench tasks. They come from 20 application domains with two to eight tasks each. The benchmark's manifest order groups tasks into domain blocks; \Cref{sec:order-design} adds shuffled orders. We follow the official protocol: the generator produces the project once, there is no repair loop, and a project is passed to evaluation as soon as its dependencies install and the development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier phase of this project used a stricter build gate (\texttt{vue-tsc}) and a more generous repair loop; those results are not comparable with the paper and are not reported as main results.
+All 101 WebGen-Bench tasks are used. They cover 20 application domains, with two to eight tasks per domain. The benchmark manifest groups tasks into domain blocks; \Cref{sec:order-design} additionally evaluates shuffled orders. The experiments follow the official protocol. The generator produces each project once, no repair loop is used, and a project is evaluated once its dependencies install and its development server starts. Test cases without an evaluation record count as failed, as in the official scoring script. An earlier project phase used a stricter build gate (\texttt{vue-tsc}) and a more permissive repair loop. Those results are not comparable with the published protocol and are not reported as main results.
 
-\Cref{fig:pipeline} shows one task in the evaluation pipeline. The memory module is the only component that differs between arms; the generator, the scaffold, the tester and the scoring are shared.
+\Cref{fig:pipeline} places the memory module in the evaluation pipeline. It is the sole component that differs across arms. The generator, scaffold, tester, and scoring procedure are shared.
 
 \begin{figure}[ht]
 \centering
@@ -26,7 +26,7 @@ We use all 101 WebGen-Bench tasks. They come from 20 application domains with tw
 
 \section{The Baseline: How One Task Is Generated and Scored}
 \label{sec:walkthrough}
-The baseline is the unmodified WebGen-Bench pipeline~\cite{lu2025webgenbench}, which we call \emph{No Memory}. We use it as the baseline because it is exactly the setting reported in the paper, so our numbers can be checked against the published 28.4\% (we obtain 28.5\%, \Cref{sec:baseline-repro}), and because memory is then the only difference between arms. We follow one task, 000006, through its four steps:
+The no-memory baseline, called \emph{No Memory}, is the unmodified WebGen-Bench pipeline~\cite{lu2025webgenbench}. It is used because it matches the setting reported in the benchmark paper, allowing the reproduced result to be compared with the published 28.4\% accuracy (28.5\% here, \Cref{sec:baseline-repro}), and because it leaves memory as the only difference between experimental arms. A single task, 000006, proceeds as follows:
 
 \noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
@@ -37,12 +37,12 @@ dark olive green.
 \end{minipage}
 
 \begin{enumerate}
-  \item \textbf{Prompt.} The requirement text above is the entire prompt; nothing else is added.
-  \item \textbf{Generation.} Bolt.diy, an open-source browser-based coding agent, opens a Vite + Vue + TypeScript starter project whose \texttt{package.json} declares only \texttt{vue}. The generator answers once; Bolt.diy writes every file in the reply into the project, installs the dependencies and starts the development server. There is no build check, no error feedback and no second attempt.
-  \item \textbf{Functional testing.} Each task has hidden test cases provided with the benchmark, on average six (647 in total); here, for example, ``Verify the display of real-time solar power generation data'', with an expected result. A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} receives one test case at a time, sees a screenshot in which every clickable element carries a numbered box, clicks or types, and after at most 15 steps answers YES (the expected result is met), PARTIAL (met in part) or NO. If the site does not start, every test case of the task is marked \emph{start failed}.
-  \item \textbf{Appearance grading.} A vision model receives a full-page screenshot of the landing page and the requirement and grades it from 1 to 5 on rendering, content relevance, layout harmony and modernness.
+  \item \textbf{Prompt.} The requirement above is the complete prompt. No additional text is supplied.
+  \item \textbf{Generation.} Bolt.diy, an open-source browser-based coding agent, opens a Vite + Vue + TypeScript starter project whose \texttt{package.json} declares only \texttt{vue}. The generator replies once. Bolt.diy writes the files in that reply, installs dependencies, and starts the development server. There is no build check, error feedback, or second attempt.
+  \item \textbf{Functional testing.} The benchmark provides hidden test cases, averaging roughly six per task (647 in total); for this task, for example, ``Verify the display of real-time solar power generation data'', with an expected result. A WebVoyager-style \gls{gui} agent~\cite{he2024webvoyager} receives one case at a time, sees a screenshot with numbered clickable elements, and may click or type for up to 15 steps. It then returns YES (the expected result is met), PARTIAL (met in part), or NO. If the site does not start, every test case is recorded as \emph{start failed}.
+  \item \textbf{Appearance grading.} A vision model receives a full-page landing-page screenshot and the requirement, then assigns a score from 1 to 5 for rendering, content relevance, layout harmony, and modernness.
 \end{enumerate}
-Both the tester and the grader are models acting as judges, which have known biases~\cite{zheng2023judge}; their raw transcripts are kept. Memory changes only step 1: it adds text after the requirement (\Cref{chap:method}); steps 2--4 are identical in every arm.
+The tester and grader are model-based judges and can introduce their own biases~\cite{zheng2023judge}, so their raw transcripts are retained. Memory affects only the prompt in step 1, where it adds text after the requirement (\Cref{chap:method}); generation and both evaluation stages remain unchanged across arms.
 
 \Cref{fig:walkthrough} shows what the tester saw for this task in two runs. Under No Memory the model imported the chart library \texttt{vue-chartjs}, which the template does not declare; Vite cannot resolve the import, the page shows only the error overlay, and all test cases fail. With the final memory the generator built the three requested views without the undeclared package, and all test cases passed.
 
@@ -61,7 +61,7 @@ Both the tester and the grader are models acting as judges, which have known bia
 \end{figure}
 
 \section{Models and Roles}
-All models are self-hosted on the university CS ML cluster (two NVIDIA H200 GPUs per job, served with vLLM~\cite{kwon2023vllm}). No commercial \gls{llm} service is called. \Cref{tab:roles} lists the roles.
+All models are self-hosted on the university CS ML cluster. Each job uses two NVIDIA H200 GPUs and serves models through vLLM~\cite{kwon2023vllm}. No commercial \gls{llm} service is used. \Cref{tab:roles} lists the model assigned to each role.
 
 \begin{table}[ht]
 \centering
@@ -82,21 +82,21 @@ Embeddings & bge-m3~\cite{chen2024bgem3} \\
 
 \paragraph{The generator.} WebGen-LM-7B, released with WebGen-Bench~\cite{lu2025webgenbench}, is Qwen2.5-Coder-7B-Instruct~\cite{hui2024qwencoder} fine-tuned on Bolt.diy trajectories for instructions decontaminated against the benchmark. It already knows the Bolt.diy output format, which makes it the natural small baseline: a model distilled for exactly this scaffold.
 
-The memory model is deliberately different from the evaluator, so that reflection cannot copy the evaluator's grading behaviour. vLLM applies the model repository's generation configuration by default; WebGen-LM-7B ships with a repetition penalty that Bolt.diy never sends, so we disable it for the generator to match the paper's setting.
+The memory model differs from the evaluator so that reflection cannot imitate the evaluator's grading behaviour. vLLM otherwise applies the generation configuration distributed with each model repository. WebGen-LM-7B includes a repetition penalty that Bolt.diy does not send, so it is disabled for the generator to reproduce the paper's setting.
 
 \section{Metrics}
 \label{sec:metrics}
-We use the benchmark's own metrics, so that the baseline can be compared directly with the published result. Over all test cases of an arm, \emph{Yes}, \emph{Partial}, \emph{No} and \emph{Start failed} are the percentages of the 647 cases with each outcome, and
+The benchmark metrics are retained so that the reproduced baseline can be compared directly with the published result. For each arm, \emph{Yes}, \emph{Partial}, \emph{No} and \emph{Start failed} are the percentages of the 647 cases with each outcome, and
 \begin{equation}
 \text{accuracy} = \text{Yes} + 0.5 \times \text{Partial},
 \end{equation}
-so a partially met case counts half and a site that never starts counts zero for all its cases. This is the official accuracy, pooled over test cases; for a single task the same formula gives its \emph{task accuracy} $(p + 0.5\,q)/n$ for $p$ passed and $q$ partial cases out of $n$. A \emph{zero-score} task is one where every case fails, usually because the page is blank. \emph{Appearance} is the mean 1--5 grade; in the main table tasks without a working site count as 0.
+so a partial result counts as 0.5, while a site that does not start contributes zero on every test case. This is the official accuracy, pooled over test cases. The same calculation gives \emph{task accuracy} $(p + 0.5\,q)/n$, where $p$ cases pass, $q$ are partial, and $n$ is the number of cases for that task. A \emph{zero-score} task fails every case, commonly because the page is blank. \emph{Appearance} is the mean 1--5 grade; in the main table, tasks without a working site receive 0.
 
-Because cases within a task share one website and fail together when it does not start, they are not independent, so we compare arms task by task: the mean per-task difference in task accuracy, with a 95\% percentile bootstrap \gls{ci} from resampling the 101 tasks~\cite{efron1993bootstrap}, and the numbers of tasks won, lost and tied. The interval reflects which tasks are in the benchmark, not the variation between repeated runs of a memory chain (about five points, \Cref{sec:fix}), so we say an interval ``excludes zero'' rather than calling a gain significant. Learning curves average task accuracy.
+Test cases within a task are not independent because they share one generated website and often fail together when it does not start. Arms are therefore compared task by task. The reported paired effect is the mean difference in task accuracy, with a 95\% percentile bootstrap \gls{ci} produced by resampling the 101 tasks~\cite{efron1993bootstrap}, alongside counts of wins, losses, and ties. This interval describes variation over the tasks in the benchmark rather than variation across repeated memory chains, which is approximately five points (\Cref{sec:fix}). The text therefore states whether an interval excludes zero rather than describing a result as statistically significant. Learning curves average task accuracy.
 
 \section{Experimental Design}
 \label{sec:design}
-We compare three memory designs, shown in \Cref{fig:families} and described in \Cref{chap:method}. \emph{Text memory} stores lessons written in natural language and attaches them to a requirement checklist. \emph{Code memory (whole-file)} keeps the checklist and adds a code pool of examples taken from the chain's own working websites; some of these examples are complete files. \emph{Code memory (fragments)}, the final method, shows only short verified fragments. We take it as the final method because it removed the scaffold failure under shuffled orders, not because it scores highest in every order: in the manifest order whole-file code memory scores higher (\Cref{sec:main}). The method was refined over several iterations; only these three designs were run on all 101 tasks, and only they are reported.\footnote{In the code repository these runs are labelled v4, v7 and v9.1.}
+Three memory designs are compared (\Cref{fig:families}; \Cref{chap:method}). \emph{Text memory} stores natural-language lessons and attaches them to a requirement checklist. \emph{Code memory (whole-file)} retains the checklist and supplements it with examples from the chain's own working websites, some of which are entire files. \emph{Code memory (fragments)}, the final method, presents only short verified fragments. It is treated as the final method because it removed the scaffold failure observed under shuffled orders, not because it scores highest in every order: whole-file code memory scores higher in manifest order (\Cref{sec:main}). The method was refined over several iterations, but only these three designs were run across all 101 tasks and are reported here.\footnote{In the code repository these runs are labelled v4, v7 and v9.1.}
 
 \begin{figure}[ht]
 \centering
@@ -116,7 +116,7 @@ We compare three memory designs, shown in \Cref{fig:families} and described in \
 \label{fig:families}
 \end{figure}
 
-\Cref{tab:design} lists every arm, the task orders in which it was run and the question it answers. All arms use WebGen-LM-7B with Bolt.diy under the official protocol, cover all 101 tasks and start from an empty memory; each arm is run once per order. The task orders are defined in \Cref{sec:order-design}.
+\Cref{tab:design} identifies each arm, the orders in which it was run, and its purpose. Every arm uses WebGen-LM-7B with Bolt.diy under the official protocol, covers all 101 tasks, and begins with empty memory. Each arm is run once for each order. The order definitions appear in \Cref{sec:order-design}.
 
 \begin{table}[ht]
 \centering
@@ -137,17 +137,17 @@ Code memory (fragments) & as above, but code examples are verified fragments onl
 \end{tabularx}
 \end{table}
 
-Memory never uses information from the current task itself (leave-one-task-out), and evaluation results are never fed back into the same task.
+Memory never accesses information from the current task (leave-one-task-out), and its evaluation outcome is never fed back into that task.
 
 \section{Reproducing the Baseline}
 \label{sec:baseline-repro}
-No Memory on all 101 tasks reaches 28.5\% accuracy (paper: 28.4\%) with a mean appearance score of 2.35 (paper: 2.5 with GPT-4o) and 30 zero-score tasks. The near-identical aggregate accuracy is evidence that the self-hosted pipeline approximately reproduces the published baseline; the appearance grader differs, and task-level agreement cannot be measured because the paper's per-task outputs are not available.
+Across all 101 tasks, No Memory achieves 28.5\% accuracy, compared with 28.4\% in the paper. Its mean appearance score is 2.35, versus 2.5 in the paper, which used GPT-4o for appearance grading, and it has 30 zero-score tasks. The close aggregate-accuracy match supports an approximate reproduction of the published self-hosted pipeline. The appearance graders differ, and task-level agreement cannot be assessed because the paper does not release per-task outputs.
 
 \section{Reproducibility and Constraints}
-Every run starts from an empty memory and stores its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts and scores; the key files of every run are archived in the project repository. The generator is decoded deterministically, so differences between arms come from the prompt rather than from sampling, although the \gls{gui} tester is not deterministic.
+Each run begins with empty memory. The project archive retains its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts, and scores. Generator decoding is deterministic, so prompt differences explain differences between arms, although the \gls{gui} tester itself is not deterministic.
 
-\paragraph{Hardware.} One long-running Slurm job on two NVIDIA H200 GPUs served all models with vLLM and was shared by all arms and orders; it used about \todo{update} H200 GPU-hours.
+\paragraph{Hardware.} One long-running Slurm job shared two NVIDIA H200 GPUs across all models and arms through vLLM. It used approximately \todo{update} H200 GPU-hours.
 
-\paragraph{Code and data availability.} The code, configuration files and the archived run records (prompts, injected memory, scores and memory databases of every run) are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \texttt{archive/phase2-webgen-2026-10/}.
+\paragraph{Code and data availability.} The code, configuration files, and archived run records, including prompts, injected memory, scores, and memory databases, are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \texttt{archive/phase2-webgen-2026-10/}.
 
-The main constraint is compute: a task takes about twelve minutes with memory and six without, so one 101-task run takes about a day. As in the original benchmark, each configuration is run once per order; comparisons are paired by task, and No Memory is repeated across orders to measure run-to-run variation.
+Compute is the main practical constraint. A memory task takes approximately 12 minutes, compared with roughly 6 minutes for No Memory, so a 101-task run lasts about a day. As in the original benchmark, each configuration is run once per order. Comparisons are paired by task, and No Memory is repeated across orders to estimate run-to-run variation.

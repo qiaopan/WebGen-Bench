@@ -4,7 +4,7 @@
 Each arm is a single run over all 101 tasks. \Crefrange{sec:main}{sec:ablation} use the manifest order; \Cref{sec:order-design} repeats the comparison in other orders. Accuracy pools all test cases (as in the official script); the learning curves average per-task accuracy, so their end points differ slightly.
 
 \section{Main Comparison}\label{sec:main}
-\Cref{tab:main} reports the main comparison in the format of the WebGen-Bench results table~\cite{lu2025webgenbench}, with the published WebGen-LM-7B result as the first row. Every arm uses the same generator, scaffold and evaluators; the treatment is the prompt supplied by the external memory pipeline, including the checklist and any cross-task content.
+\Cref{tab:main} reports the primary comparison in the format used by WebGen-Bench~\cite{lu2025webgenbench}. The published WebGen-LM-7B result appears first. Every arm uses the same generator, scaffold, and evaluators. The only treatment is the prompt assembled by the external memory pipeline, including the checklist and any cross-task content.
 
 \begin{table}[ht]
 \centering
@@ -31,12 +31,12 @@ Code memory (whole-file)\textsuperscript{b} & 34.5 & 11.1 & 53.2 & 1.2 & 40.0 & 
 \end{adjustbox}
 \end{table}
 
-The final method with fragments reaches 35.2\% against 28.5\% for No Memory (paired gain $+7.1$, [0.9, 13.1]; 44 wins, 28 losses, 29 ties) and reduces zero-score tasks from 30 to 20. Most of its gain comes from sites that work at all: 19 tasks score above zero only with memory and 9 only without; on the 62 tasks where both arms score above zero, the paired gain is $+2.6$ ([$-3.2$, 8.5]). No Memory varies by only 0.7 points across its three orders (\Cref{sec:order-design}); a memory chain varies more, because its memory diverges from the first task (\Cref{sec:fix}). For neither text memory nor the checklist alone does the interval exclude zero.
+The final fragment method reaches 35.2\%, compared with 28.5\% for No Memory. Its paired gain is $+7.1$ [0.9, 13.1], with 44 wins, 28 losses, and 29 ties, and it reduces zero-score tasks from 30 to 20. Much of this difference comes from sites that run at all: 19 tasks score above zero only with memory, while 9 do so only without it. Among the 62 tasks for which both arms score above zero, the paired gain is $+2.6$ [$-3.2$, 8.5]. No Memory varies by only 0.7 points across three orders (\Cref{sec:order-design}). A memory chain varies more because early outcomes change its later memory (\Cref{sec:fix}). The intervals for text memory and the checklist-only control both include zero.
 
-The intermediate whole-file design scored higher in this order (40.0\%, $+11.5$ [6.0, 16.9]; $-4.4$ [$-9.8$, 1.0] for the final method against it), but this advantage did not carry over to other orders (\Cref{sec:order-design}). Appearance in \Cref{tab:main} counts tasks without a working site as 0; on the 66 tasks where both No Memory and the final method produced a graded site, the means are 3.23 and 3.24.
+The intermediate whole-file design scores higher in manifest order (40.0\%, $+11.5$ [6.0, 16.9]). The final fragment method is $-4.4$ [$-9.8$, 1.0] against it in that order, but the advantage does not persist across task orders (\Cref{sec:order-design}). \Cref{tab:main} assigns an appearance score of zero to tasks without a working site. Restricting the comparison to the 66 tasks for which both No Memory and the final method produced a graded site gives means of 3.23 and 3.24, respectively.
 
 \section{Learning Curve}
-\Cref{fig:curve} plots cumulative and rolling accuracy in execution order. On the first 30 tasks text memory and the final method are both above No Memory (39.3\% and 35.0\%, versus 26.0\%). On the remaining 71 tasks text memory falls below No Memory (27.8\% vs 29.5\%, 19 zero-score tasks each), while the final method keeps its level (35.3\%, 14 zero-score tasks; whole-file code memory 40.4\%). On the last 35 tasks the final method scores 33.8\%, against 26.0\% for No Memory and 23.2\% for text memory.
+\Cref{fig:curve} shows cumulative and rolling accuracy in execution order. During the first 30 tasks, text memory and the final method both outperform No Memory: 39.3\% and 35.0\%, compared with 26.0\%. Over the remaining 71 tasks, text memory falls below No Memory (27.8\% versus 29.5\%, with 19 zero-score tasks in each arm). The final method remains at a similar level, reaching 35.3\% with 14 zero-score tasks; whole-file code memory reaches 40.4\%. In the final 35 tasks, the fragment method scores 33.8\%, compared with 26.0\% for No Memory and 23.2\% for text memory.
 
 \begin{figure}[ht]
 \centering
@@ -46,7 +46,7 @@ The intermediate whole-file design scored higher in this order (40.0\%, $+11.5$ 
 \end{figure}
 
 \section{Why Text Memory Declines and Code Memory Holds}
-\Cref{tab:prompt} counts what reached the generator's prompt, and \Cref{tab:codeerr} counts code problems in the generated sites, obtained by compiling every site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is counted as \emph{without a code construct} if it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import} or inline code. Such lessons and a ``General notes'' block remain frequent in text memory; in code memory they are rarer, and a fragment is injected in almost every task once the pool activates.
+\Cref{tab:prompt} records what entered the generator prompt, and \Cref{tab:codeerr} records code problems found by compiling each site with \texttt{@vue/compiler-sfc} 3.5.43. A lesson is classified as \emph{lacking a code construct} when it contains none of \texttt{@click}, \texttt{v-if}, \texttt{v-for}, \texttt{v-model}, \texttt{ref}, an \texttt{import}, or inline code. Such lessons, together with a ``General notes'' block, remain common in text memory. They are less frequent in code memory, where a fragment is injected for nearly every task after the pool activates.
 
 \begin{table}[ht]
 \centering
@@ -80,14 +80,13 @@ Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 6 / 5 / 10 (2
 \end{tabular}
 \end{table}
 
-These counts are correlational. Disentangling the contribution of each component requires the ablations in \Cref{sec:ablation}.
+The problem counts are correlational. The ablations in \Cref{sec:ablation} are needed to distinguish the contribution of individual components.
 
 \section{Error Analysis}
-Whole-site breaks fall from 26 tasks to 17 with the final method (8 with whole-file code memory), whereas missing Vue imports are as frequent as without memory (4.6\% of components in both arms); since the protocol forbids repair, we report this as a residual generator error.
+Whole-site breaks fall from 26 tasks with No Memory to 17 with the final method, and to 8 with whole-file code memory. Missing Vue imports, however, remain as frequent as they are without memory: 4.6\% of components in both arms. Because the protocol does not allow repair, this remains a residual generator error.
 
-The final method has 20 zero-score tasks, 11 of them also zero for No Memory. Nine import an undeclared package (\texttt{vue-router} in six; a chart, a chess and an editor library in the others), three hit a Vue compile error (\texttt{v-model} on a file input or a prop), three call a Vue function without importing it, and five render but fail every test case. Only one returned the starter project. Undeclared \texttt{vue-router} imports occur in seven tasks against three with whole-file code memory, although a fragment for this problem was injected in 88 tasks once it activated: in this order a fragment prevented the import less reliably than a complete file did, while in the shuffled orders the complete file caused scaffolds (\Cref{sec:order-design}).
+The final method has 20 zero-score tasks, 11 of which are also zero under No Memory. Nine import an undeclared package: six import \texttt{vue-router}, while the others import chart, chess, or editor libraries. Three encounter a Vue compile error involving \texttt{v-model} on a file input or prop, three call a Vue function without importing it, and five render but fail every functional test. Only one returns the starter project. \texttt{vue-router} is imported without declaration in seven tasks, compared with three under whole-file code memory, even though the relevant fragment is injected in 88 tasks after activation. In manifest order, the fragment prevents this import less reliably than a complete file; under shuffled orders, complete files instead cause scaffold outputs (\Cref{sec:order-design}).
 
-\paragraph{Appearance.} On the 68 tasks where both arms produced a graded site, the means are 3.25 (No Memory) and 3.22 (code memory); since memory changes which tasks enter this subset, this does not show that memory has no effect on appearance. \Cref{tab:main} instead averages all 101 tasks with failures as 0, and \Cref{tab:ablation} averages graded tasks.
 
 \section{Ablations: Checklist Only and Fixed Code Prefix}
 \label{sec:ablation}

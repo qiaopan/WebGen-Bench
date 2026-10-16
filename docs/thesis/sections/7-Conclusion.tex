@@ -2,16 +2,16 @@
 \label{chap:conclusion}
 
 \section{Answers to the Research Questions}
-\paragraph{\ref{rq1}} A qualified yes, for WebGen-LM-7B with Bolt.diy on WebGen-Bench. The final code memory raises accuracy from 28.5\% to 35.2\% (+7.1, CI excludes zero) and cuts zero-score tasks from 30 to 20, with gains of 7.4 and 5.5 points in two shuffled orders; most of the gain comes from sites that now render. \todo{Status: summarise all orders once seed 47 and interleaved finish.}
+\paragraph{\ref{rq1}} The answer is a qualified yes for WebGen-LM-7B with Bolt.diy on WebGen-Bench. The final code-memory method raises accuracy from 28.5\% to 35.2\% ($+7.1$, with a confidence interval excluding zero) and reduces zero-score tasks from 30 to 20. It also gains 7.4 and 5.5 points in two shuffled orders. Most of the gain comes from sites that render successfully. \todo{Status: summarise all orders once seed 47 and interleaved finish.}
 
-\paragraph{\ref{rq2}} The small generator followed short code fragments from its own earlier websites but rarely followed textual lessons; text memory fell behind No Memory late in the sequence (a cross-version, not controlled, comparison). The checklist alone added little (+3.4, interval includes zero). Fragments must be partial: a complete file was copied as a finished answer. \todo{Status: add the fixed-prefix result (queued after seed 47).}
+\paragraph{\ref{rq2}} The small generator follows short code fragments from its earlier websites more readily than textual lessons. Text memory falls below No Memory late in the sequence, although this is a cross-version rather than controlled comparison. The checklist-only control adds little ($+3.4$, with an interval including zero). Fragments also need to remain partial: complete files can be copied as finished answers. \todo{Status: add the fixed-prefix result (queued after seed 47).}
 
-\paragraph{\ref{rq3}} Code memory keeps its advantage over the sequence (35.3\% vs 29.5\% on tasks 31--101) while text memory declines, consistent with, but not proof of, learning from experience. Whole-file examples caused scaffolds when the order changed; with verified fragments the scaffolds disappeared and the gain was positive in both kinds of order, though robustness is not yet established. The whole-file design scored higher only in the original order (40.0\%). \todo{Seed 47 and interleaved order with the final method.}
+\paragraph{\ref{rq3}} Code memory maintains an advantage over the sequence (35.3\% versus 29.5\% on tasks 31--101), whereas text memory declines. This pattern is consistent with learning from experience but does not prove it. Whole-file examples cause scaffold outputs when order changes. Verified fragments remove those scaffolds, and their gain is positive for both order types tested so far, though robustness has not yet been established. Whole-file code memory scores higher only in the original order (40.0\%). \todo{Seed 47 and interleaved order with the final method.}
 
 \section{Future Work}
-Two further experiments would address the main remaining questions:
+Two experiments would address the most important remaining uncertainties.
 \begin{itemize}
-  \item \textbf{Held-out evaluation.} Because the method was developed while observing results on all 101 tasks, a clean test needs tasks that were never seen: a held-out domain, or a second website-generation benchmark, with the method frozen beforehand.
-  \item \textbf{Controlled form-of-memory comparison.} Keep retrieval, trigger and token budget fixed and vary only the form: textual rule, pseudocode, short fragment, complete file, plus random-code and length-matched text controls.
+  \item \textbf{Held-out evaluation.} Because the method was developed while observing results on all 101 tasks, a clean evaluation requires tasks that were not used in development. Suitable options include a held-out domain or a second website-generation benchmark, with the method frozen in advance.
+  \item \textbf{Controlled comparison of memory forms.} Retrieval, trigger conditions, and token budget should be fixed while varying only the representation: textual rule, pseudocode, short fragment, complete file, plus random-code and length-matched-text controls.
 \end{itemize}
-Further directions are repeating each order more than once, to separate order effects from run-to-run variation, and testing larger generators of the same family, with a text-memory arm, to see whether the preference for code depends on model size.
+Other priorities are repeated runs for each order, which would separate order effects from run-to-run variation, and testing larger generators from the same family with a text-memory arm to determine whether the preference for code depends on model size.
