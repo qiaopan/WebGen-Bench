@@ -133,7 +133,7 @@ In the seed-11 and seed-29 orders the two arms run as pairs on each task, altern
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired differences with 95\% bootstrap \gls{ci} over tasks, and zero-score tasks. Single run of each arm per order. \todo{Status (16 Oct): final method seed 47 at 91/101 and interleaved at 52/101; both Long Memory only from now on.}}
+\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired differences with 95\% bootstrap \gls{ci} over tasks, and zero-score tasks. Single run of each arm per order. \todo{Status (17 Oct 00:00): seed 47 at 94/101, interleaved at 57/101; final rows expected 17 Oct.}}
 \label{tab:order}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -206,7 +206,7 @@ With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (1
 
 
 
-\todo{Status (16 Oct): seed 47 at 91/101 (39.4\% so far), interleaved at 52/101 (38.9\% so far); expected complete about 17--18 Oct. Report whether the gain holds in all orders and whether the interleaved order is clearly worse.}
+\todo{Status (17 Oct 00:00): seed 47 at 94/101, interleaved at 57/101; both expected complete on 17 Oct. Report whether the gain holds in all orders and whether the interleaved order is clearly worse.}
 
 \paragraph{A positive case.} In the manifest order, task 000030 (13th) imported \texttt{vue-router}, which the template does not declare, and every test case failed. Static analysis recorded the undeclared import, and the code pool stored a page-switch fragment (a \texttt{ref}, navigation buttons and \texttt{v-if}, about 15 lines) taken from the 3rd task, a site that had scored 0.92 without a router. Its condition, a requirement with several pages to switch between, held for task 000059 (29th), a study-group site with four sections. Without memory the generator imported \texttt{vue-router} and the site did not start (0 of 5 test cases; checklist only also 0); with the fragment it switched sections with \texttt{ref} and \texttt{v-if} and scored 0.70.\footnote{No Memory code is taken from the seed-11 run; generation is deterministic, and both repeated No Memory runs import \texttt{vue-router} on the same 24 tasks.} The same fragment did not prevent the import in six of the 88 tasks that received it.
 
