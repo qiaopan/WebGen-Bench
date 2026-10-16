@@ -21,7 +21,7 @@ man=json.load(open("archive/phase2-webgen-2026-10/cluster_manifest_longmem_v9_1_
 acc=lambda s,ts:100*sum(s[t][0] for t in ts)/sum(s[t][1] for t in ts)
 def ci(d):
     random.seed(0); bs=sorted(sum(random.choice(d) for _ in d)/len(d) for _ in range(10000)); return 100*sum(d)/len(d),100*bs[250],100*bs[9750]
-fig,axs=plt.subplots(1,5,figsize=(20,3.8),sharey=True)
+fig,A=plt.subplots(2,3,figsize=(13,7.5),sharey=True); axs=list(A.flat)
 for ax,(name,nm,v7,v9,_) in zip(axs,O):
     N=sc(nm) if nm else dict(NMM); fill=0
     V9=sc(v9); V7=sc(v7) if v7 else {}
@@ -38,8 +38,9 @@ for ax,(name,nm,v7,v9,_) in zip(axs,O):
     x=range(1,len(ts)+1)
     if V7: ax.plot(x,roll([V7[t][0]/V7[t][1]-N[t][0]/N[t][1] for t in ts]),color="#eb6834",lw=1.8,label="v7 − No Memory")
     ax.plot(x,roll(d9),color="#2a78d6",lw=2.2,label="v9.1 − No Memory")
-    if not nm: ax.text(0.98,0.04,"NM: mean of 3 runs",transform=ax.transAxes,ha="right",fontsize=8,color="#666")
+    if not nm: ax.text(0.98,0.04,"NM: mean of 3 runs",transform=ax.transAxes,ha="right",fontsize=10,color="#666")
     ax.axhline(0,color="#999",lw=1); ax.set_title(f"{name} (n={len(ts)})",fontsize=11,loc="left")
     ax.set_xlabel("Task position"); ax.grid(axis="y",color="#e5e5e2"); ax.spines[["top","right"]].set_visible(False)
-axs[0].set_ylabel("Rolling-10 accuracy gap (points)"); axs[0].legend(frameon=False,fontsize=9,loc="lower left")
+for a in (axs[0],axs[3]): a.set_ylabel("Rolling-10 accuracy gap (points)")
+h,l=axs[0].get_legend_handles_labels(); axs[5].axis("off"); axs[5].legend(h,l,frameon=False,fontsize=12,loc="center")
 fig.tight_layout(); fig.savefig(sys.argv[1],dpi=180)
