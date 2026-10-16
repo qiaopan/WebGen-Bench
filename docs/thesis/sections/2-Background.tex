@@ -25,9 +25,9 @@ An agent-memory system must decide what to store after a task, how to maintain t
 
 \section{Small Models, Long Prompts and Instruction Following}
 \label{sec:bg-small}
-Adding information to a prompt has a cost. Models become less likely to satisfy all instructions as the number of instructions rises~\cite{harada2025curse,jaroslawicz2025ifscale}; information in the middle of a long context receives less attention than information near either end~\cite{liu2024lost}; irrelevant context can distract a model~\cite{shi2023distracted}; and longer inputs alone can reduce performance even when retrieval is accurate~\cite{du2025contextlength}. Models can be trained to prioritise instructions by source~\cite{wallace2024hierarchy}, which motivates keeping the user requirement above any memory content. Small models also benefit less consistently from long reasoning chains~\cite{li2025smallmodels}.
+Adding information to a prompt has a cost. As the number of instructions rises, models become less likely to satisfy all of them~\cite{harada2025curse,jaroslawicz2025ifscale}. Information in the middle of a long context is used less than information near either end~\cite{liu2024lost}. Irrelevant context distracts models~\cite{shi2023distracted}, and longer inputs alone can reduce performance even when retrieval is accurate~\cite{du2025contextlength}. Models can be trained to prioritise instructions by source~\cite{wallace2024hierarchy}, which motivates keeping the user requirement above any memory content. Small models also gain less consistently from long reasoning chains~\cite{li2025smallmodels}.
 
-Although these findings largely come from reasoning and question-answering settings, they imply a practical risk for memory systems: a growing store adds text to every prompt and may obscure the requirement or supply advice that the generator cannot convert into code.
+These findings come mostly from reasoning and question answering, not code generation. For a memory system the consequence is direct: each injected lesson is one more instruction placed after the requirement, so a growing store lengthens every prompt and can push the requirement towards the less-attended middle or add advice the generator cannot convert into code.
 
 \section{Self-Correction and Debugging}
 \label{sec:bg-selfcorr}
@@ -35,7 +35,7 @@ Reflection on failed attempts is related to Self-Refine~\cite{madaan2023selfrefi
 
 \section{Research Gap}
 \label{sec:gap}
-\Cref{tab:related} compares the closest studies along the dimensions relevant here. Three gaps follow. First, cross-task memory has almost exclusively been studied with large agents, leaving open whether a small generator benefits and what representation it can use. Second, the only cross-task WebGen-Bench study addresses maintainability with a strong backbone on single-topic suites and finds no clear functional-accuracy gain. Third, memory studies usually report a single task order even though the memory available for a task depends on earlier tasks.
+\Cref{tab:related} compares the closest studies along the dimensions relevant here. Cross-task memory has almost exclusively been studied with large agents, which leaves open whether a small generator benefits and which representation it can use. On WebGen-Bench itself, the only cross-task study addresses maintainability with a strong backbone on single-topic suites and finds no clear functional-accuracy gain. Memory studies also usually report a single task order, even though the memory available for a task depends on the tasks before it.
 
 This dissertation addresses these gaps by measuring memory effects on functional accuracy for a 7B generator while retaining the official single-attempt procedure within each task; by examining textual, checklist, and code-based memory across system versions, while recognising that these versions differ in more than representation; and by repeating comparisons under different task orders with task-paired confidence intervals.
 
