@@ -6,7 +6,7 @@
 \subsection{Website Generation with Language Models}
 \Gls{llm} agents can translate a natural-language requirement into a runnable website~\cite{lu2025webgenbench}. WebGen-Bench evaluates this capability end to end. It starts the generated project and uses a \gls{vlm} tester to check requested features through the interface~\cite{lu2025webgenbench,he2024webvoyager}. A website that appears plausible but does not support the required interactions therefore does not pass.
 
-The strongest benchmark results use large proprietary models. Smaller open models are attractive for a different set of reasons: they can run locally, cost less to operate, and do not require task data to be sent to a third party. WebGen-LM-7B, the 7-billion-parameter generator released with WebGen-Bench, was fine-tuned for this setting but reaches 28.4\% accuracy under the official protocol~\cite{lu2025webgenbench}. Improving such a model without retraining is therefore both practically useful and methodologically interesting.
+The strongest benchmark results use large proprietary models. Smaller open models are attractive for a different set of reasons: they can run locally, cost less to operate, and do not require task data to be sent to a third party. WebGen-LM-7B, the 7-billion-parameter generator released with WebGen-Bench, was fine-tuned for this setting but reaches 28.4\% accuracy under the official protocol~\cite{lu2025webgenbench}. Improving such a model without retraining is therefore a practical problem as well as a research question.
 
 \subsection{Every Task Is Solved in Isolation}
 WebGen-Bench, like most code-generation benchmarks, treats each task independently. The agent begins every task with the same weights and an empty context. If it produces a blank page because it imports a package that is not installed, the same failure can recur on the next task. In our baseline reproduction (\Cref{sec:nm-failures}), almost one third of the 101 tasks received zero. Many shared a small number of causes: an undeclared dependency, a missing import, or a template that did not compile.
@@ -30,7 +30,7 @@ This setting makes cross-task memory difficult to assess for two reasons. First,
     \item How does any benefit change as experience accumulates, and how sensitive is it to the order in which tasks are presented? \label{rq3}
 \end{questions}
 
-\ref{rq3} separates learning from experience from a fixed prompt change that would help equally at every point in a run. The fixed-prefix ablation (\Cref{sec:ablation}) tests this distinction.
+\ref{rq3} separates learning from experience from a fixed prompt change that would help equally at every point in a run. The fixed-prefix ablation (\Cref{sec:ablation}) is designed to test this distinction.
 
 \section{Scope}
 The study is intentionally narrow so that the comparisons remain interpretable.
@@ -45,7 +45,7 @@ The study is intentionally narrow so that the comparisons remain interpretable.
 \begin{enumerate}
     \item A fully self-hosted reproduction of the WebGen-Bench no-memory baseline for WebGen-LM-7B (28.5\% versus the reported 28.4\%), together with a failure analysis showing that many zero scores arise from blank pages caused by basic code errors (\Cref{chap:setup,sec:nm-failures}).
     \item A long-term memory pipeline for website generation consisting of a requirement checklist, a code pool containing fragments copied verbatim from the chain's own compiled websites, and memory-hygiene rules. Each component was introduced in response to an observed failure in an earlier version (\Cref{chap:method}).
-    \item Evidence that short code fragments reduce targeted failures for this small generator where textual lessons do not, together with an ablation that separates the checklist from stored cross-task content (\Cref{chap:results}).
+    \item Evidence that, in these runs, short code fragments reduced targeted failures for this small generator where textual lessons did not, together with an ablation that separates the checklist from stored cross-task content (\Cref{chap:results}).
     \item A task-order study using alternating paired runs. It shows that a memory entry can become harmful under a different ordering and that replacing whole-file examples with fragments removes that specific failure mode (\Cref{sec:order-design,sec:fix}).
 \end{enumerate}
 
