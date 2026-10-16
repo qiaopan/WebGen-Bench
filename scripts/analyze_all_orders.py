@@ -10,20 +10,20 @@ def sc(d):
         if fn: r[x["task_id"]]=(sum(c["outcome"]=="passed" for c in fn)+.5*sum(c["outcome"]=="partial" for c in fn),len(fn))
     return r
 NM1=sc("cluster_nomem_webgenlm7b_r1")
+NMs=[NM1,sc("cluster_order_blocks11_nomem"),sc("cluster_order_random29_nomem")]
+NMM={t:(sum(s[t][0] for s in NMs)/3,NM1[t][1]) for t in NM1}
 O=[("Manifest","cluster_nomem_webgenlm7b_r1","cluster_longmem_v7_webgenlm7b_r1","cluster_manifest_longmem_v9_1_webgenlm7b","manifest"),
 ("Seed 11 (blocks)","cluster_order_blocks11_nomem","cluster_order_blocks11_longmem_v7","cluster_order_blocks11_longmem_v9_1",None),
 ("Seed 29 (random)","cluster_order_random29_nomem","cluster_order_random29_longmem_v7","cluster_order_random29_longmem_v9_1",None),
-("Seed 47 (blocks)","cluster_order_blocks47_nomem",None,"cluster_order_blocks47_longmem_v9_1",None),
-("Interleaved","cluster_order_interleave_nomem",None,"cluster_order_interleave_longmem_v9_1",None)]
+("Seed 47 (blocks)",None,None,"cluster_order_blocks47_longmem_v9_1",None),
+("Interleaved",None,None,"cluster_order_interleave_longmem_v9_1",None)]
 man=json.load(open("archive/phase2-webgen-2026-10/cluster_manifest_longmem_v9_1_webgenlm7b/task-order.json"))["task_ids"] if os.path.exists("archive/phase2-webgen-2026-10/cluster_manifest_longmem_v9_1_webgenlm7b/task-order.json") else [json.loads(l)["task_id"] for l in open(P("cluster_longmem_v7_webgenlm7b_r1")+"/progress.jsonl")]
 acc=lambda s,ts:100*sum(s[t][0] for t in ts)/sum(s[t][1] for t in ts)
 def ci(d):
     random.seed(0); bs=sorted(sum(random.choice(d) for _ in d)/len(d) for _ in range(10000)); return 100*sum(d)/len(d),100*bs[250],100*bs[9750]
 fig,axs=plt.subplots(1,5,figsize=(20,3.8),sharey=True)
 for ax,(name,nm,v7,v9,_) in zip(axs,O):
-    N=sc(nm); fill=0
-    for t,v in NM1.items():
-        if t not in N: N[t]=v; fill+=1
+    N=sc(nm) if nm else dict(NMM); fill=0
     V9=sc(v9); V7=sc(v7) if v7 else {}
     order=json.load(open(P(v9)+"/task-order.json"))["task_ids"] if os.path.exists(P(v9)+"/task-order.json") else man
     ts=[t for t in order if t in V9]
@@ -38,6 +38,7 @@ for ax,(name,nm,v7,v9,_) in zip(axs,O):
     x=range(1,len(ts)+1)
     if V7: ax.plot(x,roll([V7[t][0]/V7[t][1]-N[t][0]/N[t][1] for t in ts]),color="#eb6834",lw=1.8,label="v7 − No Memory")
     ax.plot(x,roll(d9),color="#2a78d6",lw=2.2,label="v9.1 − No Memory")
+    if not nm: ax.text(0.98,0.04,"NM: mean of 3 runs",transform=ax.transAxes,ha="right",fontsize=8,color="#666")
     ax.axhline(0,color="#999",lw=1); ax.set_title(f"{name} (n={len(ts)})",fontsize=11,loc="left")
     ax.set_xlabel("Task position"); ax.grid(axis="y",color="#e5e5e2"); ax.spines[["top","right"]].set_visible(False)
 axs[0].set_ylabel("Rolling-10 accuracy gap (points)"); axs[0].legend(frameon=False,fontsize=9,loc="lower left")
