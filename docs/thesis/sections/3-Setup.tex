@@ -28,7 +28,8 @@ All 101 WebGen-Bench tasks are used. They cover 20 application domains, with two
 \label{sec:walkthrough}
 The no-memory baseline, called \emph{No Memory}, is the unmodified WebGen-Bench pipeline~\cite{lu2025webgenbench}. It is used because it matches the setting reported in the benchmark paper, allowing the reproduced result to be compared with the published 28.4\% accuracy (28.5\% here, \Cref{sec:baseline-repro}), and because it leaves memory as the only difference between experimental arms. A single task, 000006, proceeds as follows:
 
-\noindent\begin{minipage}{\linewidth}
+\medskip\noindent\begin{minipage}{\linewidth}
+\vspace{0.5\baselineskip}
 \begin{lstlisting}
 Please implement a solar dashboard to display real-time and historical solar
 data. [...] Configure the background color to honeydew, with components using
@@ -148,6 +149,6 @@ Each run begins with empty memory. The project archive retains its configuration
 
 \paragraph{Hardware.} One long-running Slurm job shared two NVIDIA H200 GPUs across all models and arms through vLLM. It used approximately \todo{update} H200 GPU-hours.
 
-\paragraph{Code and data availability.} The code, configuration files, and archived run records, including prompts, injected memory, scores, and memory databases, are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \texttt{archive/phase2-webgen-2026-10/}.
+\paragraph{Code and data availability.} The code, configuration files, and archived run records, including prompts, injected memory, scores, and memory databases, are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \path{archive/phase2-webgen-2026-10/}.
 
 Compute is the main practical constraint. A memory task takes approximately 12 minutes, compared with roughly 6 minutes for No Memory, so a 101-task run lasts about a day. As in the original benchmark, each configuration is run once per order. Comparisons are paired by task, and No Memory is repeated across orders to estimate run-to-run variation.
