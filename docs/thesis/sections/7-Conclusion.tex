@@ -13,5 +13,6 @@ Two experiments would address the most important remaining uncertainties.
 \begin{itemize}
   \item \textbf{Held-out evaluation.} Because the method was developed while observing results on all 101 tasks, a clean evaluation requires tasks that were not used in development. Suitable options include a held-out domain or a second website-generation benchmark, with the method frozen in advance.
   \item \textbf{Controlled comparison of memory forms.} Retrieval, trigger conditions, and token budget should be fixed while varying only the representation: textual rule, pseudocode, short fragment, complete file, plus random-code and length-matched-text controls.
+  \item \textbf{A second generator.} Repeating the comparison with a stronger generator, such as WebGen-LM-32B, under the same pipeline would show whether code fragments remain more useful than textual lessons when the generator follows text better.
 \end{itemize}
 Other priorities are repeated runs for each order, which would separate order effects from run-to-run variation, and testing larger generators from the same family with a text-memory arm to determine whether the preference for code depends on model size.

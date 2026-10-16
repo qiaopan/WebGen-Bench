@@ -149,7 +149,7 @@ Across all 101 tasks, No Memory achieves 28.5\% accuracy, compared with 28.4\% i
 \section{Reproducibility and Constraints}
 Each run begins with empty memory. The project archive retains its configuration file, task order, prompts, retrieved and injected memory, raw evaluator transcripts, and scores. Generator decoding is deterministic, so prompt differences explain differences between arms, although the \gls{gui} tester itself is not deterministic.
 
-\paragraph{Hardware.} One long-running Slurm job shared two NVIDIA H200 GPUs across all models and arms through vLLM. It used approximately \todo{update} H200 GPU-hours.
+\paragraph{Hardware.} One long-running Slurm job shared two NVIDIA H200 GPUs across all models and arms through vLLM. All arms share the same allocation: the generator and the 32B tester on one GPU, the 72B memory model and the embedding model on the other. Per task, No Memory takes about 6 minutes and Long Memory about 12 minutes of wall time (medians of 5.7 and 11.4 minutes between completed tasks in the manifest-order runs), the difference coming mainly from the memory model's checklist, selection and reflection calls.
 
 \paragraph{Code and data availability.} The code, configuration files, and archived run records, including prompts, injected memory, scores, and memory databases, are publicly available at \url{https://github.com/qiaopan/WebGen-Bench}; the run records are in \path{archive/phase2-webgen-2026-10/}.
 
