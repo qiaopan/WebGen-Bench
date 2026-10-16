@@ -1,0 +1,47 @@
+Please implement a web-based neighborhood mapping application for comparing data across different areas. The application should allow users to compare demographic, economic, and crime data across different areas. The application should also include data dashboards with interactive charts and customizable layouts. Use ivory for the background and forest green for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web-based neighborhood mapping application
+2. compare demographic, economic, and crime data across different areas
+   Note from earlier websites: For the side-by-side comparison: use v-for in DemographicData and CrimeData for selected areas.
+3. data dashboards with interactive charts
+   Note from earlier websites: For data display elements: include a forest green component in each using the v-for directive.
+4. customizable layouts
+5. ivory for the background and forest green for components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,48 @@
+Please implement a virtual study group website where users can create or join study groups, share resources, and collaborate on projects. The website should have functionalities for creating and joining groups, sharing resources, and collaborating on projects. Users should be able to join groups, download resources, and participate in project discussions. The website should also have a personal center where users can view their personal information. Configure all backgrounds with alice blue and all components with steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create or join study groups
+2. share resources
+3. collaborate on projects
+4. join groups
+5. download resources
+6. participate in project discussions
+7. personal center where users can view their personal information
+8. configure all backgrounds with alice blue and all components with steel blue
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,49 @@
+Please implement a website for the Global Institute of Information Security to display courses and provide online enrollment functionality. The website should have functionalities such as course catalog, chatbot integration, contact form, and certification pathways. Users should be able to browse courses, view course details, enroll online, and contact the institute. Style all pages with a lavender background and indigo components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. course catalog
+2. chatbot integration
+3. contact form
+4. certification pathways
+5. browse courses
+6. view course details
+7. enroll online
+8. contact the institute
+9. lavender background and indigo components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

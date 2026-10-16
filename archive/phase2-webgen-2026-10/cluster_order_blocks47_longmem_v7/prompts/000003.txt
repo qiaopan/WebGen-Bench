@@ -1,0 +1,21 @@
+Please implement a multi-company dashboard for managing and displaying financial data from multiple companies. The dashboard should be able to collect and display financial information from each company, provide consolidated reports, and support cross-company comparisons and reporting. Users should be able to browse financial data from each company, view consolidated reports, and perform financial management and reporting. Apply mint cream as the background; style all components with teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. multi-company dashboard for managing and displaying financial data from multiple companies
+   Note from earlier websites: For the dashboard: use mint cream as the background color for all components.
+2. collect and display financial information from each company
+3. provide consolidated reports
+4. support cross-company comparisons and reporting
+5. browse financial data from each company
+6. view consolidated reports
+7. perform financial management and reporting
+8. mint cream as the background; style all components with teal
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

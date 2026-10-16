@@ -1,0 +1,50 @@
+Please implement a health blog website for publishing health-related articles and promoting healthy lifestyles. The website should have functionalities for publishing articles, commenting, searching, and categorizing. Users should be able to browse and search articles, post comments, and follow specific topics. Choose misty rose for global background and firebrick for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. health blog website for publishing health-related articles and promoting healthy lifestyles
+2. functionalities for publishing articles
+3. commenting
+   Note from earlier websites: For the article comments: use @submit to update the state rendering comments under the article.
+4. searching
+5. categorizing
+6. users should be able to browse and search articles
+7. post comments
+8. follow specific topics
+9. misty rose for global background and firebrick for all components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
