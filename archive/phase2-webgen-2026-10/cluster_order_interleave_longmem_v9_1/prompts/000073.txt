@@ -1,0 +1,47 @@
+Please implement a link tree website for displaying and managing links. The website should have functionalities for adding, editing, and deleting links. Users should be able to create and manage their own link tree, including adding new links, editing existing links, deleting unnecessary links, and sharing their link tree with others through link tree's shareable link. Set overall background to papaya whip, then style components with dark orange.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a link tree website for displaying and managing links
+2. adding links
+   Note from earlier websites: For the link tree: implement 'add link' and 'edit link' buttons using v-if to toggle forms on click.
+3. editing existing links
+4. deleting unnecessary links
+5. users should be able to create and manage their own link tree
+6. adding new links
+7. editing existing links
+8. deleting unnecessary links
+9. sharing their link tree with others through link tree's shareable link
+10. set overall background to papaya whip, then style components with dark orange
+   Note from earlier websites: On every page: set the overall background to papaya whip and style components in dark orange.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

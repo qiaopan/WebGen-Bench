@@ -1,0 +1,32 @@
+Please implement a web-based neighborhood mapping application for comparing data across different areas. The application should allow users to compare demographic, economic, and crime data across different areas. The application should also include data dashboards with interactive charts and customizable layouts. Use ivory for the background and forest green for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web-based neighborhood mapping application for comparing data across different areas
+2. compare demographic, economic, and crime data across different areas
+3. data dashboards with interactive charts and customizable layouts
+   Note from earlier websites: For the data dashboards: use v-for to render interactive charts and customizable layouts.
+
+General notes from earlier websites:
+- On every page: set the background color to 'ivory' using global style rules.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

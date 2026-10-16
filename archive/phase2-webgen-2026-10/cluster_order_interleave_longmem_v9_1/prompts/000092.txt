@@ -1,0 +1,46 @@
+Please implement a skill sharing platform for showcasing personal skills and connecting with others. The platform should allow users to create profiles, add skills and certifications, and search for other users based on their qualifications. Users should be able to browse other users' profiles, view their skills and certifications, and contact them. The platform should also have a search feature that allows users to find other users based on their skills and certifications. Apply cornsilk for the layout background and peru for interactive elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create profiles
+2. add skills and certifications
+   Note from earlier websites: For the skill addition form: use @click on the add skill button to call 'addSkill'.
+3. search for other users based on their qualifications
+4. browse other users' profiles
+5. view their skills and certifications
+6. contact them
+   Note from earlier websites: For the contact button: update currentView state to 'contactForm' on click.
+7. search feature that allows users to find other users based on their skills and certifications
+8. cornsilk for the layout background and peru for interactive elements
+   Note from earlier websites: On every page: set layout background to cornsilk and peru for interactive elements.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 13 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,50 @@
+Please develop a construction management website for managing projects and documents. The website should have functionalities for document management, project scheduling, communication tools, estimating job costing, time tracking, and resource management. Users should be able to create and manage projects, schedule project timelines, communicate with team members, estimate project costs, track project progress, and manage resources. Assign light gray to the background and dark red to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. construction management website for managing projects and documents
+2. functionalities for document management
+   Note from earlier websites: For document management: use `v-for` and `@click` to display details on document entries.
+3. project scheduling
+4. communication tools
+5. estimating job costing
+6. time tracking
+7. resource management
+8. create and manage projects
+9. schedule project timelines
+10. communicate with team members
+11. estimate project costs
+12. track project progress
+13. manage resources
+14. light gray to the background and dark red to the UI elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 22 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

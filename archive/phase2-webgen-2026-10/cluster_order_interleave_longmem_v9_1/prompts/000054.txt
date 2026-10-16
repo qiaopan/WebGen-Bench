@@ -1,0 +1,51 @@
+Please implement a high-performance sports recruitment platform that connects athletes and sports organizations. The platform should have functionalities for athlete registration, job posting, job application, and message notification. Users should be able to log in, browse job listings, apply for jobs of interest, and receive relevant notifications. Sports organizations should be able to post jobs, and communicate with athletes. Set ghost white as the body background and use slate gray for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. high-performance sports recruitment platform
+2. athlete registration
+   Note from earlier websites: For athlete registration: use reliable form selectors and v-if for confirmation after submission.
+3. job posting
+4. job application
+5. message notification
+6. browse job listings
+7. apply for jobs of interest
+8. receive relevant notifications
+9. sports organizations should be able to post jobs
+10. communicate with athletes
+11. ghost white as the body background and use slate gray for the UI
+   Note from earlier websites: On every page: set body background to 'ghost white' and UI to slate gray for consistent appearance.
+
+General notes from earlier websites:
+- For the login form: implement a client-side @submit handler to update login state and show confirmation.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 22 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

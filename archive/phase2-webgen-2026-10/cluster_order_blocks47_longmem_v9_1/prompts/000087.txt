@@ -1,0 +1,55 @@
+Please implement an entertainment directory website to display band information and advertisements. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos. Additionally, the website should allow advertisers to register, log in, and upload their ad content. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements. Implement floral white for the page background and dark goldenrod for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an entertainment directory website to display band information and advertisements.
+2. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos.
+3. Additionally, the website should allow advertisers to register, log in, and upload their ad content.
+4. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements.
+5. Implement floral white for the page background and dark goldenrod for the elements.
+
+General notes from earlier websites:
+- For band registration: use v-if to conditionally show error messages for missing bio, picture, or audio links.
+- On every page: ensure floral white background and dark goldenrod elements for consistent theme.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 25 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

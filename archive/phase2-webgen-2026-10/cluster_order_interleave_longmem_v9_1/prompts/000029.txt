@@ -1,0 +1,50 @@
+Please implement a forum webpage with multiple features. The forum webpage should have functionalities for posting, replying, searching, and browsing by category. Users should be able to browse and search for posts, create new posts, reply to others' posts, and browse posts by category. The forum should also have a user center where users can view their own posts, reply records, and personal information. Choose ghost white for global background and slate gray for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. forum webpage
+2. posting
+3. replying
+4. searching
+   Note from earlier websites: For the SearchBar: use v-if to show posts matching the search term.
+5. browsing by category
+6. browse and search for posts
+7. create new posts
+8. reply to others' posts
+9. browse posts by category
+10. user center
+11. view their own posts
+12. reply records
+13. personal information
+14. ghost white for global background and slate gray for all components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 15 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,41 @@
+Please implement an agriculture-related website for displaying and managing agricultural information. The website should have functionalities for browsing agricultural news, viewing farm product information, and checking weather forecasts. Users should be able to browse agricultural-related news, view different types of farm product information, check local weather forecasts, and perform searches and filters. Apply theme using light cyan as background and cadet blue for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. browsing agricultural news
+   Note from earlier websites: For the NewsList component: use v-for to iterate over news array and display each article.
+2. viewing farm product information
+3. checking weather forecasts
+4. performing searches and filters
+5. applying theme using light cyan as background and cadet blue for elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

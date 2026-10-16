@@ -1,0 +1,43 @@
+Please implement a fishing contest website to manage and display fishing contest information. The website should have functionalities for posting contest announcements, displaying contest results, and showcasing contest photos. Users should be able to browse contest information, register for contests, and view contest results. Set primary background to mint cream and elements to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a fishing contest website to manage and display fishing contest information.
+2. The website should have functionalities for posting contest announcements, displaying contest results, and showcasing contest photos.
+3. Users should be able to browse contest information, register for contests, and view contest results.
+4. Set primary background to mint cream and elements to teal.
+
+General notes from earlier websites:
+- For the contest results: use `v-if` in 'ContestResults' to conditionally display results.
+- For contest registration: use `v-if` to show confirmation after form submission.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 10 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

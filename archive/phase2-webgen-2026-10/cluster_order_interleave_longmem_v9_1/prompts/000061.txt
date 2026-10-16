@@ -1,0 +1,45 @@
+Please develop a children's recycling game website to educate kids on proper waste recycling. The game should include competitive elements such as a leaderboard to keep kids engaged and motivated. The game should use a cartoon-style visual design to make it visually appealing to children. Kids should be able to play the game, receive feedback, learn how to correctly sort waste into the corresponding containers, and receive rewards and recognition through the game. Use seashell for container backgrounds and crimson for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. children's recycling game website
+2. competitive elements such as a leaderboard
+   Note from earlier websites: For the leaderboard: fetch sample data in LeaderboardPage before rendering to display ranked users.
+3. cartoon-style visual design
+4. play the game
+   Note from earlier websites: For the game: update reward state in Vue component with `v-if` when a goal is achieved.
+5. receive feedback
+6. learn how to correctly sort waste into the corresponding containers
+7. receive rewards and recognition through the game
+8. seashell for container backgrounds and crimson for component visuals
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 33 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

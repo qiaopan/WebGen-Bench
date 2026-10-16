@@ -1,0 +1,42 @@
+Please implement a website called "World of Imagination" to showcase and inspire users' imagination. The website should have functionalities for showcasing user-created content, sharing ideas, discussing, and interacting. Users should be able to browse others' creative works, share their own ideas via the share ideas form, participate in discussions, and interact with other users. Choose azure mist for the background; set all component colors to dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website called "World of Imagination" to showcase and inspire users' imagination.
+2. The website should have functionalities for showcasing user-created content, sharing ideas, discussing, and interacting.
+3. Users should be able to browse others' creative works, share their own ideas via the share ideas form, participate in discussions, and interact with other users.
+   Note from earlier websites: For the share ideas form: ensure @submit triggers content display after submission.
+
+General notes from earlier websites:
+- On every page: set background to 'azure mist' using global style rules.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 23 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

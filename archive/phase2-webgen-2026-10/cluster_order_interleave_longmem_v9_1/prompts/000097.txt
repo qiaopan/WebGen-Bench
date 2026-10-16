@@ -1,0 +1,34 @@
+Please implement a travel and camping website and web app for Europe, showcasing tourist attractions and campsites across the continent. The website should have functionalities for searching, booking, and reviewing. Users should be able to browse tourist attractions and campsites in different countries and cities, book attractions and campsites of interest, and review the attractions and campsites they have visited. Establish light pink as the main background and medium violet red for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. travel and camping website and web app for Europe
+2. showcasing tourist attractions and campsites across the continent
+3. functionalities for searching
+4. booking
+5. reviewing
+6. browse tourist attractions and campsites in different countries and cities
+7. book attractions and campsites of interest
+8. review the attractions and campsites they have visited
+9. light pink as the main background and medium violet red for the controls
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

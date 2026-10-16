@@ -1,0 +1,44 @@
+Please implement a virtual study group website where users can create or join study groups, share resources, and collaborate on projects. The website should have functionalities for creating and joining groups, sharing resources, and collaborating on projects. Users should be able to join groups, download resources, and participate in project discussions. The website should also have a personal center where users can view their personal information. Configure all backgrounds with alice blue and all components with steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create or join study groups
+2. share resources
+   Note from earlier websites: For the 'ShareResource.vue': show a confirmation message on successful form submission using ref.
+3. collaborate on projects
+4. join groups
+5. download resources
+6. participate in project discussions
+7. personal center where users can view their personal information
+8. configure all backgrounds with alice blue and all components with steel blue
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 26 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

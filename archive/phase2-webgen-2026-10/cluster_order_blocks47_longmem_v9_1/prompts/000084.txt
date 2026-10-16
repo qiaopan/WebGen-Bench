@@ -1,0 +1,57 @@
+Please implement a risk assessment website for conducting risk assessments and generating reports. The website should have functionalities for selecting risk assessment items, auto-populating data, generating charts, and creating reports. Users should be able to select risk assessment items, and the website will automatically fill in relevant data from a background database, generate charts, and create reports. The website should also have a subscription feature, allowing users to access the risk assessment tool. Define the background as alice blue and components as steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a risk assessment website for conducting risk assessments and generating reports
+2. functionalities for selecting risk assessment items
+3. auto-populating data
+4. generating charts
+5. creating reports
+6. users should be able to select risk assessment items
+7. website will automatically fill in relevant data from a background database
+8. generate charts
+9. create reports
+10. subscription feature, allowing users to access the risk assessment tool
+11. define the background as alice blue and components as steel blue
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 26 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,30 @@
+Please implement an email sending platform for sending emails. The platform should have functionalities for composing, sending, and managing emails. Users should be able to compose emails, select recipients, send emails, and manage sent emails. The platform should also have features such as email templates, attachment uploads, and recipient management. Use cornsilk for the background and peru for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an email sending platform for sending emails.
+2. The platform should have functionalities for composing, sending, and managing emails.
+3. Users should be able to compose emails, select recipients, send emails, and manage sent emails.
+4. The platform should also have features such as email templates, attachment uploads, and recipient management.
+5. Use cornsilk for the background and peru for components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

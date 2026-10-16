@@ -1,0 +1,39 @@
+Please implement an entertainment directory website to display band information and advertisements. The website should have band registration and login functionality, allowing band members to input their bio, provide picture links and audio sample links, and provide direct links to YouTube videos. Additionally, the website should allow advertisers to register, log in, and upload their ad content. Users should be able to browse band information, listen to audio samples, watch videos, and view advertisements. Implement floral white for the page background and dark goldenrod for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. entertainment directory website
+2. display band information
+3. display advertisements
+4. band registration and login functionality
+5. input their bio
+6. provide picture links
+7. provide audio sample links
+8. provide direct links to YouTube videos
+9. advertisers to register, log in, and upload their ad content
+10. browse band information
+11. listen to audio samples
+12. watch videos
+13. view advertisements
+14. floral white for the page background and dark goldenrod for the elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

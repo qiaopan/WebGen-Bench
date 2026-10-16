@@ -1,0 +1,41 @@
+Please implement a customer service call logging system to record and manage customer service calls. The system should have functionalities for client identification, call type selection, information recording, action step recording, follow-up step recording, and additional information recording. Users should be able to create new call logs, view open calls, view to-do calls, and generate call log reports. The system should also have a client creator wizard, client information modification functionality, and permission control. Set page background to light pink; color all components with medium violet red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer service call logging system
+2. client identification
+3. call type selection
+4. information recording
+   Note from earlier websites: For the call information recording: use a form submission handler with @submit to show confirmation.
+5. action step recording
+6. follow-up step recording
+7. additional information recording
+8. create new call logs
+9. view open calls
+10. view to-do calls
+11. generate call log reports
+12. client creator wizard
+13. client information modification functionality
+14. permission control
+15. page background to light pink; color all components with medium violet red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

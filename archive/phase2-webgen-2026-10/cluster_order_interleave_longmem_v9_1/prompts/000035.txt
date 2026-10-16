@@ -1,0 +1,35 @@
+Please implement a cryptocurrency escrow system for secure cryptocurrency transactions. Buyers should be able to browse and select sellers' cryptocurrency products, conduct transactions, and deposit cryptocurrencies into an escrow account. Sellers should be able to view and manage their products and transaction records. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities. Initialize the background color with light gray and component color with dark red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a cryptocurrency escrow system for secure cryptocurrency transactions.
+2. Buyers should be able to browse and select sellers' cryptocurrency products
+3. conduct transactions
+4. deposit cryptocurrencies into an escrow account
+   Note from earlier websites: For the deposit form: use @submit to handle form data and show a confirmation message.
+5. Sellers should be able to view and manage their products and transaction records
+6. The system should also have transaction confirmation
+7. cryptocurrency release
+8. dispute resolution functionalities
+9. Initialize the background color with light gray and component color with dark red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

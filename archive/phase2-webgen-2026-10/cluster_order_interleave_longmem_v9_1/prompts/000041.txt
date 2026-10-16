@@ -1,0 +1,45 @@
+Please implement an online trading website for bidding and trading. The website should have functionalities for bidding and trading, allowing users to browse trading opportunities, place orders, manage their trading accounts, and view their trading history. Set the background color to lemon chiffon and the component color to chocolate.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an online trading website for bidding and trading.
+2. The website should have functionalities for bidding and trading,
+3. allowing users to browse trading opportunities,
+4. place orders,
+5. manage their trading accounts,
+6. and view their trading history.
+7. Set the background color to lemon chiffon and the component color to chocolate.
+
+General notes from earlier websites:
+- For the TradingOpportunities.vue: use v-for to display trading opportunities from the list.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 34 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

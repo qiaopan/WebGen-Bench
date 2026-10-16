@@ -1,0 +1,33 @@
+Please implement a website that provides tool information for engineers. The website should have user registration and login functionality, and be able to display information about various tools, including tool name, description, function, price, etc. Users should be able to search and filter tools, view detailed tool information, and be able to comment and rate tools. Declare ivory as the global background color and forest green for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and login functionality
+   Note from earlier websites: On every page: ensure all forms have a handler showing confirmation after submission.
+2. display information about various tools, including tool name, description, function, price, etc.
+3. search and filter tools
+   Note from earlier websites: For the search bar: use v-if to show search results only after input, with distinct placeholder text.
+4. view detailed tool information
+5. comment and rate tools
+6. ivory as the global background color and forest green for all UI pieces
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

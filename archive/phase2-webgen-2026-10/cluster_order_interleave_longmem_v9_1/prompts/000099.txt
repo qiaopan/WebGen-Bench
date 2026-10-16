@@ -1,0 +1,48 @@
+Please implement a minimalistic bus and railway ticket booking platform where users can search and book bus and railway tickets, view real-time seat availability and prices, make secure payments, and receive booking confirmations via email or SMS. The platform should have user account management features, including user registration, login, booking history, and ticket printing options. Additionally, the platform should have a responsive design that adapts to both mobile and desktop devices. Configure all backgrounds with snow and all components with dim gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. search and book bus and railway tickets
+2. view real-time seat availability and prices
+3. make secure payments
+4. receive booking confirmations via email or SMS
+5. user account management features
+6. user registration
+7. login
+8. booking history
+9. ticket printing options
+10. responsive design that adapts to both mobile and desktop devices
+   Note from earlier websites: On every page: use media queries for responsive design to adapt to different screen sizes.
+11. configure all backgrounds with snow and all components with dim gray
+   Note from earlier websites: For the appearance: set background as snow and text in dim gray for contrast.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 19 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,38 @@
+Please implement a fitness tracking mini-program for users to record and manage their fitness activities. The mini-program should have functionalities such as a fitness leaderboard, exercise recording, fitness diary, and a fitness statistics homepage. Users should be able to browse and record their own exercises, view the leaderboard, write a fitness diary, and track their own fitness data. Apply white to the canvas background and navy to all visible components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a fitness tracking mini-program for users to record and manage their fitness activities.
+2. The mini-program should have functionalities such as a fitness leaderboard, exercise recording, fitness diary, and a fitness statistics homepage.
+3. Users should be able to browse and record their own exercises, view the leaderboard, write a fitness diary, and track their own fitness data.
+4. Apply white to the canvas background and navy to all visible components.
+
+General notes from earlier websites:
+- For the fitness leaderboard: ensure v-for renders each user's stats correctly.
+- On every page: apply white to canvas background, navy to all components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

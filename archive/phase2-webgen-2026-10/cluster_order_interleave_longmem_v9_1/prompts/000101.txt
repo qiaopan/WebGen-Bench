@@ -1,0 +1,43 @@
+Please implement a travel reimbursement and payment system for employee travel expenses. The system should have functionalities for booking tickets, hotels, and trains, generating settlements, submitting reimbursement applications, and more. Users should be able to book tickets, hotels, and trains, generate settlements report, submit reimbursement applications, and view reimbursement status. Use white for container backgrounds and navy for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. booking tickets, hotels, and trains
+   Note from earlier websites: For the booking form: Implement clickable buttons with clear labels and v-if for visual feedback.
+2. generating settlements
+3. submitting reimbursement applications
+4. viewing reimbursement status
+   Note from earlier websites: For ReimbursementStatus.vue: Implement lookup logic with v-if to find ID or show clear message.
+5. white for container backgrounds and navy for component visuals
+   Note from earlier websites: On every page: Use white for container backgrounds and navy for component visuals.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 31 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

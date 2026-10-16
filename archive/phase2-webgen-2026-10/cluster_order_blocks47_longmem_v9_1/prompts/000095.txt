@@ -1,0 +1,37 @@
+Please implement a website for downloading ringtones and wallpapers, providing services for downloading ringtones and wallpapers. The website should have the functionality to download ringtones and wallpapers, allowing users to browse and search for ringtones and wallpapers, select and download the desired content, navigate to the user profile to view the download history, add ringtones to the collection for future reference, and categorize the contents by selecting a category from the menu. The website should also have categorization and search functions to help users quickly find the ringtones and wallpapers they need. Style all pages with a light goldenrod background and olive drab components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for downloading ringtones and wallpapers, providing services for downloading ringtones and wallpapers.
+2. The website should have the functionality to download ringtones and wallpapers, allowing users to browse and search for ringtones and wallpapers, select and download the desired content,
+   Note from earlier websites: For the search functionality: Implement a submit handler in the SearchBar component using @submit.
+3. add ringtones to the collection for future reference,
+4. and categorize the contents by selecting a category from the menu.
+   Note from earlier websites: For the category menu: Ensure each category has content to avoid empty areas when filtering.
+5. Style all pages with a light goldenrod background and olive drab components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

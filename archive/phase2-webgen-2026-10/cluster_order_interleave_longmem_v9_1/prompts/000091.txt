@@ -1,0 +1,31 @@
+Please implement a smart matrimonial website for users to find partners. The website should have user registration and login functionality, allowing users to create profiles, including uploading photos and filling out personal information. The website should have advanced search and filtering options, enabling users to find suitable partners based on different criteria. The website should also have messaging and chat functionality, allowing users to communicate with each other. Design the site using lemon chiffon as the background and chocolate for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and login functionality
+2. create profiles, including uploading photos and filling out personal information
+   Note from earlier websites: For the profile creation: use `v-if` to show a confirmation after form submission.
+3. advanced search and filtering options
+4. messaging and chat functionality
+5. lemon chiffon as the background and chocolate for content blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

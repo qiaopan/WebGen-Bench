@@ -1,0 +1,38 @@
+Please develop a student portal website for registration and management of student information. The website should have user registration and profile management features, allowing students to input and manage personal details, qualifications, and career preferences. The website should also have an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests. Additionally, the website should streamline the application process with an intuitive interface, allowing students to easily apply for programs. Training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs. Establish azure as the main background and midnight blue for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and profile management features
+   Note from earlier websites: For the ProfileManagement component: implement @click handlers for all form fields and qualifications array updates.
+2. allowing students to input and manage personal details, qualifications, and career preferences
+3. an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests
+4. streamline the application process with an intuitive interface, allowing students to easily apply for programs
+5. training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs
+6. Establish azure as the main background and midnight blue for the controls
+   Note from earlier websites: For the global style: set the background color to 'azure' using global style rules.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

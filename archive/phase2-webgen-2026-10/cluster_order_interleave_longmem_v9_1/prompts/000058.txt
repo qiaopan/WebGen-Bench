@@ -1,0 +1,50 @@
+Please implement a web application for one-to-one coaching sessions to match coaches and users. The application should have functionalities such as personality assessment, user profiles, coaching and mentorship matching, scheduling and session management, and goal setting and progress tracking. Users should be able to complete a personality assessment, create and manage their profiles, search for and select suitable coaches, schedule coaching sessions, and set and track goals. Set the background to beige, and apply saddle brown to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a web application for one-to-one coaching sessions to match coaches and users.
+2. The application should have functionalities such as personality assessment
+   Note from earlier websites: For the personality assessment: implement a submit handler with @submit to handle form data and show confirmation.
+3. user profiles
+4. coaching and mentorship matching
+5. scheduling and session management
+   Note from earlier websites: For the session scheduling: implement a confirmation message in the form's submit handler after saving session details.
+6. goal setting and progress tracking
+7. Users should be able to complete a personality assessment
+8. create and manage their profiles
+9. search for and select suitable coaches
+10. schedule coaching sessions
+11. set and track goals
+12. Set the background to beige, and apply saddle brown to components
+   Note from earlier websites: On every page: implement modern design elements like gradients or rounded corners in saddle brown.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 15 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

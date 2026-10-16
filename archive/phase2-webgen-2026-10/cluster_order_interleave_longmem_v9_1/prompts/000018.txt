@@ -1,0 +1,42 @@
+Please implement a house cleaning service website that provides cleaning services. The website should have functionalities for booking services, service inquiry, and contact us. Users should be able to browse the website, understand the details of the cleaning services, book cleaning services, check service status, and contact customer service staff by phone number and email address. Set the background to azure mist, and apply dark slate blue to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a house cleaning service website that provides cleaning services.
+2. The website should have functionalities for booking services, service inquiry, and contact us.
+3. Users should be able to browse the website, understand the details of the cleaning services, book cleaning services, check service status, and contact customer service staff by phone number and email address.
+4. Set the background to azure mist, and apply dark slate blue to components.
+   Note from earlier websites: On every page: set the background color to 'azure mist' for all pages.
+5. booking services
+   Note from earlier websites: For the booking form: update a confirmation message state with `v-if` after form submission.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 24 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

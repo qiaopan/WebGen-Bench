@@ -1,0 +1,63 @@
+Please implement a customer service call logging system to record and manage customer service calls. The system should have functionalities for client identification, call type selection, information recording, action step recording, follow-up step recording, and additional information recording. Users should be able to create new call logs, view open calls, view to-do calls, and generate call log reports. The system should also have a client creator wizard, client information modification functionality, and permission control. Set page background to light pink; color all components with medium violet red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer service call logging system
+2. client identification
+3. call type selection
+4. information recording
+5. action step recording
+6. follow-up step recording
+7. additional information recording
+8. create new call logs
+9. view open calls
+10. view to-do calls
+11. generate call log reports
+12. client creator wizard
+13. client information modification functionality
+   Note from earlier websites: For the ClientModification: implement @click for each field to enable editing.
+14. permission control
+15. colours
+   Note from earlier websites: On every page: set background to light pink and components to medium violet red.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 24 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

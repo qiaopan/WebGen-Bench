@@ -1,0 +1,47 @@
+Please implement a web application for an insurance industry automation system to manage insurance business. The system should have functionalities for customer management, policy management, and claims management. Users should be able to browse customer information, policy information, and claims information, and perform corresponding operations. The system should also have data analysis and reporting capabilities, generating various reports and charts. Apply theme using whitesmoke as background and dark cyan for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. customer management
+   Note from earlier websites: For customer management: in 'CustomerManagement.vue', use v-if to show a message if the customer ID is not found.
+2. policy management
+3. claims management
+   Note from earlier websites: For claims management: in 'ClaimsManagement.vue', use v-if to show a message if the claim ID is not found.
+4. browse customer information
+5. browse policy information
+6. browse claims information
+7. perform corresponding operations
+8. data analysis and reporting capabilities
+9. generating various reports and charts
+10. whitesmoke as background and dark cyan for elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

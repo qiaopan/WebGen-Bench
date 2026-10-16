@@ -1,0 +1,45 @@
+Please implement a DMV practice test website to help users practice for their driver's license exam. The website should have features such as a practice question bank, simulated exams, and error analysis. Users should be able to select practice questions, take simulated exams, and view error analysis and exam scores. Set page background to floral white; color all components with dark goldenrod.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. DMV practice test website
+2. practice question bank
+   Note from earlier websites: For the practice question bank: call `displayNextQuestion` in `startExam` to show questions sequentially.
+3. simulated exams
+4. error analysis
+5. exam scores
+6. select practice questions
+7. take simulated exams
+8. view error analysis and exam scores
+9. set page background to floral white; color all components with dark goldenrod
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 34 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,57 @@
+Please implement a cryptocurrency escrow system for secure cryptocurrency transactions. Buyers should be able to browse and select sellers' cryptocurrency products, conduct transactions, and deposit cryptocurrencies into an escrow account. Sellers should be able to view and manage their products and transaction records. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities. Initialize the background color with light gray and component color with dark red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a cryptocurrency escrow system for secure cryptocurrency transactions.
+2. Buyers should be able to browse and select sellers' cryptocurrency products
+   Note from earlier websites: For the ProductList: set product titles as clickable v-if elements showing details.
+3. conduct transactions
+4. deposit cryptocurrencies into an escrow account
+5. Sellers should be able to view and manage their products and transaction records
+   Note from earlier websites: For the ProductManagement: use v-if for titles showing details and management.
+6. The system should also have transaction confirmation
+7. cryptocurrency release
+8. dispute resolution functionalities
+9. Initialize the background color with light gray and component color with dark red
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 27 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

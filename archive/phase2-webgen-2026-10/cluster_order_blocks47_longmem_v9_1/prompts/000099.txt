@@ -1,0 +1,47 @@
+Please implement a minimalistic bus and railway ticket booking platform where users can search and book bus and railway tickets, view real-time seat availability and prices, make secure payments, and receive booking confirmations via email or SMS. The platform should have user account management features, including user registration, login, booking history, and ticket printing options. Additionally, the platform should have a responsive design that adapts to both mobile and desktop devices. Configure all backgrounds with snow and all components with dim gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. search and book bus and railway tickets
+   Note from earlier websites: For the search function: in BookingDashboard, use v-if to show available tickets after a new search.
+2. view real-time seat availability and prices
+3. make secure payments
+4. receive booking confirmations via email or SMS
+   Note from earlier websites: For booking confirmation: in BookingConfirmation, use @click to trigger the confirmation message.
+5. user account management features
+6. user registration
+7. login
+8. booking history
+9. ticket printing options
+10. responsive design that adapts to both mobile and desktop devices
+   Note from earlier websites: On every page: implement media queries for responsive design adapting to all screen sizes.
+11. configure all backgrounds with snow and all components with dim gray
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 22 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

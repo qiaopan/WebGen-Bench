@@ -1,0 +1,35 @@
+Please implement a website that displays Canadian nutrition facts labels to help users understand food nutrition information. The website should have a product search function, where users can input food names or keywords (such as apple) to search for related nutrition information. The website should also have a nutrition analysis function, where users can input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value. Additionally, the website should provide a packaging design function, where users can design their own food packaging according to Canadian regulations. Define background as linen; define components with maroon.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website that displays Canadian nutrition facts labels to help users understand food nutrition information.
+2. The website should have a product search function, where users can input food names or keywords (such as apple) to search for related nutrition information.
+3. The website should also have a nutrition analysis function, where users can input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value.
+4. Additionally, the website should provide a packaging design function, where users can design their own food packaging according to Canadian regulations.
+5. Define background as linen; define components with maroon.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

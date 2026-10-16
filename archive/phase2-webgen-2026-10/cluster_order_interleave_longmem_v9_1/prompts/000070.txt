@@ -1,0 +1,35 @@
+Please implement a poetry blog website for displaying and sharing poetry content. The website should have functionalities for browsing poetry, searching poetry, posting poetry, and commenting on poetry. Users should be able to browse different types of poetry, search for specific poetry, post their own poetry, and comment on others' poetry. Apply light goldenrod for layout; use olive drab for buttons and cards.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a poetry blog website for displaying and sharing poetry content.
+2. The website should have functionalities for browsing poetry
+3. searching poetry
+4. posting poetry
+5. and commenting on poetry
+6. Users should be able to browse different types of poetry
+7. search for specific poetry
+8. post their own poetry
+9. and comment on others' poetry
+10. Apply light goldenrod for layout; use olive drab for buttons and cards
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

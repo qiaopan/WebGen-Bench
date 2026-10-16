@@ -1,0 +1,39 @@
+Please implement a website that provides tool information for engineers. The website should have user registration and login functionality, and be able to display information about various tools, including tool name, description, function, price, etc. Users should be able to search and filter tools, view detailed tool information, and be able to comment and rate tools. Declare ivory as the global background color and forest green for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and login functionality
+   Note from earlier websites: For the login form: Implement a submit handler checking email and password fields are not empty.
+2. display information about various tools, including tool name, description, function, price, etc.
+3. search and filter tools
+4. view detailed tool information
+   Note from earlier websites: For tool details: Use a `ref` state and `v-if` to load details, and implement a `comment` emit event.
+5. comment and rate tools
+   Note from earlier websites: On every page: Implement a confirmation message in the `submitRating` function for user feedback.
+6. declare ivory as the global background color and forest green for all UI pieces
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 16 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

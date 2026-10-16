@@ -1,0 +1,15 @@
+Please implement a community website for sharing promotions and discounts. The website should have functionalities for browsing promotions, sharing promotions, and searching promotions. Users should be able to browse and share promotions, and search for promotions of interest. The website should also have a management backend for managing users, promotions, and website settings. Use ivory for the outer layout and forest green for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. community website for sharing promotions and discounts
+2. functionalities for browsing promotions
+   Note from earlier websites: For the homepage: add a navigation link to `PromotionList` in `App.vue` for promotion display.
+3. sharing promotions
+4. searching promotions
+   Note from earlier websites: On every page: ensure search bar labels are clear and consistent for user input.
+5. users should be able to browse and share promotions
+6. search for promotions of interest
+7. management backend for managing users, promotions, and website settings
+8. ivory for the outer layout and forest green for UI blocks
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

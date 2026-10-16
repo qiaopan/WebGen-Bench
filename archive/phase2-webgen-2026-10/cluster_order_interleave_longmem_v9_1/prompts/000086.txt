@@ -1,0 +1,33 @@
+Please implement a medical journal website for publishing medical articles and information. The website should have a user-friendly interface and responsive design, making it easy for users to browse and find information. The website should include a search function, allowing users to quickly find relevant articles and information, open articals, and download artical PDFs. Users can manage account by updating profile information within the author's account. Configure the background color to seashell, with components using crimson.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user-friendly interface and responsive design
+   Note from earlier websites: On every page: apply media queries for flexible width properties to adapt layout dynamically.
+2. search function
+   Note from earlier websites: For the search bar: use v-if to show descriptive placeholder text, ensuring it's visually distinct.
+3. open articals
+4. download artical PDFs
+5. manage account by updating profile information within the author's account
+6. configure the background color to seashell, with components using crimson
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

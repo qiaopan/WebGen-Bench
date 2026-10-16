@@ -1,0 +1,48 @@
+Please create a software solutions website to provide information to prospective customers. The website should have content that introduces software solutions and staffing business, including product and service descriptions, industry news and trends, customer cases and success stories, etc. The website should be able to attract the attention of small to medium-sized businesses, and the content should be easy to understand and engaging. Users should be able to browse the website, search for relevant information or product descriptions, read articles and news, and contact the website owner for more information. Configure all backgrounds with misty rose and all components with firebrick.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. content that introduces software solutions and staffing business
+2. product and service descriptions
+3. industry news and trends
+4. customer cases and success stories
+5. attract the attention of small to medium-sized businesses
+6. content should be easy to understand and engaging
+7. Users should be able to browse the website
+8. search for relevant information or product descriptions
+   Note from earlier websites: For the SearchBar: implement a search handler with v-if to display relevant content.
+9. read articles and news
+10. contact the website owner for more information
+   Note from earlier websites: For the contact form: use @submit to show a confirmation after form submission.
+11. Configure all backgrounds with misty rose and all components with firebrick
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 28 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

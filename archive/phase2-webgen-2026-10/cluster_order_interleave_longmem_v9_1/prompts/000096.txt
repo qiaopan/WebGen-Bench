@@ -1,0 +1,22 @@
+Please implement an online travel booking website for booking train tickets, air tickets, and hotels. The website should have functionalities for searching, booking, payment, and order management. Users should be able to search and book train tickets, air tickets, and hotels, make online payments, and view order status. Use peach puff in the background layer and indian red for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online travel booking website for booking train tickets, air tickets, and hotels
+2. functionalities for searching, booking, payment, and order management
+3. search and book train tickets, air tickets, and hotels
+4. make online payments
+5. view order status
+6. peach puff in the background layer and indian red for the component layer
+   Note from earlier websites: For the background: set peach puff in the background layer.
+7. booking form
+   Note from earlier websites: For the booking form: use v-if to show a confirmation after train and hotel search form submissions.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

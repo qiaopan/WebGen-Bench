@@ -133,7 +133,7 @@ In the seed-11 and seed-29 orders the two arms run as pairs on each task, altern
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired differences with 95\% bootstrap \gls{ci} over tasks, and zero-score tasks. Single run of each arm per order. \todo{Status (17 Oct 00:00): seed 47 at 94/101, interleaved at 57/101; final rows expected 17 Oct.}}
+\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired differences with 95\% bootstrap \gls{ci} over tasks, and zero-score tasks. Single run of each arm per order.}
 \label{tab:order}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -146,28 +146,28 @@ Kind & Order & $n$ & NM & WF & F & WF $-$ NM & F $-$ NM & F $-$ WF & NM / WF / F
 \midrule
 Adjacent & Manifest\textsuperscript{a,\,$\dagger$WF} & 101 & 28.5 & \textbf{40.0} & 35.2 & $+11.5$ [6.0, 16.9] & $+7.1$ [0.9, 13.1] & $-4.4$ [$-9.7$, 1.1] & 30 / 13 / 20 \\
 Adjacent & Shuffled blocks (seed 11)\textsuperscript{$\dagger$F} & 101 & 27.9 & 33.1 & \textbf{35.4} & $+4.4$ [$-1.9$, 10.6] & $+7.4$ [1.6, 13.1] & $+3.0$ [$-3.0$, 9.0] & 29 / 21 / 16 \\
-Adjacent & Shuffled blocks (seed 47)\textsuperscript{b} & 92 & 27.9 & -- & \textbf{39.0} & -- & $+11.3$ [5.1, 17.5] & -- & 24 / -- / 9 \\
+Adjacent & Shuffled blocks (seed 47)\textsuperscript{b} & 101 & 28.3 & -- & \textbf{39.9} & -- & $+11.7$ [5.9, 17.3] & -- & 27 / -- / 9 \\
 Mixed & Random (seed 29) & 101 & 28.6 & 32.6 & \textbf{33.7} & $+4.5$ [$-2.2$, 11.3] & $+5.5$ [$-0.5$, 11.6] & $+1.0$ [$-5.0$, 7.0] & 29 / 21 / 18 \\
-Mixed & Interleaved\textsuperscript{b} & 55 & 30.9 & -- & \textbf{38.5} & -- & $+7.3$ [$-0.4$, 15.1] & -- & 13 / -- / 5 \\
+Mixed & Interleaved\textsuperscript{b} & 101 & 28.3 & -- & \textbf{36.6} & -- & $+7.9$ [1.3, 14.4] & -- & 27 / -- / 12 \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 
-\smallskip\parbox{\linewidth}{\footnotesize Bold: best memory arm in the order. $\dagger$WF / $\dagger$F: the order on which whole-file code memory / the final method was developed (development data for that arm).\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.\\ \textsuperscript{b} Long Memory only; NM is the per-task mean of the three complete No Memory runs (zero-score: tasks scoring 0 in all three). Interim: first 92 (seed 47) and 55 (interleaved) of 101 tasks.}
+\smallskip\parbox{\linewidth}{\footnotesize Bold: best memory arm in the order. $\dagger$WF / $\dagger$F: the order on which whole-file code memory / the final method was developed (development data for that arm).\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.\\ \textsuperscript{b} Long Memory only; NM is the per-task mean of the three complete No Memory runs, hence the same 28.3\% in both rows (zero-score: tasks scoring 0 in all three).}
 \end{table}
 
-Across all five orders the final method stays above No Memory (\Cref{fig:gap-all}): its pooled accuracy is 33.7--39.0\%, against 27.9--30.9\% for No Memory on the same tasks, and the paired interval excludes zero in three of them. Read by development data, the table separates the two memory designs: each is best on the order it was developed on (whole-file on the manifest, $+11.5$; the final method on seed 11, $+7.4$), but only the final method keeps a gain of $+5.5$ to $+11.3$ on the orders neither was tuned on, where whole-file code memory falls to about $+4.5$ and the final method is ahead of it by 1.0 to 3.0 points (intervals include zero). Whole-file code memory is ahead of the final method only in the manifest order.
+Across all five orders the final method stays above No Memory (\Cref{fig:gap-all}): its pooled accuracy is 33.7--39.9\%, against 27.9--28.6\% for No Memory on the same tasks, and the paired interval excludes zero in four of them (all but seed 29). Read by development data, the table separates the two memory designs: each is best on the order it was developed on (whole-file on the manifest, $+11.5$; the final method on seed 11, $+7.4$), but only the final method keeps a gain of $+5.5$ to $+11.7$ on the orders neither was tuned on, where whole-file code memory falls to about $+4.5$ and the final method is ahead of it by 1.0 to 3.0 points (intervals include zero). Whole-file code memory is ahead of the final method only in the manifest order.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/gap_all_orders.png}
-\caption{Rolling 10-task accuracy gap to No Memory in each order (positive: memory better). Blue: final method; orange: whole-file code memory (manifest, seed 11 and seed 29 only). Seed 47 and interleaved are interim (92 and 55 tasks) and are compared with the per-task mean of three No Memory runs. The orange dip after task 45 in seed 11 coincides with the scaffold outputs (\Cref{fig:scaffold}).}
+\caption{Rolling 10-task accuracy gap to No Memory in each order (positive: memory better). Blue: final method; orange: whole-file code memory (manifest, seed 11 and seed 29 only). Seed 47 and interleaved are compared with the per-task mean of three No Memory runs. The orange dip after task 45 in seed 11 coincides with the scaffold outputs (\Cref{fig:scaffold}).}
 \label{fig:gap-all}
 \end{figure}
 
 \paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
-In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The whole-file design was itself developed on the manifest order: each step from text memory to whole-file code memory followed an inspection of failures in that run. Its 40.0\% there is therefore likely optimistic, a development-set effect rather than a property of the order, since it falls by about 7 points in both shuffled orders while No Memory does not move. The final method, frozen before all its runs except seed 11, varies less (33.7--35.4\% in the three complete orders). The random and interleaved orders match the shuffled-blocks orders, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
+In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The whole-file design was itself developed on the manifest order: each step from text memory to whole-file code memory followed an inspection of failures in that run. Its 40.0\% there is therefore likely optimistic, a development-set effect rather than a property of the order, since it falls by about 7 points in both shuffled orders while No Memory does not move. The final method, frozen before all its runs except seed 11, does not depend on the order it was developed on (33.7--39.9\% across the five orders, against 32.6--40.0\% for whole-file code memory in the three orders where it was run). The random and interleaved orders match the shuffled-blocks orders, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
 
 Both runs lose much of their gain to one failure (\Cref{fig:gap-all,fig:scaffold}): Long Memory returned the unmodified scaffold on 19 (seed 11) and 16 (seed 29) tasks, all after a complete \texttt{App.vue} from another site began to be injected; No Memory never did.
 
@@ -202,11 +202,11 @@ const activeTab = ref('donation')
 \end{figure}
 
 
-With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:gap-all}). The gain is positive with domains adjacent and mixed (the mixed interval includes zero), so it does not rely on same-domain neighbours. Against whole-file code memory the final method is ahead by only 3.0 and 1.0 points, within run-to-run variation; the evidence for the fix is the removal of the scaffolds. Missing Vue imports remain (23 and 27 tasks, against 17 and 19): real pages give more opportunities for this slip.
+With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:gap-all}). The gain is positive with domains adjacent and mixed (of the two mixed orders, the seed-29 interval includes zero, while the interleaved interval, $+7.9$ [1.3, 14.4], excludes it), so it does not rely on same-domain neighbours. Against whole-file code memory the final method is ahead by only 3.0 and 1.0 points, within run-to-run variation; the evidence for the fix is the removal of the scaffolds. Missing Vue imports remain (23 and 27 tasks, against 17 and 19): real pages give more opportunities for this slip.
 
 
 
-\todo{Status (17 Oct 00:00): seed 47 at 94/101, interleaved at 57/101; both expected complete on 17 Oct. Report whether the gain holds in all orders and whether the interleaved order is clearly worse.}
+Over all five orders the gain over No Memory is positive, from $+5.5$ (seed 29) to $+11.7$ (seed 47), and its interval excludes zero in four of them. The interleaved order, in which consecutive tasks always come from different domains, is not clearly worse ($+7.9$ [1.3, 14.4]) than the adjacent orders, so the benefit does not depend on same-domain neighbours.
 
 \paragraph{A positive case.} In the manifest order, task 000030 (13th) imported \texttt{vue-router}, which the template does not declare, and every test case failed. Static analysis recorded the undeclared import, and the code pool stored a page-switch fragment (a \texttt{ref}, navigation buttons and \texttt{v-if}, about 15 lines) taken from the 3rd task, a site that had scored 0.92 without a router. Its condition, a requirement with several pages to switch between, held for task 000059 (29th), a study-group site with four sections. Without memory the generator imported \texttt{vue-router} and the site did not start (0 of 5 test cases; checklist only also 0); with the fragment it switched sections with \texttt{ref} and \texttt{v-if} and scored 0.70.\footnote{No Memory code is taken from the seed-11 run; generation is deterministic, and both repeated No Memory runs import \texttt{vue-router} on the same 24 tasks.} The same fragment did not prevent the import in six of the 88 tasks that received it.
 
