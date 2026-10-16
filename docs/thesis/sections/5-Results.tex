@@ -144,15 +144,24 @@ Kind & Order & NM & WF & F & F $-$ NM & Zero NM / WF / F \\
 \midrule
 Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & 35.2 & $+7.1$ [0.9, 13.1] & 30 / 13 / 20 \\
 Adjacent & Shuffled blocks (seed 11) & 27.9 & 33.1 & 35.4 & $+7.4$ [1.6, 13.1] & 29 / 21 / 16 \\
-Adjacent & Shuffled blocks (seed 47) & -- & -- & -- & -- & -- \\
+Adjacent & Shuffled blocks (seed 47)\textsuperscript{b} & 28.9 & -- & 39.0 & $+10.4$ [4.3, 16.6] & 25 / -- / 9 \\
 Mixed & Random (seed 29) & 28.6 & 32.6 & 33.7 & $+5.5$ [$-0.5$, 11.6] & 29 / 21 / 18 \\
-Mixed & Interleaved & -- & -- & -- & -- & -- \\
+Mixed & Interleaved\textsuperscript{c} & 31.8 & -- & 38.7 & $+6.8$ [$-1.1$, 14.7] & 13 / -- / 5 \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 
-\smallskip\parbox{\linewidth}{\footnotesize WF $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.}
+\smallskip\parbox{\linewidth}{\footnotesize WF $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.\\ \textsuperscript{b} Interim, first 92 of 101 tasks (16 Oct). \textsuperscript{c} Interim, first 54 of 101 tasks; No Memory was run for the first 14 only, the rest use the manifest No Memory score of the same task (generation is deterministic).}
 \end{table}
+
+Across all five orders the final method stays above No Memory (\Cref{fig:gap-all}): its pooled accuracy is 33.7--39.0\%, against 27.9--31.8\% for No Memory on the same tasks, and the paired interval excludes zero in three of them. Whole-file code memory is ahead of the final method only in the manifest order, on which it was developed.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/gap_all_orders.png}
+\caption{Rolling 10-task accuracy gap to No Memory in each order (positive: memory better). Blue: final method; orange: whole-file code memory (manifest, seed 11 and seed 29 only). Seed 47 and interleaved are interim (92 and 54 tasks).}
+\label{fig:gap-all}
+\end{figure}
 
 \paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
