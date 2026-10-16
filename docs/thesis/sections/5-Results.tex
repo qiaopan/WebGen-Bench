@@ -75,9 +75,9 @@ Problem & No Memory & Text & Code (fragments) \\
 Whole-site break\textsuperscript{a} & 11 / 5 / 10 (26) & 2 / 5 / 12 (19) & 4 / 4 / 9 (\textbf{17}) \\
 Missing Vue import on a page & 7 / 7 / 9 (23) & 14 / 10 / 7 (31) & 6 / 5 / 10 (21) \\
 \bottomrule
-\multicolumn{4}{l}{\footnotesize \textsuperscript{a} An undeclared package import or a Vue compile error. Final method: two sites without code facts are omitted;}\\
-\multicolumn{4}{l}{\footnotesize whole-file code memory had 8 breaks and 22 missing imports.}
 \end{tabular}
+
+\smallskip\parbox{\linewidth}{\footnotesize \textsuperscript{a} An undeclared package import or a Vue compile error. Final method: two sites without code facts are omitted; whole-file code memory had 8 breaks and 22 missing imports.}
 \end{table}
 
 The problem counts are correlational. The ablations in \Cref{sec:ablation} are needed to distinguish the contribution of individual components.
@@ -103,6 +103,8 @@ If the fixed-code control performs similarly to the final method, the contributi
 \centering
 \caption{Ablation over the 101 tasks in the manifest order (single runs). Accuracy is pooled over checks; appearance averages tasks with a grade.}
 \label{tab:ablation}
+\small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccc}
 \toprule
  & Acc.\ 1--30 & Acc.\ 31--101 & Acc.\ all & Zero-score & Appearance \\
@@ -134,6 +136,8 @@ In these orders the two arms run as pairs on each task, alternating which runs f
 \caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status: seed 47 running, interleaved queued.}}
 \label{tab:order}
 \small
+\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{llccccc}
 \toprule
 Kind & Order & NM & WF & F & F $-$ NM & Zero NM / WF / F \\
@@ -144,9 +148,10 @@ Adjacent & Shuffled blocks (seed 47) & -- & -- & -- & -- & -- \\
 Mixed & Random (seed 29) & 28.6 & 32.6 & 33.7 & $+5.5$ [$-0.5$, 11.6] & 29 / 21 / 18 \\
 Mixed & Interleaved & -- & -- & -- & -- & -- \\
 \bottomrule
-\multicolumn{7}{l}{\footnotesize WF $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].}\\
-\multicolumn{7}{l}{\footnotesize \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.}
 \end{tabular}
+\end{adjustbox}
+
+\smallskip\parbox{\linewidth}{\footnotesize WF $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.}
 \end{table}
 
 \paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
