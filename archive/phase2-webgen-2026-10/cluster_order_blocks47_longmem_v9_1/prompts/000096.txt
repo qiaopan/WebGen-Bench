@@ -1,0 +1,55 @@
+Please implement an online travel booking website for booking train tickets, air tickets, and hotels. The website should have functionalities for searching, booking, payment, and order management. Users should be able to search and book train tickets, air tickets, and hotels, make online payments, and view order status. Use peach puff in the background layer and indian red for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online travel booking website for booking train tickets, air tickets, and hotels
+2. functionalities for searching, booking, payment, and order management
+3. search and book train tickets, air tickets, and hotels
+4. make online payments
+5. view order status
+6. peach puff in the background layer and indian red for the component layer
+   Note from earlier websites: For the background: set layer to 'peach puff' and components to 'indian red'.
+7. search and book air tickets
+   Note from earlier websites: For the air ticket search: use addBooking in BookingDashboard to set status to 'confirmed'.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 23 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

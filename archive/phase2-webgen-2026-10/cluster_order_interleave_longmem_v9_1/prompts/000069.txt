@@ -1,0 +1,35 @@
+Please implement a health blog website for publishing health-related articles and promoting healthy lifestyles. The website should have functionalities for publishing articles, commenting, searching, and categorizing. Users should be able to browse and search articles, post comments, and follow specific topics. Choose misty rose for global background and firebrick for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. health blog website for publishing health-related articles and promoting healthy lifestyles
+2. functionalities for publishing articles
+3. commenting
+4. searching
+   Note from earlier websites: For the search handler: add a method in SearchBar to process queries and display results with `v-for`.
+5. categorizing
+6. users should be able to browse and search articles
+7. post comments
+8. follow specific topics
+9. misty rose for global background and firebrick for all components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

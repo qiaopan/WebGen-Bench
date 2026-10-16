@@ -1,0 +1,66 @@
+Please implement a hospital management website for managing hospital finances, reports, inventory, and patient information. The website should have financial management functionality, including collecting patient fees and managing hospital finances. The reporting functionality should include inventory reports, patient reports, and financial reports. Employees should be able to submit daily reports to superiors, including detailed information about daily activities. Pharmacy management should include inventory management of medicines. Patient electronic files should include patient name, date of visit, diagnosis, and comments. The website should also have claim formulation, laboratory management, and theater management. Configure the background color to peach puff, with components using indian red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. financial management functionality
+2. collecting patient fees
+3. managing hospital finances
+4. inventory reports
+5. patient reports
+6. financial reports
+7. daily reports
+   Note from earlier websites: For daily reports: implement a submit handler updating a confirmation state with `v-if`.
+8. pharmacy management
+9. inventory management of medicines
+10. patient electronic files
+11. patient name
+12. date of visit
+13. diagnosis
+14. comments
+15. claim formulation
+   Note from earlier websites: For claim formulation: make the form visible in the active claim section.
+16. laboratory management
+17. theater management
+18. colours
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 28 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

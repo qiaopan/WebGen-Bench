@@ -1,0 +1,36 @@
+Please implement a paper cup manufacturing system to manage inventory, production, and sales of paper cups. The system should have functionalities for managing raw materials, finished products, inventory, production, and sales. Users should be able to record and track the inventory, usage, and sales of raw materials and finished products, and generate detailed reports. The system should also have customer management capabilities, including recording customer information, sales history, and sales statistics. Assign light goldenrod to the background and olive drab to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. manage inventory, production, and sales of paper cups
+2. functionalities for managing raw materials, finished products, inventory, production, and sales
+3. record and track the inventory, usage, and sales of raw materials and finished products
+   Note from earlier websites: For form submission: Use `v-if` to show a confirmation after handling form data for inventory and sales records.
+4. generate detailed reports
+5. customer management capabilities, including recording customer information, sales history, and sales statistics
+   Note from earlier websites: For customer management: In 'SalesHistory.vue', search for customer ID and prompt registration if not found.
+6. assign light goldenrod to the background and olive drab to the UI elements
+
+General notes from earlier websites:
+- On every page: Ensure all forms have a confirmation message for successful submissions.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

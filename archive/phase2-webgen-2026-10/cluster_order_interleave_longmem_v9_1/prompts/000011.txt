@@ -1,0 +1,55 @@
+Please implement a text-based strategy browser game where players can choose a race, manage resources, upgrade, and battle. The game should have multiple pages, including the base page, ranking page, store, train page, workers page, upgrades page, bank page, messages page, and reports page. Players can choose from four races: Humans, Dragonborns, Elves, and Dwarfs, each with unique attributes. Players can manage resources, including gold, iron, wood, and wheat, and can upgrade their city, workers, and soldiers. Design the site using seashell as the background and crimson for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. text-based strategy browser game
+2. players can choose a race
+3. manage resources
+4. upgrade
+5. battle
+6. base page
+7. ranking page
+8. store
+9. train page
+10. workers page
+11. upgrades page
+12. bank page
+13. messages page
+14. reports page
+15. four races: Humans, Dragonborns, Elves, and Dwarfs
+16. unique attributes
+17. resources: gold, iron, wood, and wheat
+18. upgrade their city, workers, and soldiers
+   Note from earlier websites: For the soldier upgrade: use @submit to handle form data and show a confirmation message.
+19. seashell as the background and crimson for content blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 26 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

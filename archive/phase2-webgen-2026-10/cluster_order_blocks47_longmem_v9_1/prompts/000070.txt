@@ -1,0 +1,42 @@
+Please implement a poetry blog website for displaying and sharing poetry content. The website should have functionalities for browsing poetry, searching poetry, posting poetry, and commenting on poetry. Users should be able to browse different types of poetry, search for specific poetry, post their own poetry, and comment on others' poetry. Apply light goldenrod for layout; use olive drab for buttons and cards.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a poetry blog website for displaying and sharing poetry content.
+2. The website should have functionalities for browsing poetry
+3. searching poetry
+4. posting poetry
+5. and commenting on poetry
+6. Users should be able to browse different types of poetry
+7. search for specific poetry
+8. post their own poetry
+9. and comment on others' poetry
+10. Apply light goldenrod for layout; use olive drab for buttons and cards.
+11. searching poetry
+   Note from earlier websites: For the SearchBar: implement @submit to update searchQuery and trigger search on user input.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 6 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

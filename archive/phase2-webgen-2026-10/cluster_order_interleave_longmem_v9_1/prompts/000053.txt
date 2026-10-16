@@ -1,0 +1,41 @@
+Please implement an internship portal website that connects students with companies offering internship opportunities. The website should have a student panel and a company panel, where students can browse and apply for internships, and companies can post internship positions. The website should also be optimized for speed, navigation, user interface, and user experience. Choose mint cream for the background; set all component colors to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an internship portal website that connects students with companies offering internship opportunities.
+2. The website should have a student panel and a company panel
+3. where students can browse and apply for internships
+4. and companies can post internship positions
+5. The website should also be optimized for speed, navigation, user interface, and user experience
+6. Choose mint cream for the background; set all component colors to teal
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

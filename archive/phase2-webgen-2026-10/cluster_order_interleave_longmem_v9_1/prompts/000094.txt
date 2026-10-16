@@ -1,0 +1,35 @@
+Please implement an animal spotter website that recognizes wild animals and sends SMS alerts. The website should have the functionality to identify different types of wild animals, and assign different color codes to each animal. Users should be able to set alert conditions, and when a specific animal is detected, the system will automatically send an SMS alert. Users should be able to browse detection records, view animal information, and set personalized alerts. Set misty rose as the body background and use firebrick for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. recognizes wild animals and sends SMS alerts
+2. identify different types of wild animals
+3. assign different color codes to each animal
+4. set alert conditions
+   Note from earlier websites: For the alert settings: Implement a confirmation message in the submit handler using v-if.
+5. send an SMS alert when a specific animal is detected
+6. browse detection records
+7. view animal information
+8. set personalized alerts
+9. set misty rose as the body background and use firebrick for the UI
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

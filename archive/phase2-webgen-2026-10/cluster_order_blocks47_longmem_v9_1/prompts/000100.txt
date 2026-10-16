@@ -1,0 +1,59 @@
+Please implement a golf travel package booking website that sells golf travel packages. The website should have functionalities for customer request handling, booking confirmation, online quotes, customer relationship management, and supplier management. Users can initiate requests through the website homepage form submission, and the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions. Customers can confirm bookings online, and the system will generate digital vouchers and invoices. Assign whitesmoke to body backgrounds and dark cyan to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. golf travel package booking website that sells golf travel packages
+2. functionalities for customer request handling
+3. booking confirmation
+   Note from earlier websites: For the booking form: use v-if to show a confirmation after booking confirmation.
+4. online quotes
+5. customer relationship management
+6. supplier management
+   Note from earlier websites: For supplier management: update records and show confirmation with ref.
+7. Users can initiate requests through the website homepage form submission
+8. the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions
+9. Customers can confirm bookings online
+10. the system will generate digital vouchers and invoices
+11. Assign whitesmoke to body backgrounds and dark cyan to main components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 23 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

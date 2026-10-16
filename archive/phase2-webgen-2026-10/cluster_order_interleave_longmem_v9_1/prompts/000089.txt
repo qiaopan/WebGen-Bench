@@ -1,0 +1,51 @@
+Please implement a startup article publishing mini-program to display entrepreneurial experiences and stories. The mini-program should have functions for browsing articles, searching, collecting, and sharing. Users should be able to browse articles in different categories, search for articles of interest, collect favorite articles, and share articles on other platforms. The mini-program should also have user registration and login functions, allowing users to manage their collections and reading history. Style the layout with old lace in the background and rosy brown for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. startup article publishing mini-program
+2. display entrepreneurial experiences and stories
+3. functions for browsing articles
+4. searching
+5. collecting
+6. sharing
+7. browse articles in different categories
+   Note from earlier websites: For the article list: use v-model on category selection to update 'selectedCategory' ref.
+8. search for articles of interest
+9. collect favorite articles
+10. share articles on other platforms
+11. user registration and login functions
+   Note from earlier websites: For the login form: implement a client-side submit handler with v-if for confirmation on successful login.
+12. manage their collections and reading history
+13. old lace in the background and rosy brown for the interface
+   Note from earlier websites: On every page: ensure all interface elements display rosy brown color on page load.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 22 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

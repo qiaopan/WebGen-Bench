@@ -1,0 +1,25 @@
+Please implement a website for generating stock reports to provide stock information and analysis. The website should have the functionality to search and summarize stock information, and generate customized stock reports based on user requirements. Users should be able to input stock codes or names, select report formats and content, and the website will automatically generate the corresponding reports. The reports should include basic stock information, market trends, financial data, and more. Set the background color to white and the component color to navy.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for generating stock reports to provide stock information and analysis.
+2. The website should have the functionality to search and summarize stock information,
+   Note from earlier websites: For the stock search: ensure form submission works correctly to avoid content missing issues.
+3. and generate customized stock reports based on user requirements.
+4. Users should be able to input stock codes or names,
+5. select report formats and content,
+6. and the website will automatically generate the corresponding reports.
+7. The reports should include basic stock information, market trends, financial data, and more.
+8. Set the background color to white and the component color to navy.
+
+General notes from earlier websites:
+- On every page: provide clear navigation to prevent navigation issues.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

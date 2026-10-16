@@ -1,0 +1,39 @@
+Please implement a modern diagram maker website for creating and editing diagrams. The website should have functionalities for creating new diagrams, editing existing diagrams, adding and removing diagram elements, and adjusting layout and style. Users should be able to choose from different diagram types, such as flowcharts, organizational charts, and mind maps, and use a drag-and-drop interface to add and arrange diagram elements. Select ghost white for layout background and slate gray for component details.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a modern diagram maker website for creating and editing diagrams.
+2. The website should have functionalities for creating new diagrams.
+3. editing existing diagrams.
+4. adding and removing diagram elements,
+5. and adjusting layout and style.
+6. Users should be able to choose from different diagram types, such as flowcharts, organizational charts, and mind maps,
+7. and use a drag-and-drop interface to add and arrange diagram elements.
+8. Select ghost white for layout background and slate gray for component details.
+   Note from earlier websites: For the layout: set background to ghost white and details to slate gray.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 18 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

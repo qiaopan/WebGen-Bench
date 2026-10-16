@@ -1,0 +1,48 @@
+Please implement a golf travel package booking website that sells golf travel packages. The website should have functionalities for customer request handling, booking confirmation, online quotes, customer relationship management, and supplier management. Users can initiate requests through the website homepage form submission, and the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions. Customers can confirm bookings online, and the system will generate digital vouchers and invoices. Assign whitesmoke to body backgrounds and dark cyan to main components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. golf travel package booking website that sells golf travel packages
+2. functionalities for customer request handling
+3. booking confirmation
+4. online quotes
+5. customer relationship management
+6. supplier management
+7. Users can initiate requests through the website homepage form submission
+   Note from earlier websites: For the booking form: implement a form submission handler using @submit to show a confirmation message.
+8. the system will collect information based on customer preferences and dynamically apply hotel, flight, transport, and golf conditions
+9. Customers can confirm bookings online
+10. the system will generate digital vouchers and invoices
+11. Assign whitesmoke to body backgrounds and dark cyan to main components
+   Note from earlier websites: On every page: set the body background color to 'whitesmoke' in global style rules.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 28 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

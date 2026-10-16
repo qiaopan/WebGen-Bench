@@ -1,0 +1,37 @@
+Please implement a community website for sharing promotions and discounts. The website should have functionalities for browsing promotions, sharing promotions, and searching promotions. Users should be able to browse and share promotions, and search for promotions of interest. The website should also have a management backend for managing users, promotions, and website settings. Use ivory for the outer layout and forest green for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a community website for sharing promotions and discounts.
+2. The website should have functionalities for browsing promotions,
+3. sharing promotions,
+4. and searching promotions.
+5. Users should be able to browse and share promotions,
+6. and search for promotions of interest.
+7. The website should also have a management backend for managing users, promotions, and website settings.
+8. Use ivory for the outer layout and forest green for UI blocks.
+
+General notes from earlier websites:
+- For the search handler: add a method in SearchBar to process queries and display results with `v-for`.
+- On every page: set the background color to 'ivory' for a consistent global style.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,45 @@
+Please implement a web application for one-to-one coaching sessions to match coaches and users. The application should have functionalities such as personality assessment, user profiles, coaching and mentorship matching, scheduling and session management, and goal setting and progress tracking. Users should be able to complete a personality assessment, create and manage their profiles, search for and select suitable coaches, schedule coaching sessions, and set and track goals. Set the background to beige, and apply saddle brown to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a web application for one-to-one coaching sessions to match coaches and users.
+2. The application should have functionalities such as personality assessment
+   Note from earlier websites: For the personality assessment: update result state with `v-if` in the submit handler.
+3. user profiles
+4. coaching and mentorship matching
+5. scheduling and session management
+   Note from earlier websites: For session scheduling: trigger scheduleSession method on 'Schedule Session' button click.
+6. goal setting and progress tracking
+7. Users should be able to complete a personality assessment
+8. create and manage their profiles
+9. search for and select suitable coaches
+10. schedule coaching sessions
+11. set and track goals
+12. Set the background to beige, and apply saddle brown to components
+   Note from earlier websites: On every page: set background to beige and saddle brown for components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

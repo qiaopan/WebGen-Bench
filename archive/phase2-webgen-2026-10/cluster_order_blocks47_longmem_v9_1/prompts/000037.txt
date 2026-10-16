@@ -1,0 +1,55 @@
+Please implement an e-commerce integration feature that allows customers to customize shirts. Customers should be able to input information such as shirt model, fabric, and measurements. The system should be able to generate a corresponding shirt design based on the customer's input and allow them to preview and confirm the design. The system should also be able to handle orders and payments. Declare floral white as the global background color and dark goldenrod for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement an e-commerce integration feature
+2. customers to customize shirts
+   Note from earlier websites: For the shirt customization: use v-if to show the preview based on customer input.
+3. input information such as shirt model, fabric, and measurements
+4. generate a corresponding shirt design based on the customer's input
+5. preview and confirm the design
+6. handle orders and payments
+7. Declare floral white as the global background color and dark goldenrod for all UI pieces
+   Note from earlier websites: On every page: set floral white as background and dark goldenrod for UI pieces.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 27 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable.. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        placeholder="Search attractions..."
+        @input="emit('update-filters', { query: $event.target.value, country: props.selectedCountry, city: props.selectedCity })"
+      >
+      <select 
+        :value="props.selectedCountry" 
+        @change="emit('update-filters', { query: props.searchQuery, country: $event.target.value, city: props.selectedCity })"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

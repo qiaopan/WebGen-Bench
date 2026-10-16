@@ -1,0 +1,45 @@
+Please create a biography website to display a person's life and achievements. The website should have functionalities to display basic information, life experiences, achievements, and honors. Users should be able to browse biographies, view detailed information, and search for related content. The website should have a search function, allowing users to quickly find relevant information. Assign snow as the background color and apply dim gray to all elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. display basic information
+2. display life experiences
+3. display achievements
+4. display honors
+5. browse biographies
+6. view detailed information
+7. search for related content
+   Note from earlier websites: For the search function: Implement a search handler in the SearchBar component using @submit.
+8. search function
+9. snow as the background color and apply dim gray to all elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 18 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

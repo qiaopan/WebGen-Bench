@@ -1,0 +1,34 @@
+Please implement a computing task website for performing calculations. The website should have functionalities for inputting mathematical expressions, executing calculations, and displaying results. Users should be able to input mathematical expressions, select the calculation type (e.g., "Basic Arithmetic"), execute the calculation, and view the calculation results. Use mint cream as the screen background and teal for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a computing task website for performing calculations.
+2. The website should have functionalities for inputting mathematical expressions, executing calculations, and displaying results.
+3. Users should be able to input mathematical expressions, select the calculation type (e.g., "Basic Arithmetic"), execute the calculation, and view the calculation results.
+4. Use mint cream as the screen background and teal for component highlights.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 18 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

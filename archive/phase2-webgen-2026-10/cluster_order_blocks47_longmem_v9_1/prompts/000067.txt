@@ -1,0 +1,45 @@
+Please implement a family event portal website for publishing and storing obituaries, funeral arrangements, and multimedia memories. The website should have functionalities for obituary publishing, mortuary list, condolences, and statistics. Users should be able to publish and manage their own obituaries and funeral arrangements, view and leave messages on others' obituaries, and view statistical analysis. Use cornsilk for the outer layout and peru for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. family event portal website
+2. publishing and storing obituaries
+   Note from earlier websites: For the Obituary component: implement an edit method and button using ref for state.
+3. funeral arrangements
+4. multimedia memories
+5. functionalities for obituary publishing
+6. mortuary list
+7. condolences
+8. statistics
+   Note from earlier websites: For StatisticalAnalysis.vue: implement a method to calculate and display trends.
+9. Users should be able to publish and manage their own obituaries and funeral arrangements
+10. view and leave messages on others' obituaries
+   Note from earlier websites: On every page: ensure v-if displays confirmation messages for leaveMessage and FuneralArrangementsManagement.vue.
+11. view statistical analysis
+12. cornsilk for the outer layout and peru for UI blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

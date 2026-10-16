@@ -1,0 +1,42 @@
+Please implement a webpage to showcase team projects and skills, including team introduction, project showcase, skill showcase, and contact information. Users should be able to browse team information, view project cases, understand team skills, and contact the team through the contact information. Initialize the background color with whitesmoke and component color with dark cyan.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a webpage to showcase team projects and skills, including team introduction, project showcase, skill showcase, and contact information.
+2. Users should be able to browse team information, view project cases, understand team skills, and contact the team through the contact information.
+3. Initialize the background color with whitesmoke and component color with dark cyan.
+
+General notes from earlier websites:
+- For the project cases: use a `v-for` loop and `@click` for details.
+- For the team introduction: use a `v-for` loop and `@click` for details.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 28 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,40 @@
+Please implement a website called "World of Imagination" to showcase and inspire users' imagination. The website should have functionalities for showcasing user-created content, sharing ideas, discussing, and interacting. Users should be able to browse others' creative works, share their own ideas via the share ideas form, participate in discussions, and interact with other users. Choose azure mist for the background; set all component colors to dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. showcase user-created content
+2. share ideas
+3. discussing
+   Note from earlier websites: For the DiscussionSection.vue: add @click to the submit button to trigger 'comment' emit.
+4. interacting
+5. browse others' creative works
+6. share their own ideas via the share ideas form
+7. participate in discussions
+8. interact with other users
+9. choose azure mist for the background; set all component colors to dark slate blue
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

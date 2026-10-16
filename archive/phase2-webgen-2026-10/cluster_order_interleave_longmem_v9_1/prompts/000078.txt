@@ -1,0 +1,29 @@
+Please implement a computing task website for performing calculations. The website should have functionalities for inputting mathematical expressions, executing calculations, and displaying results. Users should be able to input mathematical expressions, select the calculation type (e.g., "Basic Arithmetic"), execute the calculation, and view the calculation results. Use mint cream as the screen background and teal for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a computing task website for performing calculations.
+2. The website should have functionalities for inputting mathematical expressions, executing calculations, and displaying results.
+3. Users should be able to input mathematical expressions, select the calculation type (e.g., "Basic Arithmetic"), execute the calculation, and view the calculation results.
+4. Use mint cream as the screen background and teal for component highlights.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

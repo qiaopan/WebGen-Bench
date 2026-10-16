@@ -1,0 +1,33 @@
+Please implement a website for a clinical office to display office information and services. The website should have basic pages, including a homepage, about us, services, and contact us. Users should be able to browse the website, learn about the office's information, view the services provided, and contact the office through the contact page. The website should also have a simple navigation menu to help users quickly find the information they need. Style all pages with a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a website for a clinical office to display office information and services.
+2. The website should have basic pages, including a homepage, about us, services, and contact us.
+3. Users should be able to browse the website, learn about the office's information, view the services provided, and contact the office through the contact page.
+4. The website should also have a simple navigation menu to help users quickly find the information they need.
+5. Style all pages with a light cyan background and cadet blue components.
+
+General notes from earlier websites:
+- For the navigation menu: implement a 'Home' menu item with @click to redirect to the homepage.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

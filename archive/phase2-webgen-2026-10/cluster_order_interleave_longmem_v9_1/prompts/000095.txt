@@ -1,0 +1,37 @@
+Please implement a website for downloading ringtones and wallpapers, providing services for downloading ringtones and wallpapers. The website should have the functionality to download ringtones and wallpapers, allowing users to browse and search for ringtones and wallpapers, select and download the desired content, navigate to the user profile to view the download history, add ringtones to the collection for future reference, and categorize the contents by selecting a category from the menu. The website should also have categorization and search functions to help users quickly find the ringtones and wallpapers they need. Style all pages with a light goldenrod background and olive drab components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a website for downloading ringtones and wallpapers
+2. provide services for downloading ringtones and wallpapers
+3. have the functionality to download ringtones and wallpapers
+   Note from earlier websites: For the download button: Implement a 'download' function in the component's script for the download button.
+4. allow users to browse and search for ringtones and wallpapers
+   Note from earlier websites: For the search function: Implement a search handler in the SearchBar component using v-if to display results.
+5. select and download the desired content
+6. navigate to the user profile to view the download history
+7. add ringtones to the collection for future reference
+8. categorize the contents by selecting a category from the menu
+9. have categorization and search functions to help users quickly find the ringtones and wallpapers they need
+10. style all pages with a light goldenrod background and olive drab components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

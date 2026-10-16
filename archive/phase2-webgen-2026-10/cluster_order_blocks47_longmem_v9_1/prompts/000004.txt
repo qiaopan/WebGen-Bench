@@ -1,0 +1,43 @@
+Please implement a sports analytics website that provides basketball betting data and analysis. The website should have functionalities for data visualization, match prediction, and betting recommendations. Users should be able to browse data for basketball, view match history, team rankings, player performance, and make informed betting decisions based on the analysis results. Define the background as ghost white and components as slate gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. sports analytics website
+2. provides basketball betting data and analysis
+3. data visualization
+   Note from earlier websites: For the data visualization: emit an event from the selection component and handle it in the parent to display the chart.
+4. match prediction
+5. betting recommendations
+6. browse data for basketball
+7. view match history
+8. team rankings
+9. player performance
+10. make informed betting decisions based on the analysis results
+11. background as ghost white and components as slate gray
+   Note from earlier websites: On every page: set background to 'ghost white' and components to 'slate gray' using global style rules.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

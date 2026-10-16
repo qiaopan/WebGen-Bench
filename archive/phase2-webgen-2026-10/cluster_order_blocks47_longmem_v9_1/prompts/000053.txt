@@ -1,0 +1,41 @@
+Please implement an internship portal website that connects students with companies offering internship opportunities. The website should have a student panel and a company panel, where students can browse and apply for internships, and companies can post internship positions. The website should also be optimized for speed, navigation, user interface, and user experience. Choose mint cream for the background; set all component colors to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. student panel
+2. company panel
+   Note from earlier websites: For the company panel: display it after login using the login component.
+3. students can browse and apply for internships
+   Note from earlier websites: For the internship application form: implement a submit handler with `v-if` for confirmation.
+4. companies can post internship positions
+5. optimized for speed
+6. optimized for navigation
+7. optimized for user interface
+8. optimized for user experience
+9. mint cream for the background; set all component colors to teal
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

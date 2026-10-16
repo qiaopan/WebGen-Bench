@@ -1,0 +1,34 @@
+Please implement a personal portfolio website to showcase design works. The website should have functionalities for showcasing works about the designer, and contact information. Users should be able to browse the designer's portfolio, learn about the designer's background and experience, and get in touch with the designer through contact information. Configure your theme with peach puff as background and indian red as component color.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a personal portfolio website to showcase design works.
+2. The website should have functionalities for showcasing works about the designer, and contact information.
+3. Users should be able to browse the designer's portfolio, learn about the designer's background and experience, and get in touch with the designer through contact information.
+4. Configure your theme with peach puff as background and indian red as component color.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

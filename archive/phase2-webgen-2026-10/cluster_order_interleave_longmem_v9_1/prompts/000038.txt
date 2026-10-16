@@ -1,0 +1,44 @@
+Please implement a short-term apartment rental website for showcasing and renting apartments. The website should have functionalities for searching, filtering, and booking apartments. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records. Use linen as the screen background and maroon for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short-term apartment rental website for showcasing and renting apartments.
+2. The website should have functionalities for searching, filtering, and booking apartments.
+   Note from earlier websites: For the filter options: use v-model on 'selectedFilter' ref to update displayed apartments.
+3. Users should be able to browse different types of apartments,
+4. search and filter apartments that meet their criteria,
+5. book selected apartments,
+6. and view booking records.
+7. Use linen as the screen background and maroon for component highlights.
+   Note from earlier websites: On every page: ensure all forms and inputs are clearly labeled and easily identifiable.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 25 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

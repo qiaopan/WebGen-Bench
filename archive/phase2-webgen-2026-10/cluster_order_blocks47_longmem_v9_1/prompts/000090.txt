@@ -1,0 +1,37 @@
+Please implement a social website for user registration, making friends, and sharing. The website should have a registration function, allowing users to create an account and log in. Users should be able to invite friends to join the website and vote on content. Users should be able to upload pictures and earn points. The website should have a personal homepage that displays user information and updates. Use light cyan as the default background and cadet blue for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. social website for user registration, making friends, and sharing
+2. registration function, allowing users to create an account and log in
+   Note from earlier websites: For the login form: Implement a submit handler using @submit to check email and password fields.
+3. invite friends to join the website and vote on content
+4. upload pictures and earn points
+5. personal homepage that displays user information and updates
+6. light cyan as the default background and cadet blue for component styling
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

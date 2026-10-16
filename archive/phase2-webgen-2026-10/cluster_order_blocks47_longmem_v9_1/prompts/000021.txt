@@ -1,0 +1,35 @@
+Please implement a website for The All-In Bourbon Bar to showcase its products and services. The website should have functionalities for displaying menus, introducing the membership-only private poker room, and showcasing events and promotions. Users should be able to browse the website, view menus, learn about the private poker room, view events and promotions, and make online reservations or purchases. Use peach puff for container backgrounds and indian red for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. displaying menus
+2. introducing the membership-only private poker room
+3. showcasing events and promotions
+4. make online reservations or purchases
+5. peach puff for container backgrounds and indian red for component visuals
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

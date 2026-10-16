@@ -1,0 +1,41 @@
+Please implement a travel and camping website and web app for Europe, showcasing tourist attractions and campsites across the continent. The website should have functionalities for searching, booking, and reviewing. Users should be able to browse tourist attractions and campsites in different countries and cities, book attractions and campsites of interest, and review the attractions and campsites they have visited. Establish light pink as the main background and medium violet red for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. travel and camping website and web app for Europe
+2. showcasing tourist attractions and campsites across the continent
+3. functionalities for searching, booking, and reviewing
+4. browse tourist attractions and campsites in different countries and cities
+5. book attractions and campsites of interest
+   Note from earlier websites: For the booking form: use addBooking in BookingDashboard to set status to 'confirmed' and show summary.
+6. review the attractions and campsites they have visited
+7. light pink as the main background and medium violet red for the controls
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 22 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalPrice = computed(() => {
+  const days = (new Date(endDate.value) - new Date(startDate.value)) / (1000 * 60 * 60 * 24)
+  return days * props.car.price
+})
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

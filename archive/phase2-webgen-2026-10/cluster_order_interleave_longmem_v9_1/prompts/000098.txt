@@ -1,0 +1,41 @@
+Please implement a comprehensive car rental platform for booking car rental services. The platform should have a user-friendly interface, allowing users to easily browse and book car rental services. Users should be able to browse different types of cars, select rental dates and times, book selected cars, and view booking records. The platform should support multiple payment methods and provide order management functionality. Set the background to papaya whip, and apply dark orange to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a comprehensive car rental platform for booking car rental services.
+2. The platform should have a user-friendly interface, allowing users to easily browse and book car rental services.
+3. Users should be able to browse different types of cars, select rental dates and times, book selected cars, and view booking records.
+   Note from earlier websites: For the booking form: implement the lookup logic in 'CarTypes.vue' using v-for to display car types.
+4. Set the background to papaya whip, and apply dark orange to components.
+   Note from earlier websites: For the appearance: set background to papaya whip and apply dark orange to components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,46 @@
+Please create a one-page website for promoting Fundraiser Day, including introduction to the event, fundraiser testimonials, offer information, and company information. The website should have functionalities such as an automatically moving carousel for displaying offers, a section for displaying fundraiser testimonials, and a section for displaying company information. Users should be able to browse the website to learn more about the Fundraiser Day event. Establish cornsilk as the main background and peru for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please create a one-page website for promoting Fundraiser Day
+2. including introduction to the event
+3. fundraiser testimonials
+4. offer information
+5. company information
+6. an automatically moving carousel for displaying offers
+7. a section for displaying fundraiser testimonials
+8. a section for displaying company information
+9. Users should be able to browse the website to learn more about the Fundraiser Day event
+10. Establish cornsilk as the main background and peru for the controls
+   Note from earlier websites: For the background: set cornsilk as the main color using CSS.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 14 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

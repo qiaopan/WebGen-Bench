@@ -1,0 +1,54 @@
+Please implement an e-government system for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. The system should have functionalities for office management, infrastructure management, procurement management, personnel management, financial management, and decision-making management. Users should be able to browse related information, submit applications, approve, query status, and perform related operations. The system should also include functions such as leave, middle-level cadres leaving Shenzhen, attendance, and "five powers" management, which can design and circulate corresponding forms and processes. Implement light pink for the page background and medium violet red for the elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. office management
+2. infrastructure management
+3. procurement management
+   Note from earlier websites: For the lookup logic: Use v-if in 'ProcurementManagement.vue' and 'StatusQuery.vue' to show a message if not found.
+4. personnel management
+5. financial management
+6. decision-making management
+7. browse related information
+8. submit applications
+   Note from earlier websites: For form submission: in 'five powers management' and middle-level cadres leaving Shenzhen, use @submit to handle data.
+9. approve
+10. query status
+11. perform related operations
+12. leave
+13. middle-level cadres leaving Shenzhen
+14. attendance
+15. "five powers" management
+16. design and circulate corresponding forms and processes
+17. light pink for the page background and medium violet red for the elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 21 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

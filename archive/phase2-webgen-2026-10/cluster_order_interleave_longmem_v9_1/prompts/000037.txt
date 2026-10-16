@@ -1,0 +1,42 @@
+Please implement an e-commerce integration feature that allows customers to customize shirts. Customers should be able to input information such as shirt model, fabric, and measurements. The system should be able to generate a corresponding shirt design based on the customer's input and allow them to preview and confirm the design. The system should also be able to handle orders and payments. Declare floral white as the global background color and dark goldenrod for all UI pieces.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement an e-commerce integration feature
+2. customers to customize shirts
+3. input information such as shirt model, fabric, and measurements
+4. generate a corresponding shirt design based on the customer's input
+5. preview and confirm the design
+6. handle orders and payments
+7. Declare floral white as the global background color and dark goldenrod for all UI pieces
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 15 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

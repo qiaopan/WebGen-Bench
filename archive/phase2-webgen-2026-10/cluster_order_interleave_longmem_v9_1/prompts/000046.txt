@@ -1,0 +1,56 @@
+Please implement a hospital management website for managing hospital finances, reports, inventory, and patient information. The website should have financial management functionality, including collecting patient fees and managing hospital finances. The reporting functionality should include inventory reports, patient reports, and financial reports. Employees should be able to submit daily reports to superiors, including detailed information about daily activities. Pharmacy management should include inventory management of medicines. Patient electronic files should include patient name, date of visit, diagnosis, and comments. The website should also have claim formulation, laboratory management, and theater management. Configure the background color to peach puff, with components using indian red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. financial management functionality
+2. collecting patient fees
+3. managing hospital finances
+4. inventory reports
+5. patient reports
+6. financial reports
+7. daily reports
+8. detailed information about daily activities
+9. inventory management of medicines
+   Note from earlier websites: For PharmacyManagement.vue: implement lookup logic with v-if for medicine ID.
+10. patient electronic files
+11. patient name
+12. date of visit
+13. diagnosis
+14. comments
+15. claim formulation
+   Note from earlier websites: For claim formulation: use @submit in form submission handler to show confirmation.
+16. laboratory management
+17. theater management
+18. colours
+   Note from earlier websites: On every page: set background color to peach puff for consistent design.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 12 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

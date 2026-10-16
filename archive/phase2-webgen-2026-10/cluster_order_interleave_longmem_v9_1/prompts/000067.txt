@@ -1,0 +1,50 @@
+Please implement a family event portal website for publishing and storing obituaries, funeral arrangements, and multimedia memories. The website should have functionalities for obituary publishing, mortuary list, condolences, and statistics. Users should be able to publish and manage their own obituaries and funeral arrangements, view and leave messages on others' obituaries, and view statistical analysis. Use cornsilk for the outer layout and peru for UI blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. family event portal website
+2. publishing and storing obituaries
+3. funeral arrangements
+4. multimedia memories
+5. obituary publishing
+6. mortuary list
+7. condolences
+8. statistics
+9. publish and manage their own obituaries and funeral arrangements
+10. view and leave messages on others' obituaries
+11. view statistical analysis
+12. cornsilk for the outer layout and peru for UI blocks
+
+General notes from earlier websites:
+- For the booking form: use @submit to call 'publishFuneralArrangement' and show confirmation.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 28 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

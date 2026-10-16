@@ -1,0 +1,41 @@
+Please implement a whistleblower secrets/awareness website to expose truths about business and society. The website should have an anonymous reporting feature, where users can submit their insights and evidence. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions. The website should have a search function, where users can search for specific topics and keywords. The website should also have a news and blog section, where the latest news and articles are published. Use a azure background and apply midnight blue to the UI components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a whistleblower secrets/awareness website to expose truths about business and society.
+2. The website should have an anonymous reporting feature, where users can submit their insights and evidence.
+3. The website should also have a discussion forum, where users can discuss and share their thoughts and opinions.
+4. The website should have a search function, where users can search for specific topics and keywords.
+5. The website should also have a news and blog section, where the latest news and articles are published.
+6. Use a azure background and apply midnight blue to the UI components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 32 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

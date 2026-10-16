@@ -1,0 +1,46 @@
+Please implement a consulting business website that provides leadership and business training services. The website should have an e-commerce component, allowing customers to purchase services directly from the site. The website should include features such as workshops, online classes, podcasts, and blogs. Users should be able to browse and purchase services, and interact with the website. Set all pages to have a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. consulting business website
+2. provides leadership and business training services
+3. e-commerce component
+4. customers to purchase services directly from the site
+5. workshops
+6. online classes
+7. podcasts
+8. blogs
+9. browse and purchase services
+10. interact with the website
+11. light cyan background and cadet blue components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 33 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

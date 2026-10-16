@@ -1,0 +1,36 @@
+Please implement a link tree website for displaying and managing links. The website should have functionalities for adding, editing, and deleting links. Users should be able to create and manage their own link tree, including adding new links, editing existing links, deleting unnecessary links, and sharing their link tree with others through link tree's shareable link. Set overall background to papaya whip, then style components with dark orange.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a link tree website for displaying and managing links.
+2. The website should have functionalities for adding, editing, and deleting links.
+3. Users should be able to create and manage their own link tree, including adding new links, editing existing links, deleting unnecessary links, and sharing their link tree with others through link tree's shareable link.
+4. Set overall background to papaya whip, then style components with dark orange.
+5. adding, editing, and deleting links
+   Note from earlier websites: For the new link form: implement a submit handler with `v-if` for a visible confirmation message.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

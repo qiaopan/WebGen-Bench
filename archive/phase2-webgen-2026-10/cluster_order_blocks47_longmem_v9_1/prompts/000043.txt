@@ -1,0 +1,39 @@
+Please implement a short message service platform for sending and managing short messages. The platform should have functionalities for sending short messages, managing user information, configuring policies, and monitoring short message sending situations. Users should be able to send short messages, view short message sending records, configure sending policies, and monitor short message sending situations. Apply azure mist as the background; style all components with dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. sending short messages
+   Note from earlier websites: For sending short messages: use v-if to show the send form only when user is logged in.
+2. managing user information
+3. configuring policies
+4. monitoring short message sending situations
+5. view short message sending records
+6. configure sending policies
+7. apply azure mist as the background; style all components with dark slate blue
+   Note from earlier websites: On every page: apply global style rules for 'azure mist' background and dark slate blue components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

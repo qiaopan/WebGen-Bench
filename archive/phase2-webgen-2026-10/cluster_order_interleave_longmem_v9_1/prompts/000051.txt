@@ -1,0 +1,39 @@
+Please implement a recruitment website for hiring drivers and posting job listings. The website should have functionalities for user registration, job posting, job application, and contact form. Users should be able to register and create profiles, apply for jobs, and manage their contact information. Clients should be able to view their active job postings. The website should include pages such as home, about us, clients, drivers, jobs, and contact. Design the site using white as the background and navy for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. recruitment website for hiring drivers and posting job listings
+2. functionalities for user registration
+   Note from earlier websites: On every page: ensure all forms have validation logic, especially for required fields.
+3. job posting
+   Note from earlier websites: For the ClientJobPostings.vue: use v-if to show a message if no job is found in the active job postings list.
+4. job application
+5. contact form
+6. users should be able to register and create profiles
+7. apply for jobs
+8. manage their contact information
+9. clients should be able to view their active job postings
+10. pages such as home, about us, clients, drivers, jobs, and contact
+11. white as the background and navy for content blocks
+   Note from earlier websites: For the content blocks: apply margin or padding to keep them visually distinct.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

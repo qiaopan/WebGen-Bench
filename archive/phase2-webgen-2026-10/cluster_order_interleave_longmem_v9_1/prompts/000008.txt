@@ -1,0 +1,37 @@
+Please implement an online trivia contest app for hosting knowledge competitions. The app should have functionalities for contest enrollment, question display, answer submission, scoring, and leaderboard. Users should be able to browse and enroll in contests, answer contest questions, submit answers, view their scores and rankings, and compare their performance with others on the leaderboard. Specify beige as the base color and saddle brown for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online trivia contest app
+2. contest enrollment
+3. question display
+4. answer submission
+5. scoring
+6. leaderboard
+7. browse and enroll in contests
+8. answer contest questions
+9. submit answers
+10. view their scores and rankings
+11. compare their performance with others on the leaderboard
+12. beige as the base color and saddle brown for all components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

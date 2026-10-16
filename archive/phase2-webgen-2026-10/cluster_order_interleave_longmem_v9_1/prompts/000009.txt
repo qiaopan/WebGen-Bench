@@ -1,0 +1,44 @@
+Please implement a chess web application where users can play chess online. The application should have functionalities for creating new games, joining existing games, moving pieces, undoing moves, and resigning. Users should be able to click buttons to choose from different board themes and difficulty levels, and view game history and statistics. Style the layout with alice blue in the background and steel blue for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a chess web application where users can play chess online.
+2. The application should have functionalities for creating new games
+3. joining existing games
+4. moving pieces
+5. undoing moves
+6. and resigning
+7. Users should be able to click buttons to choose from different board themes and difficulty levels
+8. and view game history and statistics
+9. Style the layout with alice blue in the background and steel blue for the interface
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 1 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,36 @@
+Please implement a short message service platform for sending and managing short messages. The platform should have functionalities for sending short messages, managing user information, configuring policies, and monitoring short message sending situations. Users should be able to send short messages, view short message sending records, configure sending policies, and monitor short message sending situations. Apply azure mist as the background; style all components with dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short message service platform for sending and managing short messages.
+2. The platform should have functionalities for sending short messages
+3. managing user information
+4. configuring policies
+   Note from earlier websites: For the policy settings: in 'submitPolicy', use @click to show a confirmation message.
+5. monitoring short message sending situations
+6. Users should be able to send short messages
+7. view short message sending records
+8. configure sending policies
+9. monitor short message sending situations
+10. Apply azure mist as the background; style all components with dark slate blue
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+
+const joined = ref(false)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,46 @@
+Please implement a baseball simulation website for simulating baseball games and managing baseball teams. The website should have functionalities for player statistics tracking, team management, and live game simulation. Users should be able to view detailed player statistics, manage team rosters and finances, simulate games, and view the results. Users should also be able to adjust team strategies and lineups based on their management decisions. Apply floral white for the layout background and dark goldenrod for interactive elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a baseball simulation website for simulating baseball games and managing baseball teams.
+2. The website should have functionalities for player statistics tracking
+3. team management
+   Note from earlier websites: For team management: use v-if to show a confirmation after submitRoster updates the roster successfully.
+4. and live game simulation
+5. Users should be able to view detailed player statistics
+6. manage team rosters and finances
+7. simulate games
+8. and view the results
+9. Users should also be able to adjust team strategies and lineups based on their management decisions
+10. Apply floral white for the layout background and dark goldenrod for interactive elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on prop. Earlier websites broke here (Vue compile error: v-model cannot be used on a prop, because local prop bindings are not writable., 2 tasks). Code that works:
+```vue
+<input 
+        :value="props.searchQuery" 
+        @input="$emit('update:searchQuery', $event.target.value)" 
+        placeholder="Search ringtones..."
+        class="search-input"
+      >
+```
+
+Component fails: ref() not imported. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 31 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const searchQuery = ref('')
+const filteredPosts = computed(() => {
+```
+
+Import error: missing package declaration. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('search')
+  <div class="app-container">
+    <header>
+      <h1>Stock Report Generator</h1>
+    <main>
+      <StockSearch v-if="activeTab === 'search'" />
+      <ReportGenerator v-if="activeTab === 'generate'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

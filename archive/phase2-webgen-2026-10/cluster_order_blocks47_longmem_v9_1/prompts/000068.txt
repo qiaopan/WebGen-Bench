@@ -1,0 +1,38 @@
+Please implement an environmental warning system website to display real-time weather and air quality data. The website should have a real-time update function, displaying the air quality index (AQI) for the past two weeks, and allowing users to compare pollution and air quality changes. Users should be able to browse current weather and air quality data, including temperature, humidity, and gas sensor data. Set primary background to azure mist and elements to dark slate blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an environmental warning system website to display real-time weather and air quality data.
+2. The website should have a real-time update function, displaying the air quality index (AQI) for the past two weeks, and allowing users to compare pollution and air quality changes.
+3. Users should be able to browse current weather and air quality data, including temperature, humidity, and gas sensor data.
+4. Set primary background to azure mist and elements to dark slate blue.
+
+General notes from earlier websites:
+- For the toggleComparison: implement toggleComparison function using v-if to show comparison tool correctly.
+- For the website: set primary background to azure mist and elements to dark slate blue, add dark slate blue icons.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

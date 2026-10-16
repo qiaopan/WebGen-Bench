@@ -1,0 +1,37 @@
+Please implement an online learning platform for data science that provides Python data science courses. The platform should have functionalities for browsing courses, learning courses, submitting assignments, and querying grades. Users should be able to browse and select Python data science courses of interest, learn course content, submit assignments, and query their own learning grades. Use honeydew in the background layer and dark olive green for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement an online learning platform for data science that provides Python data science courses.
+2. The platform should have functionalities for browsing courses, learning courses, submitting assignments, and querying grades.
+3. Users should be able to browse and select Python data science courses of interest, learn course content, submit assignments, and query their own learning grades.
+4. Use honeydew in the background layer and dark olive green for the component layer.
+
+General notes from earlier websites:
+- For the browsing courses: add a v-if to `CourseList` in `App.vue` for dynamic course display.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const activeTab = ref('promotions')
+  <div class="app-container">
+    <header>
+      <h1>Promotion Sharing Platform</h1>
+      <nav>
+        <button @click="activeTab = 'promotions'">Promotions</button>
+        <button @click="activeTab = 'search'">Search</button>
+        <button @click="activeTab = 'admin'">Admin</button>
+    <main>
+      <PromotionList v-if="activeTab === 'promotions'" />
+      <SearchBar v-if="activeTab === 'search'" />
+      <AdminDashboard v-if="activeTab === 'admin'" />
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 5 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const searchQuery = ref('')
+const searchResults = ref([])
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
