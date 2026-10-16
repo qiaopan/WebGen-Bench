@@ -161,15 +161,15 @@ Across all five orders the final method stays above No Memory (\Cref{fig:gap-all
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figures/gap_all_orders.png}
-\caption{Rolling 10-task accuracy gap to No Memory in each order (positive: memory better). Blue: final method; orange: whole-file code memory (manifest, seed 11 and seed 29 only). Seed 47 and interleaved are interim (92 and 55 tasks) and are compared with the per-task mean of three No Memory runs.}
+\caption{Rolling 10-task accuracy gap to No Memory in each order (positive: memory better). Blue: final method; orange: whole-file code memory (manifest, seed 11 and seed 29 only). Seed 47 and interleaved are interim (92 and 55 tasks) and are compared with the per-task mean of three No Memory runs. The orange dip after task 45 in seed 11 coincides with the scaffold outputs (\Cref{fig:scaffold}).}
 \label{fig:gap-all}
 \end{figure}
 
 \paragraph{Development and validation.} Seed 11 was used to develop the fragment fix (\Cref{sec:fix}) and is therefore development data for the final method. Its manifest, seed-29, seed-47 and interleaved runs started after it was frozen. All orders use the same 101 tasks, on which the method was developed, so this is a within-benchmark study with cross-order validation, not a held-out evaluation (\Cref{sec:threats}).
 
-No Memory stays at 27.9--28.6\% in every complete order, so differences between orders are on the memory side. The whole-file design was itself developed on the manifest order: each step from text memory to whole-file code memory followed an inspection of failures in that run. Its 40.0\% there is therefore likely optimistic, a development-set effect rather than a property of the order, since it falls by about 7 points in both shuffled orders. The random and interleaved orders give gains similar to the shuffled-blocks orders, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
+In both shuffled orders whole-file code memory leads by about 4.5 points, but neither interval excludes zero (\Cref{tab:order}); No Memory stays at 27.9--28.6\%, so the change is on the memory side. The whole-file design was itself developed on the manifest order: each step from text memory to whole-file code memory followed an inspection of failures in that run. Its 40.0\% there is therefore likely optimistic, a development-set effect rather than a property of the order, since it falls by about 7 points in both shuffled orders while No Memory does not move. The final method, frozen before all its runs except seed 11, varies less (33.7--35.4\% in the three complete orders). The random and interleaved orders match the shuffled-blocks orders, so the gain does not require adjacent same-domain tasks, although these runs do not measure how much adjacency contributes.
 
-Both runs lose much of their gain to one failure (\Cref{fig:order-gap,fig:scaffold}): Long Memory returned the unmodified scaffold on 19 (seed 11) and 16 (seed 29) tasks, all after a complete \texttt{App.vue} from another site began to be injected; No Memory never did.
+Both runs lose much of their gain to one failure (\Cref{fig:gap-all,fig:scaffold}): Long Memory returned the unmodified scaffold on 19 (seed 11) and 16 (seed 29) tasks, all after a complete \texttt{App.vue} from another site began to be injected; No Memory never did.
 
 \begin{figure}[ht]
 \centering
@@ -201,14 +201,8 @@ const activeTab = ref('donation')
 \label{fig:scaffold}
 \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\textwidth]{figures/order_gaps.png}
-\caption{Rolling 10-task mean of the accuracy gap to No Memory in the same order (positive: memory better). Orange: whole-file code memory; blue: final method. The orange dip after task 45 in seed 11 coincides with the scaffold outputs.}
-\label{fig:order-gap}
-\end{figure}
 
-With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0), and zero-score tasks fell from 29 to 16 and 18 (\Cref{tab:order,fig:order-gap}). The final method's lead over whole-file code memory in these orders is within run-to-run variation; the evidence for the fix is the removal of the scaffolds. Missing Vue imports remain (23 and 27 tasks, against 17 and 19): real pages give more opportunities for this slip.
+With the failure fixed (\Cref{sec:fix}), no scaffold occurred in either order (19 $\to$ 0 and 16 $\to$ 0) and the gain over No Memory rose to 7.4 points in seed 11 (95\% \gls{ci} [1.6, 13.1]) and 5.5 points in seed 29 ([$-0.5$, 11.6]), with zero-score tasks reduced from 29 to 16 and 18 (\Cref{tab:order,fig:gap-all}). The gain is positive with domains adjacent and mixed (the mixed interval includes zero), so it does not rely on same-domain neighbours. Against whole-file code memory the final method is ahead by only 3.0 and 1.0 points, within run-to-run variation; the evidence for the fix is the removal of the scaffolds. Missing Vue imports remain (23 and 27 tasks, against 17 and 19): real pages give more opportunities for this slip.
 
 
 
