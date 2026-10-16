@@ -133,28 +133,30 @@ In these orders the two arms run as pairs on each task, alternating which runs f
 
 \begin{table}[ht]
 \centering
-\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired difference to No Memory with 95\% bootstrap \gls{ci}, and zero-score tasks. Single run of each arm per order. \todo{Status (16 Oct): final method seed 47 at 91/101 and interleaved at 52/101; both Long Memory only from now on.}}
+\caption{Task-order experiments: accuracy (\%) of No Memory (NM), whole-file code memory (WF) and the final method with fragments (F), paired differences with 95\% bootstrap \gls{ci} over tasks, and zero-score tasks. Single run of each arm per order. \todo{Status (16 Oct): final method seed 47 at 91/101 and interleaved at 52/101; both Long Memory only from now on.}}
 \label{tab:order}
 \small
 \setlength{\tabcolsep}{4pt}
 \begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{llccccc}
+\begin{tabular}{llcccccccc}
 \toprule
-Kind & Order & NM & WF & F & F $-$ NM & Zero NM / WF / F \\
+ & & & \multicolumn{3}{c}{Accuracy (\%)} & \multicolumn{3}{c}{Paired difference, points [95\% CI]} & Zero-score \\
+\cmidrule(lr){4-6}\cmidrule(lr){7-9}
+Kind & Order & $n$ & NM & WF & F & WF $-$ NM & F $-$ NM & F $-$ WF & NM / WF / F \\
 \midrule
-Adjacent & Manifest\textsuperscript{a} & 28.5 & 40.0 & 35.2 & $+7.1$ [0.9, 13.1] & 30 / 13 / 20 \\
-Adjacent & Shuffled blocks (seed 11) & 27.9 & 33.1 & 35.4 & $+7.4$ [1.6, 13.1] & 29 / 21 / 16 \\
-Adjacent & Shuffled blocks (seed 47)\textsuperscript{b} & 28.9 & -- & 39.0 & $+10.4$ [4.3, 16.6] & 25 / -- / 9 \\
-Mixed & Random (seed 29) & 28.6 & 32.6 & 33.7 & $+5.5$ [$-0.5$, 11.6] & 29 / 21 / 18 \\
-Mixed & Interleaved\textsuperscript{c} & 31.8 & -- & 38.7 & $+6.8$ [$-1.1$, 14.7] & 13 / -- / 5 \\
+Adjacent & Manifest\textsuperscript{a,\,$\dagger$WF} & 101 & 28.5 & \textbf{40.0} & 35.2 & $+11.5$ [6.0, 16.9] & $+7.1$ [0.9, 13.1] & $-4.4$ [$-9.7$, 1.1] & 30 / 13 / 20 \\
+Adjacent & Shuffled blocks (seed 11)\textsuperscript{$\dagger$F} & 101 & 27.9 & 33.1 & \textbf{35.4} & $+4.4$ [$-1.9$, 10.6] & $+7.4$ [1.6, 13.1] & $+3.0$ [$-3.0$, 9.0] & 29 / 21 / 16 \\
+Adjacent & Shuffled blocks (seed 47)\textsuperscript{b} & 92 & 28.9 & -- & \textbf{39.0} & -- & $+10.4$ [4.3, 16.6] & -- & 25 / -- / 9 \\
+Mixed & Random (seed 29) & 101 & 28.6 & 32.6 & \textbf{33.7} & $+4.5$ [$-2.2$, 11.3] & $+5.5$ [$-0.5$, 11.6] & $+1.0$ [$-5.0$, 7.0] & 29 / 21 / 18 \\
+Mixed & Interleaved\textsuperscript{c} & 54 & 31.8 & -- & \textbf{38.7} & -- & $+6.8$ [$-1.1$, 14.7] & -- & 13 / -- / 5 \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 
-\smallskip\parbox{\linewidth}{\footnotesize WF $-$ NM: manifest $+11.5$ [6.0, 16.9]; seed 11 $+4.4$ [$-1.9$, 10.6]; seed 29 $+4.5$ [$-2.2$, 11.3].\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.\\ \textsuperscript{b} Interim, first 92 of 101 tasks (16 Oct). \textsuperscript{c} Interim, first 54 of 101 tasks; No Memory was run for the first 14 only, the rest use the manifest No Memory score of the same task (generation is deterministic).}
+\smallskip\parbox{\linewidth}{\footnotesize Bold: best memory arm in the order. $\dagger$WF / $\dagger$F: the order on which whole-file code memory / the final method was developed (development data for that arm).\\ \textsuperscript{a} Not run as alternating pairs; the two arms were run at different times.\\ \textsuperscript{b} Interim, first 92 of 101 tasks (16 Oct). \textsuperscript{c} Interim, first 54 of 101 tasks; No Memory was run for the first 14 only, the rest use the manifest No Memory score of the same task (generation is deterministic).}
 \end{table}
 
-Across all five orders the final method stays above No Memory (\Cref{fig:gap-all}): its pooled accuracy is 33.7--39.0\%, against 27.9--31.8\% for No Memory on the same tasks, and the paired interval excludes zero in three of them. Whole-file code memory is ahead of the final method only in the manifest order, on which it was developed.
+Across all five orders the final method stays above No Memory (\Cref{fig:gap-all}): its pooled accuracy is 33.7--39.0\%, against 27.9--31.8\% for No Memory on the same tasks, and the paired interval excludes zero in three of them. Read by development data, the table separates the two memory designs: each is best on the order it was developed on (whole-file on the manifest, $+11.5$; the final method on seed 11, $+7.4$), but only the final method keeps a gain of $+5.5$ to $+10.4$ on the orders neither was tuned on, where whole-file code memory falls to about $+4.5$ and the final method is ahead of it by 1.0 to 3.0 points (intervals include zero). Whole-file code memory is ahead of the final method only in the manifest order.
 
 \begin{figure}[ht]
 \centering
