@@ -101,6 +101,7 @@ Three memory designs are compared (\Cref{fig:families}; \Cref{chap:method}). \em
 
 \begin{figure}[ht]
 \centering
+\begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[node distance=5mm and 7mm, every node/.style={font=\small},
   fam/.style={draw, rounded corners, align=center, text width=3.3cm, minimum height=16mm, inner sep=4pt},
   base/.style={draw, rounded corners, align=center, text width=1.9cm, minimum height=16mm},
@@ -113,6 +114,7 @@ Three memory designs are compared (\Cref{fig:families}; \Cref{chap:method}). \em
 \draw[->] (txt) -- node[why, above=1mm]{text not\\followed} (code);
 \draw[->] (code) -- node[why, above=1mm]{whole-file\\example\\$\rightarrow$ scaffold} (fin);
 \end{tikzpicture}
+\end{adjustbox}
 \caption{The three memory designs. Each arrow names the failure that motivated the next design. Accuracy is on the manifest order (101 tasks, one run).}
 \label{fig:families}
 \end{figure}
