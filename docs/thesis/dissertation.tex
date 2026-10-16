@@ -79,7 +79,7 @@ We reproduce the official No Memory baseline on a self-hosted cluster (28.5\% ac
 
 The final method, code memory, adds a requirement checklist and a code pool: when earlier tasks show a code error that breaks a site, the prompt carries a short fragment copied verbatim from the chain's own compiled, successful websites. In a single run over all 101 tasks it reaches 35.2\% against 28.5\% (paired gain 7.1 points, 95\% CI 0.9--13.1), and it gains 7.4 and 5.5 points in two shuffled orders, one of which was used to develop it. An intermediate version that sometimes showed whole files scored higher in the original order (40.0\%) but made the generator return the untouched starter project in shuffled orders; fragments removed this failure. Gains are functional, largely from sites that now render; appearance on sites working in both arms is similar.
 
-The main observation is that, for this small generator, the \emph{form} of memory mattered: short code fragments reduced the targeted failures where textual warnings did not reliably do so. All results are single runs on the benchmark on which the method was developed. \todo{Status: fixed-prefix ablation queued; its result decides whether the gain is described as accumulated memory or as automatically discovered prompt code.}
+In these runs, short code fragments reduced the targeted failures, whereas textual warnings did not reliably prevent them. All results are single runs on the benchmark on which the method was developed. \todo{Status: fixed-prefix ablation queued; its result decides whether the gain is described as accumulated memory or as automatically discovered prompt code.}
 \end{abstract}
 
 \begin{acknowledgements}
