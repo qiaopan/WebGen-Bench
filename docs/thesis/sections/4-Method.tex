@@ -3,11 +3,11 @@
 
 \section{Problem Formulation}
 \label{sec:formulation}
-A run processes the tasks $t_1,\dots,t_n$ ($n=101$) in a fixed order. Task $t_i$ has a requirement $r_i$ and hidden test cases $c_{i,1},\dots,c_{i,m_i}$. A generator $G$ with fixed weights maps a prompt $x_i$ to a project $y_i=G(x_i)$, which the evaluator $E$ scores as $a_i=E(y_i, c_{i,\cdot})\in[0,1]$ with the accuracy defined in \Cref{chap:setup}. Under No Memory, $x_i=r_i$. With memory, the prompt is
+A run processes tasks $t_1,\dots,t_n$ ($n=101$) in a fixed order. Task $t_i$ has a requirement $r_i$ and hidden test cases $c_{i,1},\dots,c_{i,m_i}$. A generator $G$ with fixed parameters maps prompt $x_i$ to project $y_i=G(x_i)$, and evaluator $E$ assigns accuracy $a_i=E(y_i, c_{i,\cdot})\in[0,1]$ as defined in \Cref{chap:setup}. With No Memory, $x_i=r_i$. With memory,
 \begin{equation}
 x_i = r_i \oplus f(r_i, M_{i-1}), \qquad M_i = u\bigl(M_{i-1}, r_i, y_i, \tau_i, a_i\bigr),
 \end{equation}
-where $M_0=\emptyset$, $f$ selects and formats memory for the current requirement, $\oplus$ appends text after the requirement, $\tau_i$ is the evaluator transcript, and $u$ updates the memory after the task. Because $f$ reads only $M_{i-1}$, the evaluation of $t_i$ never reaches its own prompt, and $G$, $E$ and the protocol are identical across arms. \Cref{alg:pipeline} and \Cref{fig:memflow} give the final design (\Cref{sec:pipeline}); \Cref{sec:nm-failures} first explains the failures that motivated it.
+where $M_0=\emptyset$, $f$ selects and formats information from the memory available before task $t_i$, $\oplus$ appends it to the requirement, $\tau_i$ is the evaluator transcript, and $u$ updates the memory only after the task has been evaluated. Because $f$ reads only $M_{i-1}$, evaluation of $t_i$ cannot affect its own prompt. The generator, evaluator, and protocol are identical across arms. \Cref{alg:pipeline} and \Cref{fig:memflow} describe the final design (\Cref{sec:pipeline}); \Cref{sec:nm-failures} first presents the failures that motivated it.
 
 \begin{algorithm}[ht]
 \caption{Cross-task memory for one run (final version).}
@@ -25,7 +25,7 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 \end{algorithmic}
 \end{algorithm}
 
-\noindent \textsc{StaticAnalyse} records undeclared imports, Vue functions used without import and compile errors; \textsc{UpdatePool} is described in \Cref{sec:codepool}, and \Cref{tab:params} lists the constants.
+\noindent \textsc{StaticAnalyse} records undeclared imports, Vue functions used without import, and compile errors. \textsc{UpdatePool} is described in \Cref{sec:codepool}, while \Cref{tab:params} gives the fixed constants.
 
 \begin{figure}[ht]
 \centering
@@ -57,23 +57,23 @@ where $M_0=\emptyset$, $f$ selects and formats memory for the current requiremen
 
 \section{Starting Point: Why No Memory Fails}
 \label{sec:nm-failures}
-We began by inspecting the code that No Memory actually produced, rather than its scores. Two findings shaped everything that followed.
+The initial analysis examined generated code rather than scores alone. Two observations shaped the later design.
 
-\paragraph{Blank pages from basic errors.} Bolt.diy's Vue template declares only \texttt{vue} as a dependency, and WebGen-LM-7B never edits \texttt{package.json} (0 of 81 inspected responses). When it imports \texttt{vue-router} or uses a Vue function such as \texttt{ref} without importing it, the whole site renders as a blank page and every test case fails. In an early Long Memory run, 26 of 74 tasks were blank, 19 of them because of an undeclared \texttt{vue-router} import. Many zero-score tasks therefore fail before their functional difficulty can be assessed: the site does not render because of a basic error that the model repeats.
+\paragraph{Blank pages from basic errors.} Bolt.diy's Vue template declares only \texttt{vue} as a dependency, and WebGen-LM-7B did not edit \texttt{package.json} in any of the 81 inspected responses. When it imported \texttt{vue-router}, or used a Vue function such as \texttt{ref} without importing it, the site rendered as a blank page and all test cases failed. In an early Long Memory run, 26 of 74 tasks produced blank pages; 19 of those failures involved an undeclared \texttt{vue-router} import. In many cases, functional difficulty cannot be assessed because the site fails before any requested behaviour can be evaluated.
 
-\paragraph{Text is not followed.} In a targeted diagnostic, not a powered experiment, we took nine tasks that had produced blank pages, kept their original prompts, and added a single sentence, phrased in several ways (``add vue-router to package.json'', ``do not use vue-router'', ``put pages in App.vue with \texttt{ref} and \texttt{v-if}'', or the same sentence at both the start and the end). None recovered more than one task in three. Each phrasing was tried on three of the nine tasks; a task counted as recovered when the generated code imported no undeclared package and compiled. A ten-line code example of the same idea, tried on all nine, recovered seven. Because the text variants and the code example were tried on different subsets, this is indicative rather than conclusive; it suggested that memory might work better as code, in line with reports that small models follow instructions less reliably~\cite{harada2025curse,li2025smallmodels}.
+\paragraph{Text is not followed.} A targeted diagnostic, rather than a powered experiment, used nine tasks that had produced blank pages. Their original prompts were retained while one sentence was added in several forms: ``add vue-router to package.json'', ``do not use vue-router'', ``put pages in App.vue with \texttt{ref} and \texttt{v-if}'', or the same instruction at both the beginning and end of the prompt. No phrasing recovered more than one task out of three; each was tried on three of the nine tasks, and a task counted as recovered when the generated code imported no undeclared package and compiled. A ten-line code example implementing the same idea, tested on all nine tasks, recovered seven. The text variants and code example were evaluated on different task subsets, so this finding is suggestive rather than conclusive. It nevertheless indicated that code might be a more usable memory representation for this model, consistent with evidence that small models follow instructions less reliably~\cite{harada2025curse,li2025smallmodels}.
 
 \section{Final Method}
 \label{sec:pipeline}
-For each task, in order:
+For every task, the pipeline proceeds in the following order.
 \begin{enumerate}
-  \item \textbf{Requirement checklist.} The memory model splits the requirement into items (\Cref{sec:checklist}).
-  \item \textbf{Retrieve lessons.} The memory model also splits the requirement into at most three functional \emph{aspects} (a feature and the user action that triggers it) and appearance aspects; these are the retrieval queries. Functional lessons are retrieved by similarity and judged for applicability by the memory model as a hard match (same user trigger and same state change), a soft transfer (same kind of interaction) or a reject; the query is the aspect written as feature, user trigger, expected state change and a domain-free interaction pattern, and it is compared with the stored case (trigger, observation, cause, preventive action); only hard matches are attached to checklist items. A small common pool adds site-wide lessons that contain a concrete code construct.
-  \item \textbf{Code pool.} At most three verified fragments whose trigger condition holds (\Cref{sec:codepool}).
-  \item \textbf{Generate and evaluate.} One generation by WebGen-LM-7B; official functional and appearance evaluation.
-  \item \textbf{Reflect and store.} The memory model reflects on the evaluated task; new lessons are deduplicated against existing ones, utilities are updated, and code facts are computed for the code pool.
+  \item \textbf{Build a requirement checklist.} The memory model divides the requirement into items (\Cref{sec:checklist}).
+  \item \textbf{Retrieve lessons.} It also decomposes the requirement into no more than three functional \emph{aspects}, each defined by a feature, user trigger, expected state change, and domain-independent interaction pattern, plus appearance aspects. Functional lessons are retrieved by similarity and assessed as a hard match (the same trigger and state change), soft transfer (the same interaction type), or reject. Only hard matches are attached to checklist items. A small common pool contributes site-wide lessons containing a concrete code construct.
+  \item \textbf{Select code.} At most three verified fragments are added when their trigger conditions hold (\Cref{sec:codepool}).
+  \item \textbf{Generate and evaluate.} WebGen-LM-7B generates one project, which then undergoes the official functional and appearance evaluation.
+  \item \textbf{Reflect and store.} The memory model reflects on the evaluated task. New lessons are deduplicated, utility estimates are updated, and code facts are recorded for the pool.
 \end{enumerate}
-The products of step 5 are read by steps 2 and 3 of later tasks; this is the only path through which tasks influence each other. \Cref{fig:prompt} shows the resulting prompt for one task; under No Memory the prompt is the first paragraph only.
+The products of step 5 can influence only later tasks through steps 2 and 3. \Cref{fig:prompt} illustrates the resulting prompt. Under No Memory, the first requirement paragraph is the full prompt.
 
 \begin{figure}[ht]
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
@@ -106,26 +106,26 @@ Build every checklist item; the notes only warn about mistakes earlier websites 
 
 \subsection{Requirement Checklist}
 \label{sec:checklist}
-The original requirement remains at the top of the prompt and is declared binding. The checklist below it repeats every requested feature, so that memory content cannot crowd a feature out of the model's attention~\cite{liu2024lost,wallace2024hierarchy}. Lessons are attached to the item they concern rather than listed separately, which avoids a separate list being read as the full scope of the task.
+The original requirement remains at the beginning of the prompt and is explicitly binding. The checklist repeats each requested feature so that added memory does not displace a requirement from the model's attention~\cite{liu2024lost,wallace2024hierarchy}. Lessons are attached to the checklist item to which they apply, rather than presented as a separate list that could be mistaken for the task's complete scope.
 
 \subsection{Code Pool}
 \label{sec:codepool}
-The code pool is computed without an \gls{llm} for detection:
+Detection for the code pool does not rely on an \gls{llm}.
 \begin{itemize}
-  \item \textbf{Problem facts.} After each task, code analysis of the generated site records undeclared imports (\texttt{import:<package>}: an import statement whose package \texttt{package.json} does not declare), Vue functions used without import (\texttt{vue-api}: a Vue function name followed by \texttt{(} or \texttt{<} in a script that neither imports nor defines it), both found by pattern matching on the source, and compile errors from compiling each \gls{sfc}'s script and template together with \texttt{@vue/compiler-sfc}, as Vite's Vue plugin does (without type checking or bundling).
-  \item \textbf{Trigger.} A problem key becomes active after it has appeared in two different tasks, following Metis's rule of promoting a procedure only after it recurs~\cite{dai2026metis}. Whole-site failures that code detects objectively (an undeclared package, a compile error) become active after one occurrence. Missing-import and compile-error entries apply to every Vue site; other entries are applied only if the memory model judges their condition to hold for the requirement.
-  \item \textbf{Source.} The example comes from the chain's own earlier websites that scored at least 0.5, compile and have no undeclared import, preferring the highest-scoring site. The threshold of 0.5 is a design choice (at least half the checks passed), not a tuned value. Successful sites supply \emph{how} to write it; failed sites decide \emph{when} it is needed~\cite{reasoningbank2025}.
-  \item \textbf{Fragment selection.} The memory model picks the key lines; code then verifies that the lines are verbatim from the source file, contain at most 15 lines, contain no \texttt{<script>}/\texttt{<template>} tag lines, and include the import of the most frequently missed function plus another line that calls it (the same pattern: its name followed by \texttt{(} or \texttt{<}). If the model fails twice, a rule-based extraction is used. An entry is updated by adding a new version only when the new example covers strictly more of the needed functions; the old version is kept for provenance~\cite{ace2026}.
-  \item \textbf{Slots.} At most three entries per task, at most one of them for a missing package.
+  \item \textbf{Problem facts.} After each task, static analysis records undeclared imports (\texttt{import:<package>}), Vue functions used without import (\texttt{vue-api}), and compile errors. Imports are checked against \texttt{package.json}. Vue-function use is detected when a function name is followed by \texttt{(} or \texttt{<} in a script that neither imports nor defines it. Each Vue \gls{sfc} is compiled with \texttt{@vue/compiler-sfc} in the same script-template combination used by Vite's Vue plugin, without type checking or bundling.
+  \item \textbf{Trigger.} A problem key becomes active after appearing in two different tasks, following Metis's policy of promoting a procedure only after recurrence~\cite{dai2026metis}. Objectively detected whole-site failures, such as undeclared packages and compile errors, become active after one occurrence. Missing-import and compile-error entries apply to every Vue site. Other entries are used only when the memory model judges their condition to be present in the requirement.
+  \item \textbf{Source.} Examples come from earlier websites in the same chain that score at least 0.5, compile, and contain no undeclared import; the highest-scoring eligible site is preferred. The 0.5 threshold is a design choice, not a tuned value. Successful sites show \emph{how} to implement a construct, while failed sites establish \emph{when} the construct may be needed~\cite{reasoningbank2025}.
+  \item \textbf{Fragment selection.} The memory model identifies candidate lines, and code verifies that they are verbatim from the source, at most 15 lines long, and contain no \texttt{<script>} or \texttt{<template>} tag lines. A fragment must include both the import of the most frequently missed function and another line that calls it. If the model fails twice, a rule-based extractor is used. A new version replaces an entry only when it covers strictly more required functions; the earlier version is retained for provenance~\cite{ace2026}.
+  \item \textbf{Slots.} Each task receives at most three entries, with no more than one addressing a missing package.
 \end{itemize}
-\textit{Verified} in this dissertation means only that a fragment is verbatim from a source file that compiles and comes from a site with score $\ge 0.5$; it does not mean that the fragment is correct for the new task. Because the triggers are general, the code pool behaves partly like a learned prompt prefix: once active, many later tasks receive the same fragment. The fixed-prefix ablation (\Cref{sec:ablation}) separates this from learning. \Cref{tab:params} lists the constants of the final configuration.
+In this dissertation, \textit{verified} means only that a fragment is copied verbatim from a source file that compiles and comes from a site scoring at least 0.5. It does not guarantee that the fragment is correct for a new task. General triggers also make the pool partly resemble a learned prompt prefix: after activation, many later tasks receive the same fragment. The fixed-prefix ablation (\Cref{sec:ablation}) is designed to distinguish that effect from online learning. \Cref{tab:params} lists the constants of the final configuration.
 
 \subsection{Memory Hygiene}
 \begin{itemize}
-  \item \textbf{Concrete only.} Common-pool entries without a code construct (for example \texttt{@click}, \texttt{v-if}, an \texttt{import} line) are dropped. Rewriting may generalise the \emph{condition} under which a lesson applies but not the \emph{action}.
-  \item \textbf{Deduplication at storage time.} A new lesson is compared with similar stored lessons; if the memory model judges it to share the same root cause and fix, it is recorded as support for the old lesson instead of a new entry~\cite{chhikara2025mem0}.
-  \item \textbf{Utility and retirement.} For each lesson we count injections $u$ and recurrences $r$ (the same problem reappearing after injection), and compute utility $(u - r + 1)/(u + 2)$~\cite{zhou2025memento,zhao2024expel}. Ranking uses support $\times$ severity $\times$ utility; a lesson injected at least five times with utility below 0.3 is no longer injected. Utility is a heuristic and its constants were not tuned.
-  \item \textbf{No hand-written conclusions.} Reflection instructions describe how to investigate, never what the answer is.
+  \item \textbf{Concrete entries only.} Common-pool entries without a code construct, such as \texttt{@click}, \texttt{v-if}, or an \texttt{import} line, are removed. Rewriting may generalise an applicability \emph{condition} but does not alter the \emph{action}.
+  \item \textbf{Deduplication at storage.} A new lesson is compared with similar stored lessons. When the memory model judges that the root cause and fix are the same, the new evidence supports the existing lesson rather than creating another entry~\cite{chhikara2025mem0}.
+  \item \textbf{Utility and retirement.} For each lesson, the system tracks injections $u$ and recurrences $r$, where a recurrence is the same problem occurring after injection. Utility is $(u - r + 1)/(u + 2)$~\cite{zhou2025memento,zhao2024expel}. Entries are ranked by support $\times$ severity $\times$ utility. A lesson injected at least five times with utility below 0.3 is no longer injected. The utility measure is heuristic and its constants were not tuned.
+  \item \textbf{No hand-written conclusions.} Reflection instructions specify how to investigate an outcome, rather than prescribing its answer.
 \end{itemize}
 
 \begin{table}[ht]

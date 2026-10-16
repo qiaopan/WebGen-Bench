@@ -6,11 +6,11 @@
 \contentsline {figure}{\numberline {3.2}{\ignorespaces The first screenshot the tester received for task 000006 (seed-11 order). (a) An undeclared package stops the whole site. (b) The numbered dashed boxes are drawn by the tester to name the elements it can click; they are not part of the website.\relax }}{11}{figure.caption.3}%
 \contentsline {figure}{\numberline {3.3}{\ignorespaces The three memory designs. Each arrow names the failure that motivated the next design. Accuracy is on the manifest order (101 tasks, one run).\relax }}{13}{figure.caption.5}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces The memory flow of the final method.}}{16}{figure.caption.7}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces The final method's prompt for task 000041 (seed 11), shortened: requirement, checklist with attached lessons, and verified code fragments.\relax }}{18}{figure.caption.8}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces The memory flow of the final method.}}{17}{figure.caption.7}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces The final method's prompt for task 000041 (seed 11), shortened: requirement, checklist with attached lessons, and verified code fragments.\relax }}{19}{figure.caption.8}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Cumulative and rolling-10 accuracy by execution order for No Memory, text memory and both code memories.\relax }}{22}{figure.caption.11}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Task 000041 (seed 11), whole-file code memory. Left: the injected \texttt {App.vue} of an earlier food-donation site. Right: the generator returned the untouched starter project; all five test cases failed.\relax }}{27}{figure.caption.16}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Rolling 10-task mean of the accuracy gap to No Memory in the same order (positive: memory better). Orange: whole-file code memory; blue: final method. The orange dip after task 45 in seed 11 coincides with the scaffold outputs.\relax }}{28}{figure.caption.17}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Cumulative and rolling-10 accuracy by execution order for No Memory, text memory and both code memories.\relax }}{24}{figure.caption.11}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Task 000041 (seed 11), whole-file code memory. Left: the injected \texttt {App.vue} of an earlier food-donation site. Right: the generator returned the untouched starter project; all five test cases failed.\relax }}{28}{figure.caption.16}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Rolling 10-task mean of the accuracy gap to No Memory in the same order (positive: memory better). Orange: whole-file code memory; blue: final method. The orange dip after task 45 in seed 11 coincides with the scaffold outputs.\relax }}{29}{figure.caption.17}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
