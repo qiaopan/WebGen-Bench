@@ -1,0 +1,56 @@
+Please implement a web application for one-to-one coaching sessions to match coaches and users. The application should have functionalities such as personality assessment, user profiles, coaching and mentorship matching, scheduling and session management, and goal setting and progress tracking. Users should be able to complete a personality assessment, create and manage their profiles, search for and select suitable coaches, schedule coaching sessions, and set and track goals. Set the background to beige, and apply saddle brown to components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a web application for one-to-one coaching sessions to match coaches and users.
+2. The application should have functionalities such as personality assessment
+3. user profiles
+4. coaching and mentorship matching
+5. scheduling and session management
+6. goal setting and progress tracking
+7. Users should be able to complete a personality assessment
+8. create and manage their profiles
+9. search for and select suitable coaches
+10. schedule coaching sessions
+11. set and track goals
+12. Set the background to beige
+   Note from earlier websites: For the background: set the background color to beige using CSS.
+
+General notes from earlier websites:
+- On every page: apply saddle brown to components with class='saddleBrown'.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,54 @@
+Please develop a student portal website for registration and management of student information. The website should have user registration and profile management features, allowing students to input and manage personal details, qualifications, and career preferences. The website should also have an advanced matching algorithm that matches students with training providers based on criteria such as qualifications, location, field of study, and career interests. Additionally, the website should streamline the application process with an intuitive interface, allowing students to easily apply for programs. Training providers should also be able to access student information based on predefined criteria to enable direct communication and attraction of students to their skills development programs. Establish azure as the main background and midnight blue for the controls.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. user registration and profile management features
+2. input and manage personal details
+3. input and manage qualifications
+4. input and manage career preferences
+5. advanced matching algorithm
+6. matches students with training providers
+7. criteria such as qualifications, location, field of study, and career interests
+8. intuitive interface
+9. apply for programs
+10. training providers should also be able to access student information
+11. predefined criteria
+12. direct communication and attraction of students
+13. skills development programs
+14. azure as the main background and midnight blue for the controls
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

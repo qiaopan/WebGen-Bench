@@ -1,0 +1,44 @@
+Please implement a barber shop management website for managing barbers and services. The website should have functionalities for adding barbers, services, and sending WhatsApp notifications. Users should be able to browse barbers and services, add new barbers and services, and send notifications to clients. Style the layout with snow in the background and dim gray for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a barber shop management website for managing barbers and services.
+2. The website should have functionalities for adding barbers, services, and sending WhatsApp notifications.
+3. Users should be able to browse barbers and services, add new barbers and services, and send notifications to clients.
+4. Style the layout with snow in the background and dim gray for the interface.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,52 @@
+Please implement an online learning platform for data science that provides Python data science courses. The platform should have functionalities for browsing courses, learning courses, submitting assignments, and querying grades. Users should be able to browse and select Python data science courses of interest, learn course content, submit assignments, and query their own learning grades. Use honeydew in the background layer and dark olive green for the component layer.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. online learning platform for data science
+2. Python data science courses
+3. browsing courses
+   Note from earlier websites: For the browsing courses: use v-for to list courses and ensure each is clickable.
+4. learning courses
+5. submitting assignments
+6. querying grades
+7. browse and select Python data science courses of interest
+8. learn course content
+9. submit assignments
+10. query their own learning grades
+11. honeydew in the background layer and dark olive green for the component layer
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

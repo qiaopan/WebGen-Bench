@@ -1,0 +1,45 @@
+Please implement a health survey website for women to fill out and submit health information. The website should have functionalities for filling out the survey, and submitting information. Users can fill out the relevant survey, and submit their information. The system will automatically collect the information and provide data management, permission management, data review, and reporting functions. Use whitesmoke as the default background and dark cyan for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a health survey website for women to fill out and submit health information.
+2. The website should have functionalities for filling out the survey, and submitting information.
+3. Users can fill out the relevant survey, and submit their information.
+4. The system will automatically collect the information and provide data management, permission management, data review, and reporting functions.
+5. Use whitesmoke as the default background and dark cyan for component styling.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import CompanyDashboard from './components/CompanyDashboard.vue'
+import FinancialReports from './components/FinancialReports.vue'
+
+const activeTab = ref('dashboard')
+</script>
+
+<template>
+  <div class="app-container">
+    <header>
+      <h1>Financial Dashboard</h1>
+      <nav>
+        <button @click="activeTab = 'dashboard'" :class="{ active: activeTab === 'dashboard' }">Dashboard</button>
+        <button @click="activeTab = 'reports'" :class="{ active: activeTab === 'reports' }">Reports</button>
+      </nav>
+    </header>
+
+    <main>
+      <CompanyDashboard v-if="activeTab === 'dashboard'" />
+      <FinancialReports v-if="activeTab === 'reports'" />
+    </main>
+  </div>
+</template>
+```
+
+Component fails: missing reactive state. Earlier websites broke here (a component calls computed(), ref() without importing it from 'vue' (that page fails when opened), 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const newTopic = ref('')
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
