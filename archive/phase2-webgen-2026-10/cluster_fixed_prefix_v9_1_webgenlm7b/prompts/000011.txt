@@ -1,0 +1,68 @@
+Please implement a text-based strategy browser game where players can choose a race, manage resources, upgrade, and battle. The game should have multiple pages, including the base page, ranking page, store, train page, workers page, upgrades page, bank page, messages page, and reports page. Players can choose from four races: Humans, Dragonborns, Elves, and Dwarfs, each with unique attributes. Players can manage resources, including gold, iron, wood, and wheat, and can upgrade their city, workers, and soldiers. Design the site using seashell as the background and crimson for content blocks.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. text-based strategy browser game
+2. players can choose a race
+3. manage resources
+4. upgrade
+5. battle
+6. base page
+7. ranking page
+8. store
+9. train page
+10. workers page
+11. upgrades page
+12. bank page
+13. messages page
+14. reports page
+15. four races: Humans, Dragonborns, Elves, and Dwarfs
+16. unique attributes
+17. resources: gold, iron, wood, and wheat
+18. upgrade their city, workers, and soldiers
+19. seashell as the background and crimson for content blocks
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

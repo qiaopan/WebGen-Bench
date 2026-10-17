@@ -1,0 +1,43 @@
+Please implement a barber shop management website for managing barbers and services. The website should have functionalities for adding barbers, services, and sending WhatsApp notifications. Users should be able to browse barbers and services, add new barbers and services, and send notifications to clients. Style the layout with snow in the background and dim gray for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a barber shop management website
+2. adding barbers
+   Note from earlier websites: For the barber form: Implement a submit handler using ref to update the barbers array and re-render.
+3. adding services
+4. sending WhatsApp notifications
+5. browse barbers
+6. browse services
+7. add new barbers
+8. add new services
+9. send notifications to clients
+10. style the layout with snow in the background and dim gray for the interface
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 23 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

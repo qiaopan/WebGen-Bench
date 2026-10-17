@@ -1,0 +1,42 @@
+Please implement a consulting business website that provides leadership and business training services. The website should have an e-commerce component, allowing customers to purchase services directly from the site. The website should include features such as workshops, online classes, podcasts, and blogs. Users should be able to browse and purchase services, and interact with the website. Set all pages to have a light cyan background and cadet blue components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. consulting business website
+2. provides leadership and business training services
+3. e-commerce component
+4. customers to purchase services directly from the site
+5. workshops
+6. online classes
+7. podcasts
+8. blogs
+9. browse and purchase services
+10. interact with the website
+11. light cyan background and cadet blue components
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 8 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,40 @@
+Please implement a short-term apartment rental website for showcasing and renting apartments. The website should have functionalities for searching, filtering, and booking apartments. Users should be able to browse different types of apartments, search and filter apartments that meet their criteria, book selected apartments, and view booking records. Use linen as the screen background and maroon for component highlights.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a short-term apartment rental website for showcasing and renting apartments.
+2. The website should have functionalities for searching, filtering, and booking apartments.
+   Note from earlier websites: For the search bar: implement a submit handler to update state and render results.
+3. Users should be able to browse different types of apartments,
+4. search and filter apartments that meet their criteria,
+5. book selected apartments,
+   Note from earlier websites: For the booking form: use `v-model` and `v-for` for selection, show booking confirmation.
+6. and view booking records.
+7. Use linen as the screen background and maroon for component highlights.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,42 @@
+Please implement a species biological information database website for displaying and managing biological information data. The website should have functionalities for browsing, searching, and filtering. Users should be able to browse biological information data for different species, search for specific data, and filter data based on different criteria. Specify linen as the base color and maroon for all components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. species biological information database website
+2. functionalities for browsing
+3. functionalities for searching
+   Note from earlier websites: For the search functionality: implement v-if to show search results only when data is available.
+4. functionalities for filtering
+5. browse biological information data for different species
+6. search for specific data
+7. filter data based on different criteria
+8. linen as the base color and maroon for all components
+   Note from earlier websites: On every page: ensure all components use maroon color consistently.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

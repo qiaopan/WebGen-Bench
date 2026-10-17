@@ -1,0 +1,41 @@
+Please implement a risk assessment website for conducting risk assessments and generating reports. The website should have functionalities for selecting risk assessment items, auto-populating data, generating charts, and creating reports. Users should be able to select risk assessment items, and the website will automatically fill in relevant data from a background database, generate charts, and create reports. The website should also have a subscription feature, allowing users to access the risk assessment tool. Define the background as alice blue and components as steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a risk assessment website for conducting risk assessments and generating reports.
+2. The website should have functionalities for selecting risk assessment items, auto-populating data, generating charts, and creating reports.
+3. Users should be able to select risk assessment items, and the website will automatically fill in relevant data from a background database, generate charts, and create reports.
+4. The website should also have a subscription feature, allowing users to access the risk assessment tool.
+5. Define the background as alice blue and components as steel blue.
+
+General notes from earlier websites:
+- On every page: use media queries and flexible layout elements for seamless mobile adjustment.
+- For the booking form: ensure all content is visible and usable on mobile devices.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

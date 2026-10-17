@@ -1,0 +1,47 @@
+Please implement a virtual study group website where users can create or join study groups, share resources, and collaborate on projects. The website should have functionalities for creating and joining groups, sharing resources, and collaborating on projects. Users should be able to join groups, download resources, and participate in project discussions. The website should also have a personal center where users can view their personal information. Configure all backgrounds with alice blue and all components with steel blue.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. create or join study groups
+2. share resources
+   Note from earlier websites: For the ShareResources.vue: use @submit.prevent to add resources and show confirmation.
+3. collaborate on projects
+4. join groups
+5. download resources
+6. participate in project discussions
+7. personal center where users can view their personal information
+8. configure all backgrounds with alice blue and all components with steel blue
+   Note from earlier websites: For the components: apply steel blue and clear labels for user-friendly organization.
+9. functionalities for creating and joining groups
+10. functionalities for sharing resources
+11. functionalities for collaborating on projects
+
+General notes from earlier websites:
+- On every page: ensure all content is visible and usable on mobile devices.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

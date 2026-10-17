@@ -14,6 +14,48 @@ cd "$WG/webgen"
 next="$WG/queue/generator.env.next"
 [[ -f "$marker.env" ]] && next="$marker.env"
 [[ -f "$next" ]] || { echo "SWITCH_ABORT no $next"; exit 1; }
+# Lane-2 idle guard (2026-10-17): lane2.sh read generator.env at start and uses the main generator, so do not
+# switch while any lane-2 run is active or unfinished. Waits until no run_continual_memory process names a
+# lane-2 output and every P line in lane2/filler.conf is done (101 progress lines per output). SWITCH_GUARD_ONLY=1
+# only evaluates the guard once and exits (0 idle, 2 busy) without switching.
+lane2_busy() {
+  "$WG/webgen/env/webvoyager/bin/python3.10" - "$WG/queue/lane2/filler.conf" "$WG/webgen" <<'PY'
+import json, subprocess, sys
+from pathlib import Path
+conf, root = Path(sys.argv[1]), Path(sys.argv[2])
+outs, reasons = [], []
+for line in (conf.read_text().splitlines() if conf.is_file() else []):
+    f = line.split()
+    if not f or f[0].startswith("#"):
+        continue
+    if f[0] == "P" and len(f) >= 4:
+        outs += [o for o in (f[2], f[3]) if o != "-"]
+    elif f[0] in ("L", "N") and len(f) >= 2:
+        outs.append(f[1])
+    else:
+        reasons.append(f"unknown line: {line}")
+for o in outs:
+    p = root / o / "progress.jsonl"
+    n = len({json.loads(r)["task_id"] for r in p.read_text().splitlines() if r.strip()}) if p.is_file() else 0
+    if n < 101:
+        reasons.append(f"{o} {n}/101")
+ps = subprocess.run(["pgrep", "-af", "run_continual_memory"], capture_output=True, text=True).stdout
+for o in outs:
+    if any(o.rstrip("/") in l for l in ps.splitlines() if "pgrep" not in l):
+        reasons.append(f"runner active on {o}")
+print("; ".join(reasons))
+sys.exit(1 if reasons else 0)
+PY
+}
+waited=0
+while busy=$(lane2_busy); [[ $? -ne 0 ]]; do
+  [[ "${SWITCH_GUARD_ONLY:-0}" == 1 ]] && { echo "SWITCH_GUARD busy: $busy"; exit 2; }
+  (( waited % 10 == 0 )) && echo "SWITCH_WAIT_LANE2 ${waited}min: $busy $(date -Is)"
+  sleep 60; waited=$((waited + 1))
+done
+echo "SWITCH_LANE2_IDLE after ${waited}min $(date -Is)"
+[[ "${SWITCH_GUARD_ONLY:-0}" == 1 ]] && exit 0
+
 old_env="$WG/queue/generator.env"
 SERVICE_LOG="$WG/logs/services-${SLURM_JOB_ID:-manual}"
 set -a; source .env; [[ -f "$old_env" ]] && source "$old_env"; set +a

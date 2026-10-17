@@ -1,0 +1,42 @@
+Please implement a website that displays Canadian nutrition facts labels to help users understand food nutrition information. The website should have a product search function, where users can input food names or keywords (such as apple) to search for related nutrition information. The website should also have a nutrition analysis function, where users can input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value. Additionally, the website should provide a packaging design function, where users can design their own food packaging according to Canadian regulations. Define background as linen; define components with maroon.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. displays Canadian nutrition facts labels
+2. product search function
+   Note from earlier websites: For the product search: ensure form submission works with @submit to prevent content missing issues.
+3. input food names or keywords (such as apple) to search for related nutrition information
+4. nutrition analysis function
+5. input food ingredients (such as chicken, rice, broccoli) and serving sizes to calculate their nutritional value
+6. packaging design function
+7. design their own food packaging according to Canadian regulations
+8. Define background as linen
+9. define components with maroon
+   Note from earlier websites: On every page: use maroon for all components consistently as defined in the requirement.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 13 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

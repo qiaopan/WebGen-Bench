@@ -1,0 +1,42 @@
+Please implement a cryptocurrency escrow system for secure cryptocurrency transactions. Buyers should be able to browse and select sellers' cryptocurrency products, conduct transactions, and deposit cryptocurrencies into an escrow account. Sellers should be able to view and manage their products and transaction records. The system should also have transaction confirmation, cryptocurrency release, and dispute resolution functionalities. Initialize the background color with light gray and component color with dark red.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. cryptocurrency escrow system for secure cryptocurrency transactions
+2. buyers should be able to browse and select sellers' cryptocurrency products
+   Note from earlier websites: For the product card: implement @click to update view to detailed product info page.
+3. conduct transactions
+4. deposit cryptocurrencies into an escrow account
+5. sellers should be able to view and manage their products and transaction records
+6. transaction confirmation
+7. cryptocurrency release
+8. dispute resolution functionalities
+9. initialize the background color with light gray and component color with dark red
+   Note from earlier websites: For component color: set dark red consistently using component color setting.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 7 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

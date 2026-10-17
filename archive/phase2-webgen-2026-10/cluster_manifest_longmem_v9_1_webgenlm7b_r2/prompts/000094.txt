@@ -1,0 +1,42 @@
+Please implement an animal spotter website that recognizes wild animals and sends SMS alerts. The website should have the functionality to identify different types of wild animals, and assign different color codes to each animal. Users should be able to set alert conditions, and when a specific animal is detected, the system will automatically send an SMS alert. Users should be able to browse detection records, view animal information, and set personalized alerts. Set misty rose as the body background and use firebrick for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. recognizes wild animals and sends SMS alerts
+2. identify different types of wild animals
+3. assign different color codes to each animal
+4. set alert conditions
+5. send an SMS alert
+6. browse detection records
+7. view animal information
+   Note from earlier websites: For the animal detection: implement v-if to show animal info based on detection conditions.
+8. set misty rose as the body background and use firebrick for the UI
+   Note from earlier websites: On every page: set body background as misty rose and UI elements as firebrick.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 24 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,43 @@
+Please implement a food distribution website for managing and distributing food. The website should have functionalities for food donation, food distribution, and volunteer management. Users should be able to browse food donation information, apply for food distribution, view volunteer information, and manage their own accounts. Use azure for the background and midnight blue for components.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. food donation
+2. food distribution
+3. volunteer management
+4. browse food donation information
+5. apply for food distribution
+   Note from earlier websites: For the booking form: use @submit to handle form submission and show a confirmation message.
+6. manage their own accounts
+7. use azure for the background and midnight blue for components
+
+General notes from earlier websites:
+- On every page: ensure all forms have a submit handler to prevent content missing issues.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
