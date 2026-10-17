@@ -1,0 +1,19 @@
+Please implement a fishing contest website to manage and display fishing contest information. The website should have functionalities for posting contest announcements, displaying contest results, and showcasing contest photos. Users should be able to browse contest information, register for contests, and view contest results. Set primary background to mint cream and elements to teal.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. posting contest announcements
+2. displaying contest results
+3. showcasing contest photos
+4. browse contest information
+5. register for contests
+   Note from earlier websites: For contest registration: use `v-model` and `v-for` for form options, show confirmation on submission.
+6. primary background to mint cream and elements to teal
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

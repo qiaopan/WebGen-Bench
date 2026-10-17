@@ -1,0 +1,44 @@
+Please implement a sports analytics website that provides basketball betting data and analysis. The website should have functionalities for data visualization, match prediction, and betting recommendations. Users should be able to browse data for basketball, view match history, team rankings, player performance, and make informed betting decisions based on the analysis results. Define the background as ghost white and components as slate gray.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. sports analytics website
+2. basketball betting data and analysis
+3. data visualization
+4. match prediction
+5. betting recommendations
+   Note from earlier websites: For the betting recommendations form: use @submit to update state and show a confirmation.
+6. browse data for basketball
+7. view match history
+8. team rankings
+9. player performance
+   Note from earlier websites: For player performance: render data in 'PlayerPerformance.vue' using v-for.
+10. make informed betting decisions based on the analysis results
+11. background as ghost white and components as slate gray
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

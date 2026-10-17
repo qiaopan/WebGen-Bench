@@ -1,0 +1,38 @@
+Please implement a social website for user registration, making friends, and sharing. The website should have a registration function, allowing users to create an account and log in. Users should be able to invite friends to join the website and vote on content. Users should be able to upload pictures and earn points. The website should have a personal homepage that displays user information and updates. Use light cyan as the default background and cadet blue for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. social website for user registration, making friends, and sharing
+2. registration function, allowing users to create an account and log in
+3. invite friends to join the website and vote on content
+4. upload pictures and earn points
+5. personal homepage that displays user information and updates
+6. light cyan as the default background and cadet blue for component styling
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 21 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

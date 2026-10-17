@@ -1,0 +1,41 @@
+Please implement a personal portfolio website to showcase design works. The website should have functionalities for showcasing works about the designer, and contact information. Users should be able to browse the designer's portfolio, learn about the designer's background and experience, and get in touch with the designer through contact information. Configure your theme with peach puff as background and indian red as component color.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a personal portfolio website
+2. showcase design works
+3. functionalities for showcasing works about the designer
+4. contact information
+   Note from earlier websites: For the contact form: use @submit.prevent to trigger submitForm on form submission.
+5. browse the designer's portfolio
+6. learn about the designer's background and experience
+7. get in touch with the designer through contact information
+8. configure your theme with peach puff as background and indian red as component color
+   Note from earlier websites: For the theme: set peach puff as background and indian red for components.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 15 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

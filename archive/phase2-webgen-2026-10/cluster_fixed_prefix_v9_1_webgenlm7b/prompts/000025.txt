@@ -1,0 +1,61 @@
+Please implement a web application for an insurance industry automation system to manage insurance business. The system should have functionalities for customer management, policy management, and claims management. Users should be able to browse customer information, policy information, and claims information, and perform corresponding operations. The system should also have data analysis and reporting capabilities, generating various reports and charts. Apply theme using whitesmoke as background and dark cyan for elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. web application for an insurance industry automation system
+2. manage insurance business
+3. functionalities for customer management
+4. functionalities for policy management
+5. functionalities for claims management
+6. browse customer information
+7. browse policy information
+8. browse claims information
+9. perform corresponding operations
+10. data analysis and reporting capabilities
+11. generating various reports and charts
+12. theme using whitesmoke as background and dark cyan for elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

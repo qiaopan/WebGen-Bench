@@ -1,0 +1,38 @@
+Please implement a wheel of fortune website where users can spin the wheel to win prizes. The website should have functionalities for spinning the wheel, displaying prizes, and recording user winning records. Users should be able to spin the wheel, view the prize list, view their own winning records. Use light gray as the default background and dark red for component styling.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. spin the wheel
+2. displaying prizes
+3. recording user winning records
+4. view the prize list
+5. view their own winning records
+6. light gray as the default background and dark red for component styling
+   Note from earlier websites: For dark red components: ensure text contrasts for accessibility on dark red backgrounds.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 11 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

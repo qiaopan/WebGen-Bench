@@ -1,0 +1,46 @@
+Please implement a paper cup manufacturing system to manage inventory, production, and sales of paper cups. The system should have functionalities for managing raw materials, finished products, inventory, production, and sales. Users should be able to record and track the inventory, usage, and sales of raw materials and finished products, and generate detailed reports. The system should also have customer management capabilities, including recording customer information, sales history, and sales statistics. Assign light goldenrod to the background and olive drab to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. manage inventory
+2. manage production
+3. manage sales of paper cups
+4. manage raw materials
+5. manage finished products
+   Note from earlier websites: For the finished products inventory form: Implement @submit.prevent to update inventory.
+6. record and track the inventory, usage, and sales of raw materials and finished products
+7. generate detailed reports
+8. customer management capabilities
+9. recording customer information
+10. sales history
+11. sales statistics
+12. assign light goldenrod to the background and olive drab to the UI elements
+   Note from earlier websites: On every page: Implement UI elements in olive drab for clear visual indication of user interaction functions.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 18 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

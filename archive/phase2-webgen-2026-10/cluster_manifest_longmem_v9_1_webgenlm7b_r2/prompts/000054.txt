@@ -1,0 +1,46 @@
+Please implement a high-performance sports recruitment platform that connects athletes and sports organizations. The platform should have functionalities for athlete registration, job posting, job application, and message notification. Users should be able to log in, browse job listings, apply for jobs of interest, and receive relevant notifications. Sports organizations should be able to post jobs, and communicate with athletes. Set ghost white as the body background and use slate gray for the UI.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. high-performance sports recruitment platform
+2. connects athletes and sports organizations
+3. athlete registration
+4. job posting
+   Note from earlier websites: For the job posting: Implement a @submit.prevent in JobPostingForm.vue to trigger submitForm on form submit.
+5. job application
+6. message notification
+7. browse job listings
+   Note from earlier websites: On every page: Ensure forms update state and show confirmation messages after successful submission.
+8. apply for jobs of interest
+9. receive relevant notifications
+10. sports organizations should be able to post jobs
+11. communicate with athletes
+12. ghost white as the body background and use slate gray for the UI
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 3 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 20 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

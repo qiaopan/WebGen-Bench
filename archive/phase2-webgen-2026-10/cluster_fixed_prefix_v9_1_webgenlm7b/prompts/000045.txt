@@ -1,0 +1,59 @@
+Please implement a paper cup manufacturing system to manage inventory, production, and sales of paper cups. The system should have functionalities for managing raw materials, finished products, inventory, production, and sales. Users should be able to record and track the inventory, usage, and sales of raw materials and finished products, and generate detailed reports. The system should also have customer management capabilities, including recording customer information, sales history, and sales statistics. Assign light goldenrod to the background and olive drab to the UI elements.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. manage inventory, production, and sales of paper cups
+2. manage raw materials
+3. manage finished products
+4. record and track the inventory, usage, and sales of raw materials and finished products
+5. generate detailed reports
+6. customer management capabilities
+7. record customer information
+8. record sales history
+9. record sales statistics
+10. assign light goldenrod to the background and olive drab to the UI elements
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,24 @@
+Please implement a website for The All-In Bourbon Bar to showcase its products and services. The website should have functionalities for displaying menus, introducing the membership-only private poker room, and showcasing events and promotions. Users should be able to browse the website, view menus, learn about the private poker room, view events and promotions, and make online reservations or purchases. Use peach puff for container backgrounds and indian red for component visuals.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. implement a website for The All-In Bourbon Bar
+2. displaying menus
+3. introducing the membership-only private poker room
+4. showcasing events and promotions
+5. users should be able to browse the website
+6. view menus
+7. learn about the private poker room
+8. view events and promotions
+9. make online reservations or purchases
+   Note from earlier websites: For the reservation form: use `v-model` and `v-for` for fields and options, show a confirmation on submit.
+10. use peach puff for container backgrounds and indian red for component visuals
+   Note from earlier websites: On every page: ensure text on indian red backgrounds contrasts for accessibility.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 2 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

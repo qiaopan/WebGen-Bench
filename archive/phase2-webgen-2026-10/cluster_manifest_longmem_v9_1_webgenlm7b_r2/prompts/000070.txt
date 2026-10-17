@@ -1,0 +1,43 @@
+Please implement a poetry blog website for displaying and sharing poetry content. The website should have functionalities for browsing poetry, searching poetry, posting poetry, and commenting on poetry. Users should be able to browse different types of poetry, search for specific poetry, post their own poetry, and comment on others' poetry. Apply light goldenrod for layout; use olive drab for buttons and cards.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. Please implement a poetry blog website for displaying and sharing poetry content.
+2. The website should have functionalities for browsing poetry
+3. searching poetry
+4. posting poetry
+   Note from earlier websites: For the poetry submission: use @submit to update state and show a confirmation.
+5. and commenting on poetry
+6. Users should be able to browse different types of poetry
+7. search for specific poetry
+8. post their own poetry
+9. and comment on others' poetry
+10. Apply light goldenrod for layout; use olive drab for buttons and cards.
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 4 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav class="navbar">
+      <div class="logo">Clinic Name</div>
+      <div class="nav-links">
+        <button @click="currentPage = 'home'">Home</button>
+        <button @click="currentPage = 'about'">About Us</button>
+        <button @click="currentPage = 'services'">Services</button>
+        <button @click="currentPage = 'contact'">Contact</button>
+    <main class="main-content">
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ServicesPage v-if="currentPage === 'services'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref(), computed() without importing it from 'vue' (that page fails when opened), 24 tasks). Code that works:
+```vue
+import { ref, computed } from 'vue'
+const startDate = ref('')
+const totalCost = computed(() => {
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.

@@ -1,0 +1,62 @@
+Please implement a startup article publishing mini-program to display entrepreneurial experiences and stories. The mini-program should have functions for browsing articles, searching, collecting, and sharing. Users should be able to browse articles in different categories, search for articles of interest, collect favorite articles, and share articles on other platforms. The mini-program should also have user registration and login functions, allowing users to manage their collections and reading history. Style the layout with old lace in the background and rosy brown for the interface.
+
+FEATURE CHECKLIST (the requirement above, item by item; build every item):
+1. startup article publishing mini-program
+2. display entrepreneurial experiences and stories
+3. functions for browsing articles
+4. functions for searching
+5. functions for collecting
+6. functions for sharing
+7. browse articles in different categories
+8. search for articles of interest
+9. collect favorite articles
+10. share articles on other platforms
+11. user registration and login functions
+12. manage their collections and reading history
+13. old lace in the background and rosy brown for the interface
+
+CODE FROM EARLIER WEBSITES THAT WORKED:
+Vue compile error: v-model on file inputs. Earlier websites broke here (Vue compile error: v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead., 1 tasks). Code that works:
+```vue
+<div class="form-group">
+        <label>Evidence (optional)</label>
+        <input @change="handleEvidenceChange" type="file">
+      </div>
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div v-if="submitted" class="success-message">
+      <h3>Thank you for your submission!</h3>
+      <p>Your report has been received and will be reviewed.</p>
+    </div>
+  </div>
+</template>
+```
+
+Component fails: ref() not recognized. Earlier websites broke here (a component calls ref() without importing it from 'vue' (that page fails when opened), 9 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentSlide = ref(0)
+```
+
+Missing package: imports a package that package.json does not declare. Earlier websites broke here (a package missing from package.json, 1 tasks). Code that works:
+```vue
+import { ref } from 'vue'
+const currentPage = ref('home')
+  <div class="app-container">
+    <nav>
+      <button @click="currentPage = 'home'">Home</button>
+      <button @click="currentPage = 'about'">About</button>
+      <button @click="currentPage = 'products'">Products</button>
+      <button @click="currentPage = 'news'">News</button>
+      <button @click="currentPage = 'contact'">Contact</button>
+    <main>
+      <HomePage v-if="currentPage === 'home'" />
+      <AboutPage v-if="currentPage === 'about'" />
+      <ProductsPage v-if="currentPage === 'products'" />
+      <NewsPage v-if="currentPage === 'news'" />
+      <ContactPage v-if="currentPage === 'contact'" />
+```
+
+Build every checklist item; the notes only warn about mistakes earlier websites made.
